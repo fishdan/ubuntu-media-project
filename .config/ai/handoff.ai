@@ -1,1 +1,12 @@
 # Handoff
+
+## 2026-09-04 — Paused Spec 005
+
+- Branch: `feature/0.005-graphics-av-display-audio-power`
+- Current task: T004, connect GPU HDMI through the AV receiver to the projector while preserving SSH.
+- Completed: T001-T003 (planning, read-only AV report, and temporary-monitor/audio/power baseline).
+- Files modified: `.config/ai/progress.ai`, `.config/ai/handoff.ai`, `specs/0/0.005-graphics-av-display-audio-power/spec.md`.
+- Files added: `docs/av-setup.md`, `scripts/av-report.sh`, and the Spec 005 plan/research/data-model/quickstart/tasks artifacts.
+- Validation: `bash -n scripts/av-report.sh`; successful report execution; no-mutating-command source scan; `git diff --check`.
+- Known issue: The receiver/projector path is unavailable, so native projector mode, HDMI receiver audio, power behavior, hot-plug recovery, and AV-on/off boot cases are untested. PipeWire currently exposes only `Dummy Output` with the temporary monitor.
+- Recommended resumption: Connect GTX 1060 HDMI → receiver → projector, keep SSH open, and continue at T004. Do not mark Spec 005 complete before T004-T012 pass.

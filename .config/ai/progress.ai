@@ -1,5 +1,22 @@
 # Progress Log
 
+## 2026-09-04 — Spec 005 Postponed Before Physical AV Testing
+
+- The project owner postponed physical receiver/projector testing because the AV equipment is not currently available.
+- Spec 005 remains incomplete after T001-T003. No display, audio, or power settings were changed; T004-T012 remain open.
+- The safe baseline, diagnostic script, recovery notes, and acceptance matrix are preserved on `feature/0.005-graphics-av-display-audio-power` for later resumption.
+- This is an explicitly approved roadmap deferral, not acceptance of the AV path. Later features must not claim projector or receiver validation from the temporary-monitor baseline.
+
+## 2026-09-04 — Spec 005 Safe AV Baseline
+
+- Created the Spec 005 plan, research, data model, quickstart, tasks, read-only `scripts/av-report.sh`, and initial `docs/av-setup.md` recovery matrix.
+- Validated the report with `bash -n`, successful execution, a source review finding no mutating commands, and `git diff --check`.
+- Confirmed the active GNOME graphical seat and SSH recovery remain available. The command shell itself is an SSH/TTY session and is not used as evidence of the native graphical-session display environment.
+- Confirmed NVIDIA driver 580.173.02 and a connected `card1-HDMI-A-1` path advertising modes up to 1920x1080 for the temporary HP 2310 monitor. The permanent receiver/projector chain is not connected or accepted yet.
+- Confirmed ALSA exposes Intel analog and NVIDIA HDMI playback devices, while PipeWire currently exposes only `Dummy Output`; no HDMI audio success is claimed.
+- Captured original GNOME power state: AC inactivity type `suspend`, AC timeout `0`, and desktop idle delay 300 seconds. No power setting has been changed.
+- The next blocking task is T004: physically connect GPU HDMI through the receiver to the projector while preserving SSH.
+
 ## 2026-09-04 — Spec 004 Hardware Inventory
 
 - Created the read-only `scripts/hardware-report.sh` collector and the reviewed inventory in `docs/hardware.md`; added the Spec 004 plan, research, data model, quickstart, and completed task list.
