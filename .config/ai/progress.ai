@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-04 — Spec 008 DualSense Planning and Baseline
+
+- Confirmed PR #4 is merged on `main` and created `feature/0.008-dualsense-controller`.
+- Confirmed the Realtek Bluetooth controller is powered, but no Bluetooth device is currently paired or known. No controller address is recorded.
+- Confirmed Ubuntu kernel 7.0 includes signed in-tree `hid_playstation` support; the module is not loaded because no PlayStation controller is connected.
+- Confirmed Ubuntu 26.04 offers `kodi-peripheral-joystick` 21.1.23, `input-remapper` 2.2.0, `joystick` 1.8.1, and `evtest` 1.36; none is installed yet. AntiMicroX is not available from the configured repository.
+- Selected native `hid_playstation` and Kodi joystick input as the first layer, with input-remapper reserved for an explicit desktop/browser media mode that can be disabled before Steam.
+- Added Spec 008 acceptance criteria, plan, research, data model, quickstart, and tasks. Brave, on-screen keyboard, Steam, and universal-home integration remain staged for Specs 009-012.
+- SSH/Kodi remote control remains the recovery path during pairing and mapping. Next task: install support, then pair the physical DualSense without storing its Bluetooth address in Git.
+
 ## 2026-09-04 — Spec 007 Reboot, Recovery, and Final Acceptance
 
 - Added `scripts/configure-kodi-session.sh` and disabled GNOME idle blanking for the media user at the owner's request; the previous value was 300 seconds and the tracked rollback resets the setting to the Ubuntu default.
