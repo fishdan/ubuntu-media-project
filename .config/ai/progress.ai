@@ -13,3 +13,8 @@
 - Read `setup.md` and documented the repository as a reproducible, remotely managed Ubuntu 24.04 living-room media appliance project.
 - Updated `start.ai`, the constitution, and the new `README.md` with the mission, safety boundaries, and delivery approach.
 - Created concise planned specifications `0.003` through `0.013` for the ordered appliance roadmap. Detailed plans and tasks are intentionally deferred until each feature begins.
+
+## 2026-09-04 — 0.014 Branch and Merge Governance
+
+- Added a constitution rule requiring future feature, fix, refactor, configuration, and documentation work to use a non-`main` branch and merge into `main` after validation.
+- The direct commit to `main` for this governance update is explicitly authorized by the project owner in this session.

@@ -202,6 +202,8 @@ Manual schema changes are prohibited except during emergencies and must be recon
 
 Version control history is valuable.
 
+All feature, fix, refactor, configuration, and documentation work MUST be performed on a non-`main` branch and merged into `main` after relevant validation. Direct commits to `main` are permitted only with explicit human authority for that specific change or for emergency recovery; the exception and its reason MUST be recorded in project history.
+
 Never:
 
 * Rewrite history unnecessarily
