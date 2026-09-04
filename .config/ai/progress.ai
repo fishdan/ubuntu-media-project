@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-09-04 — Spec 004 Hardware Inventory
+
+- Created the read-only `scripts/hardware-report.sh` collector and the reviewed inventory in `docs/hardware.md`; added the Spec 004 plan, research, data model, quickstart, and completed task list.
+- Confirmed the HP ENVY Desktop 795-00xx has an Intel Core i7-8700 (6 cores/12 threads), 14 GiB OS-visible memory, a 256 GB-class SanDisk SATA SSD, and an HP PLDS DVD writer.
+- Confirmed an NVIDIA GeForce GTX 1060 3GB using proprietary driver 580.173.02, with its GP106 HDMI audio controller visible through `snd_hda_intel`.
+- Confirmed Realtek RTL8822BE Wi-Fi using `rtw88_8822be`, Realtek RTL8111-family Gigabit Ethernet using `r8169`, and a Realtek Bluetooth 4.2 USB controller.
+- Confirmed Intel built-in audio and NVIDIA GPU audio controllers are detected, but PipeWire currently exposes only `Dummy Output`; HDMI/AV audio acceptance remains in Spec 005.
+- Validated the collector with `bash -n` and two successful executions. Source review found no host-mutating commands. `shellcheck` was not installed, so no ShellCheck result is claimed.
+- Scanned all new Spec 004 artifacts for private-key headers, MAC addresses, IPv4 addresses, UUID values, likely secret assignments, and unredacted PipeWire cookies; no matches were found. The collector explicitly redacts Bluetooth controller addresses and PipeWire runtime cookies.
+- Spec 004 is complete. Physical Ethernet link testing, HDMI video/audio behavior, Bluetooth pairing, and DualSense acceptance remain assigned to their later roadmap features.
+
 ## 2026-09-04 — Spec 003 Final Acceptance
 
 - Completed T013 by documenting Ubuntu 26.04.1 LTS, hostname `orpheus`, the router-side DHCP reservation approach, observed interfaces and priorities, validated remote access, and physical-console recovery in `README.md`, `setup.md`, and the feature quickstart.
