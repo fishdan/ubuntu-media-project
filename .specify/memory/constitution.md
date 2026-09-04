@@ -1,4 +1,4 @@
-# FishDev Default Constitution
+# FishDan Ubuntu Media PC Constitution
 
 Version: 1.0
 
@@ -7,6 +7,20 @@ This constitution defines the engineering principles governing all repositories 
 This constitution is authoritative once adopted by a repository.
 
 All humans and AI assistants working within the repository must follow these principles.
+
+---
+
+# Project Mission and Appliance Guardrails
+
+This repository configures an HP ENVY Desktop 795-00XX as a reproducible Ubuntu 24.04 LTS living-room media appliance. Normal users must be able to use the appliance from the couch; administrators must be able to recover it remotely.
+
+- Configuration changes MUST be represented in version-controlled scripts, configuration files, systemd user units, desktop launchers, or documentation whenever practical.
+- Installation and deployment scripts MUST be idempotent, fail clearly, and avoid undocumented interactive behavior.
+- SSH access, a normal Ubuntu desktop, and configured Wi-Fi fallback MUST be preserved until a tested replacement recovery path exists.
+- Hardware-dependent choices—especially GPU driver, display, HDMI audio, Wi-Fi, Bluetooth, storage, and power behavior—MUST be based on captured machine evidence, not auction-listing assumptions.
+- Couch-facing features MUST be accepted from the couch: with the projector/receiver path, DualSense controller, and no routine keyboard or mouse requirement.
+- Browser profiles, streaming credentials, cookies, Wi-Fi credentials, SSH private keys, and tokens MUST remain outside version control.
+- Each feature MUST document a recovery or escape path before it changes automatic startup or takes over the graphical session.
 
 ---
 

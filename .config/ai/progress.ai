@@ -7,3 +7,9 @@
 - Initialized Git with `main` and committed all project files in initial commit `ed1105a`.
 - Created and pushed the public GitHub repository: https://github.com/fishdan/ubuntu-media-project
 - Validation: `origin` is `https://github.com/fishdan/ubuntu-media-project.git`; GitHub reports `PUBLIC` visibility and `main` as the default branch. No likely credential patterns were detected before publication.
+
+## 2026-09-04 — 0.002 Establish Project Blueprint
+
+- Read `setup.md` and documented the repository as a reproducible, remotely managed Ubuntu 24.04 living-room media appliance project.
+- Updated `start.ai`, the constitution, and the new `README.md` with the mission, safety boundaries, and delivery approach.
+- Created concise planned specifications `0.003` through `0.013` for the ordered appliance roadmap. Detailed plans and tasks are intentionally deferred until each feature begins.

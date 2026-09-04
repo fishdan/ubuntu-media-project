@@ -1,6 +1,12 @@
-# FishDev Session Startup Guide
+# FishDan Ubuntu Media PC — AI Session Startup Guide
 
 This document defines the standard AI-assisted development workflow for this repository. It must be executed at the beginning of every session.
+
+## Project Purpose
+
+This repository makes an auction-purchased HP ENVY Desktop 795-00XX into a reproducible, remotely managed Ubuntu 24.04 LTS living-room media appliance. The intended experience is a TV-friendly media home on the projector, controlled primarily with a PS5 DualSense controller, with Kodi, browser-based streaming through Brave, Steam Big Picture, an on-screen keyboard, and a reliable return-home action.
+
+Treat this as an installation and configuration project—not a one-time list of shell commands. Prefer idempotent scripts, tracked configuration, systemd user services or desktop launchers, and documented manual steps. Preserve SSH access, a normal Ubuntu desktop, backup Wi-Fi, and a recovery path throughout the work.
 
 ---
 
@@ -41,7 +47,7 @@ At the start of every session, you must complete the following steps before begi
 7. Determine the technology stack.
 8. Verify constitution availability (read and honor `.specify/memory/constitution.md`).
 9. Review active specifications (e.g., `spec.md`, `plan.md`, `tasks.md`).
-10. Recommend next work.
+10. Recommend the next incomplete task in the established appliance roadmap. Do not skip hardware discovery, remote-access validation, or couch-side acceptance testing.
 
 MONTHLY SECURITY AUDIT
 
@@ -55,7 +61,7 @@ Fix any critical or high-severity vulnerabilities that can be remediated safely 
 
 Record the date, findings, fixes, commands run, and validation results in `progress.ai`.
 
-Do not begin feature implementation until this sequence completes and you output the **Session Startup Response**.
+Do not begin feature implementation until this sequence completes and you output the **Session Startup Response**. On the media PC, do not make appliance-visible changes until SSH access survives a reboot; do not make GPU, display, audio, or wireless assumptions before recording the actual hardware inventory.
 
 ---
 
