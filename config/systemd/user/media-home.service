@@ -6,6 +6,7 @@ PartOf=graphical-session.target
 [Service]
 Type=simple
 ExecStart=%h/.local/bin/launch-media-home
+TimeoutStopSec=10s
 
 [Install]
 WantedBy=graphical-session.target

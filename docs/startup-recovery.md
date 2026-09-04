@@ -6,6 +6,7 @@
 - `media-home.service` starts from the GNOME graphical-session target.
 - The service invokes `~/.local/bin/launch-media-home`, deployed from the repository.
 - There is no automatic restart policy. An intentional exit or failure cannot create a relaunch loop.
+- Service shutdown is bounded to ten seconds so a stuck Kodi process cannot indefinitely block recovery.
 - Before Spec 007 installs Kodi, the launcher logs a staged-state message and leaves GNOME usable.
 
 ## Inspect

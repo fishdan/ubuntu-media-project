@@ -1,5 +1,51 @@
 # Progress Log
 
+## 2026-09-04 — Spec 007 Reboot, Recovery, and Final Acceptance
+
+- Added `scripts/configure-kodi-session.sh` and disabled GNOME idle blanking for the media user at the owner's request; the previous value was 300 seconds and the tracked rollback resets the setting to the Ubuntu default.
+- Found that `kodi --standalone` could hang during Quit inside the managed GNOME session. Changed the launcher to `kodi -fs`, which is the appropriate fullscreen mode under the existing window manager.
+- Added `TimeoutStopSec=10s` to `media-home.service`. When Kodi hung after an HDMI audio sink failure, the bounded stop terminated the remaining process group and restored GNOME instead of hanging indefinitely.
+- Rebooted and confirmed SSH, GDM automatic login, disabled idle blanking, enabled `media-home.service`, and automatic fullscreen Kodi startup. The project owner visually confirmed Kodi after reboot.
+- Ran a final watched cycle: local `kodi-send Quit` exited normally with service result `success`, GNOME was visually confirmed, and a subsequent service start visibly restored Kodi. Kodi remains running as the intended appliance state.
+- Confirmed the Ubuntu Kodi and `kodi-send` packages are version `2:21.3+dfsg-1ubuntu1`. Shell syntax, systemd unit verification, service/package state, and `git diff --check` passed.
+- No Kodi runtime profile files are tracked. Scans found no private keys or likely secret assignments in the feature artifacts.
+- NFS remains explicitly out of scope. Spec 007 is complete; DualSense navigation is the next roadmap feature, while receiver/projector/audio acceptance remains deferred in Spec 005.
+
+## 2026-09-04 — Spec 007 Playback and Exit Validation
+
+- Installed Ubuntu's `kodi-eventclients-kodi-send` package and added it to `scripts/install-kodi.sh` for reproducible SSH-side navigation, playback, exit, and recovery without a physical keyboard.
+- The project owner visually confirmed fullscreen Kodi, remote menu movement, and playback of the local GNOME `display-dual-monitors.webm` test clip. Kodi selected its VP8 software decoder and fullscreen video window.
+- Replaced `kodi --standalone` with `kodi -fs`; the appliance runs Kodi inside the recoverable GNOME window-manager session.
+- A normal Quit completed successfully in one fullscreen-mode test. A later run hung after the HDMI audio sink failed/disappeared and Kodi stopped its event server. Added `TimeoutStopSec=10s` to `media-home.service`; bounded stops terminated the remaining process group and visibly restored GNOME.
+- At the owner's request, disabled GNOME idle blanking (`idle-delay=0`) after recording the previous 300-second value. Added `scripts/configure-kodi-session.sh` to reproduce, check, or restore the default setting; screen locking and manual power controls were not disabled.
+- Tasks T004-T007 pass with the HDMI-sink shutdown limitation documented. Final reboot and recovery acceptance remain.
+
+## 2026-09-04 — Spec 007 Kodi Installation and First Launch
+
+- Added and validated idempotent `scripts/install-kodi.sh`; installed Kodi `2:21.3+dfsg-1ubuntu1` and distribution-managed dependencies from Ubuntu `resolute/universe` without adding a third-party package source.
+- Verified `/usr/bin/kodi`, installed/candidate version equality, and the `kodi`, `kodi-bin`, `kodi-data`, and `kodi-repository-kodi` package versions.
+- Restarted `media-home.service`; it successfully replaced the staged missing-Kodi behavior with `kodi --standalone`. The Kodi process and Estuary UI initialization remain healthy with no service restart loop.
+- The project owner confirmed Kodi is visible and looks correct on the attached monitor after a one-time GNOME screen wake request.
+- Waking the monitor caused PipeWire to expose the NVIDIA HDMI sink; the live Kodi stream is routed to the HP 2310 monitor. Audible playback is not yet confirmed and permanent receiver audio remains Spec 005 work.
+- Selected the system-provided `display-dual-monitors.webm` GNOME help asset for local playback testing without adding media to Git.
+
+## 2026-09-04 — Spec 007 Kodi-Only Scope and Baseline
+
+- The project owner explicitly excluded NFS from Spec 007 because it is unlikely to be needed and can be added later. Tasks T008-T010 are not applicable; no server, export, mount, or credentials are configured.
+- Baseline validation confirmed SSH and GDM are active, the graphical seat is available, and `media-home.service` is enabled but inactive after its successful missing-Kodi staged run.
+- Confirmed Kodi is not installed, `~/.kodi` does not exist, and Ubuntu offers Kodi `2:21.3+dfsg-1ubuntu1` from `resolute/universe`.
+- Confirmed the existing audio limitation remains: PipeWire exposes `Dummy Output`. Local Kodi video can be tested on the attached monitor, but receiver/HDMI audio acceptance remains deferred to Spec 005.
+- Added the idempotent Ubuntu-package installer and Kodi setup/recovery documentation. Package installation has not yet run.
+
+## 2026-09-04 — Spec 007 Kodi and Network Media Planning
+
+- Confirmed PR #3 is merged on `main` and created `feature/0.007-kodi-local-network-media` for the next roadmap feature.
+- Confirmed Ubuntu 26.04 offers Kodi `2:21.3+dfsg-1ubuntu1` from `universe` and `nfs-common` `1:2.8.5-1ubuntu1` from `main`; neither package is installed yet.
+- Added the Spec 007 plan, research, data model, quickstart, acceptance criteria, and task list. No Kodi/NFS package or appliance configuration changes were made during planning.
+- Selected the Ubuntu Kodi package, the existing Spec 006 `media-home.service` entry point, untracked Kodi runtime userdata, and optional systemd NFS automounts with bounded failure behavior.
+- NFS implementation is blocked on an explicit scope decision and, if in scope, the server/export/local mount/read-only inputs. Controller acceptance remains in Spec 008, and receiver/projector/audio acceptance remains in paused Spec 005.
+- Next task: T002 baseline inspection, followed by the T003 NFS scope decision before installation.
+
 ## 2026-09-04 — Spec 006 Reboot Acceptance
 
 - Rebooted after confirming SSH, GDM automatic-login configuration, and enabled `media-home.service`. The host booted at 16:51 and SSH reconnected successfully from the administrator laptop.
