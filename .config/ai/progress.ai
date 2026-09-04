@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-04 — Spec 007 Kodi and Network Media Planning
+
+- Confirmed PR #3 is merged on `main` and created `feature/0.007-kodi-local-network-media` for the next roadmap feature.
+- Confirmed Ubuntu 26.04 offers Kodi `2:21.3+dfsg-1ubuntu1` from `universe` and `nfs-common` `1:2.8.5-1ubuntu1` from `main`; neither package is installed yet.
+- Added the Spec 007 plan, research, data model, quickstart, acceptance criteria, and task list. No Kodi/NFS package or appliance configuration changes were made during planning.
+- Selected the Ubuntu Kodi package, the existing Spec 006 `media-home.service` entry point, untracked Kodi runtime userdata, and optional systemd NFS automounts with bounded failure behavior.
+- NFS implementation is blocked on an explicit scope decision and, if in scope, the server/export/local mount/read-only inputs. Controller acceptance remains in Spec 008, and receiver/projector/audio acceptance remains in paused Spec 005.
+- Next task: T002 baseline inspection, followed by the T003 NFS scope decision before installation.
+
 ## 2026-09-04 — Spec 006 Reboot Acceptance
 
 - Rebooted after confirming SSH, GDM automatic-login configuration, and enabled `media-home.service`. The host booted at 16:51 and SSH reconnected successfully from the administrator laptop.
