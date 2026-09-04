@@ -149,7 +149,7 @@ A feature should be considered complete only when its acceptance criteria work f
 
 # 4. Initial Ubuntu Installation
 
-Use **Ubuntu 24.04 LTS Desktop**.
+Use **Ubuntu 26.04 LTS Desktop**.
 
 Ubuntu Desktop is preferred over Ubuntu Server because this system needs:
 
@@ -183,12 +183,10 @@ Only after remote administration is proven should the PC move to the AV receiver
 
 # 5. Hostname
 
-Choose a stable hostname.
-
-Example:
+The appliance hostname is:
 
 ```text
-media
+orpheus
 ```
 
 or another FishDan convention.
@@ -199,10 +197,10 @@ Verify:
 hostnamectl
 ```
 
-Change if needed:
+If rebuilding the appliance, restore it with:
 
 ```bash
-sudo hostnamectl set-hostname media
+sudo hostnamectl set-hostname orpheus
 ```
 
 ---
@@ -231,6 +229,8 @@ Use **wired Gigabit Ethernet** once the machine is installed in the AV rack.
 
 Keep Wi-Fi configured as a fallback management path.
 
+The observed NetworkManager interfaces are `enp3s0` for Ethernet and `wlp2s0` for Wi-Fi. Their autoconnect priorities are `100` and `10`, respectively, so Ethernet is preferred whenever its link is available.
+
 Inspect routing:
 
 ```bash
@@ -243,13 +243,13 @@ Ubuntu should normally prefer Ethernet over Wi-Fi automatically.
 
 Create a **DHCP reservation** in the router for this PC.
 
-Example:
+Reserve an address for `orpheus` using the router and the appropriate interface MAC address. The currently observed Wi-Fi address is:
 
 ```text
-media -> 192.168.1.150
+orpheus -> 192.168.1.203
 ```
 
-Do not hard-code a static address on Ubuntu unless there is a reason to do so.
+Treat that address as temporary until the router reservation is confirmed. Do not hard-code a static address on Ubuntu unless there is a reason to do so.
 
 ---
 
@@ -272,13 +272,13 @@ systemctl status ssh
 From the development machine:
 
 ```bash
-ssh <username>@media
+ssh dfish@orpheus
 ```
 
 or:
 
 ```bash
-ssh <username>@192.168.1.150
+ssh dfish@192.168.1.203
 ```
 
 ## SSH keys
@@ -309,14 +309,16 @@ This is a hard prerequisite before installing the box in the AV rack.
 
 # 8. VS Code Remote SSH
 
-On the development machine, configure `~/.ssh/config`:
+On the development machine, configure `~/.ssh/config`, selecting its existing private-key path locally:
 
 ```sshconfig
-Host media
-    HostName 192.168.1.150
-    User <username>
+Host orpheus
+    HostName 192.168.1.203
+    User dfish
     IdentityFile ~/.ssh/id_ed25519
 ```
+
+Update `HostName` if the router assigns a different reserved address. Never copy the laptop's private key into this repository or onto the appliance.
 
 Then connect using the VS Code **Remote - SSH** extension.
 
@@ -996,13 +998,14 @@ The browser profile should live outside the repo.
 
 ## Base OS
 
-- [ ] Ubuntu 24.04 LTS installed
-- [ ] Wi-Fi works
+- [x] Ubuntu 26.04 LTS installed
+- [x] Wi-Fi works
 - [ ] Ethernet works
-- [ ] SSH works
-- [ ] SSH survives reboot
-- [ ] VS Code Remote SSH works
-- [ ] GitHub repo cloned
+- [x] Ethernet profile is ready and preferred; physical link test awaits AV-rack cabling
+- [x] SSH works
+- [x] SSH survives unattended headless reboot
+- [x] VS Code Remote SSH works
+- [x] GitHub repository is present
 
 ## Hardware
 
@@ -1072,7 +1075,7 @@ When the PC gets home, use this order.
 
 ```text
 1. Connect monitor, keyboard, mouse.
-2. Boot Ubuntu 24.04 LTS live USB.
+2. Boot Ubuntu 26.04 LTS live USB.
 3. Install Ubuntu.
 4. Connect Wi-Fi.
 5. Update packages.

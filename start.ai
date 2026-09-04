@@ -4,7 +4,7 @@ This document defines the standard AI-assisted development workflow for this rep
 
 ## Project Purpose
 
-This repository makes an auction-purchased HP ENVY Desktop 795-00XX into a reproducible, remotely managed Ubuntu 24.04 LTS living-room media appliance. The intended experience is a TV-friendly media home on the projector, controlled primarily with a PS5 DualSense controller, with Kodi, browser-based streaming through Brave, Steam Big Picture, an on-screen keyboard, and a reliable return-home action.
+This repository makes an auction-purchased HP ENVY Desktop 795-00XX into a reproducible, remotely managed Ubuntu 26.04 LTS living-room media appliance. The intended experience is a TV-friendly media home on the projector, controlled primarily with a PS5 DualSense controller, with Kodi, browser-based streaming through Brave, Steam Big Picture, an on-screen keyboard, and a reliable return-home action.
 
 Treat this as an installation and configuration project—not a one-time list of shell commands. Prefer idempotent scripts, tracked configuration, systemd user services or desktop launchers, and documented manual steps. Preserve SSH access, a normal Ubuntu desktop, backup Wi-Fi, and a recovery path throughout the work.
 

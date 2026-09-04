@@ -12,7 +12,7 @@ All humans and AI assistants working within the repository must follow these pri
 
 # Project Mission and Appliance Guardrails
 
-This repository configures an HP ENVY Desktop 795-00XX as a reproducible Ubuntu 24.04 LTS living-room media appliance. Normal users must be able to use the appliance from the couch; administrators must be able to recover it remotely.
+This repository configures an HP ENVY Desktop 795-00XX as a reproducible Ubuntu 26.04 LTS living-room media appliance. Normal users must be able to use the appliance from the couch; administrators must be able to recover it remotely.
 
 - Configuration changes MUST be represented in version-controlled scripts, configuration files, systemd user units, desktop launchers, or documentation whenever practical.
 - Installation and deployment scripts MUST be idempotent, fail clearly, and avoid undocumented interactive behavior.

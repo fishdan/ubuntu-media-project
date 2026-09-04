@@ -1,6 +1,6 @@
 # FishDan Ubuntu Media PC
 
-This repository turns an HP ENVY Desktop 795-00XX into a reproducible, remotely managed Ubuntu 24.04 LTS living-room media appliance.
+This repository turns an HP ENVY Desktop 795-00XX into a reproducible, remotely managed Ubuntu 26.04 LTS living-room media appliance.
 
 The finished system should feel like a console-style home interface, not a desktop PC: power it on, arrive at a TV-friendly media home on the projector, and use a PS5 DualSense controller for Kodi, browser streaming, and Steam Big Picture. An administrator must still be able to manage and recover it remotely with SSH and VS Code Remote SSH.
 
@@ -25,7 +25,7 @@ The first hands-on milestone is intentionally conservative: install Ubuntu, prov
 
 | Order | Feature | Outcome |
 | --- | --- | --- |
-| 1 | Base Ubuntu and remote administration | Ubuntu 24.04, networking, SSH, reboot recovery, and VS Code Remote SSH work. |
+| 1 | Base Ubuntu and remote administration | Ubuntu 26.04, networking, SSH, reboot recovery, and VS Code Remote SSH work. |
 | 2 | Hardware inventory | Actual GPU, storage, network, Bluetooth, USB, and audio facts are recorded. |
 | 3 | Graphics, AV display, HDMI audio, and power | Projector/receiver output is stable and recoverable. |
 | 4 | Automatic login and appliance startup | The graphical session reaches a controlled media home without sacrificing recovery. |
@@ -38,6 +38,14 @@ The first hands-on milestone is intentionally conservative: install Ubuntu, prov
 | 11 | Boot, recovery, and reproducibility polish | The appliance survives normal failures and can be rebuilt from Git. |
 
 The corresponding lightweight specs are in [`specs/0/`](specs/0/). Full acceptance criteria, plans, and tasks will be written only when work begins on a feature.
+
+## Current administration baseline
+
+The appliance is named `orpheus` and runs Ubuntu 26.04.1 LTS. OpenSSH starts automatically, ED25519 key authentication and VS Code Remote SSH have been validated from a separate administrator laptop, and remote access has survived an unattended boot with no keyboard or monitor attached.
+
+NetworkManager prefers the `enp3s0` Ethernet profile when a cable is available and retains the `Machine Network` Wi-Fi profile on `wlp2s0` as the management fallback. Use a router-side DHCP reservation rather than configuring a static address on Ubuntu. The currently observed Wi-Fi address, `192.168.1.203`, is operational evidence and may change until the router reservation is applied.
+
+For recovery, reconnect a monitor and keyboard to use the normal GNOME desktop or a local TTY. Do not remove Wi-Fi fallback or local-console access while changing appliance startup behavior.
 
 ## Non-negotiable safeguards
 

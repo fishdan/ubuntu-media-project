@@ -1,5 +1,68 @@
 # Progress Log
 
+## 2026-09-04 — Spec 003 Final Acceptance
+
+- Completed T013 by documenting Ubuntu 26.04.1 LTS, hostname `orpheus`, the router-side DHCP reservation approach, observed interfaces and priorities, validated remote access, and physical-console recovery in `README.md`, `setup.md`, and the feature quickstart.
+- Completed T014 with a repository-wide review for private-key filenames and headers plus likely secret assignments. No SSH private keys, Wi-Fi credentials, cookies, passwords, API keys, or tokens were found. Public-key fingerprints and LAN addresses remain recorded as non-secret acceptance evidence.
+- Completed T015 acceptance on the post-reboot system: hostname `orpheus`; SSH enabled, active, and listening on IPv4/IPv6 port 22; public-key connection from the separate laptop; Wi-Fi fallback connected on `wlp2s0`; Ethernet autoconnect priority `100` over Wi-Fi priority `10`; and an active graphical session on `seat0`.
+- The Ethernet interface `enp3s0` is physically down because no cable is connected. Its profile is ready and preferred, but link-level Ethernet validation remains part of the later AV-rack installation rather than a failure of the remote-administration acceptance.
+- The router-side DHCP reservation remains an external router-administration action. The host intentionally uses DHCP and is currently reachable at `192.168.1.203`.
+- Validation commands: OS release inspection, `hostnamectl`, `uptime`, `systemctl`, `ss`, `nmcli`, `ip`, `loginctl`, `journalctl`, repository filename/content scans with `find` and `rg`, and `git diff --check`.
+- Spec 003 is complete. The next roadmap feature is Spec 004 hardware inventory.
+
+## 2026-09-04 — Spec 003 Administrator-Laptop SSH Validation
+
+- Confirmed a separate administrator laptop at `192.168.1.235` can connect to `dfish@orpheus` at `192.168.1.203` using its ED25519 public key; only the public key is installed on the appliance.
+- The SSH service journal recorded successful public-key authentication with fingerprint `SHA256:A2VOa4QZCOZTC6B6mltxJCsUGcF896pDfkxL3kM0N3w` before reboot at 16:01 and after boot at 16:07.
+- The live post-reboot session reports hostname `orpheus`, active `ssh`, connected Wi-Fi on `wlp2s0`, and an unavailable/disconnected Ethernet interface `enp3s0`.
+- The remote process runs through VS Code Server, confirming that VS Code Remote SSH reaches the appliance.
+- Validation commands: `hostnamectl --static`, `id -un`, `SSH_CONNECTION`, `systemctl is-active ssh`, `nmcli device status`, `ssh-keygen -lf ~/.ssh/authorized_keys`, process inspection, and `journalctl -u ssh`.
+
+## 2026-09-04 — Spec 003 Headless Reboot and Recovery Acceptance
+
+- The administrator confirmed the appliance completed its required reboot with no keyboard or monitor attached; public-key SSH from the separate laptop succeeded afterward.
+- After reconnecting the monitor and rebooting again, the host booted at 16:22, started `ssh.service` at 16:22:27, and accepted the laptop's ED25519 key at 16:22:58.
+- Confirmed `ssh.service` is enabled and active, the current VS Code Remote SSH session originates from `192.168.1.235`, and `orpheus` remains reachable at `192.168.1.203`.
+- Confirmed an active graphical GNOME session on `seat0`, preserving local desktop recovery after reconnecting the monitor.
+- Confirmed Wi-Fi fallback `Machine Network` is connected on `wlp2s0`; the disconnected Ethernet profile `netplan-enp3s0` remains enabled for autoconnect with priority `100`, above Wi-Fi priority `10`.
+- Validation commands: `uptime -s`, `hostnamectl --static`, `systemctl is-enabled ssh`, `systemctl is-active ssh`, `nmcli device status`, NetworkManager connection-property inspection, `loginctl`, and `journalctl -u ssh -b`.
+
+## 2026-09-04 — Ubuntu 26.04 Baseline Decision
+
+- Approved the installed Ubuntu 26.04.1 LTS host as the supported project baseline.
+- Updated the constitution, startup guide, README, setup guide, and Spec 003 artifacts to use Ubuntu 26.04 LTS.
+- Kept earlier 24.04 references in historical progress entries unchanged.
+
+## 2026-09-04 — Spec 003 Host Baseline Inventory
+
+- Confirmed Ubuntu 26.04.1 LTS (`resolute`) with Ubuntu GNOME on kernel `7.0.0-31-generic`.
+- Confirmed hostname `orpheus`, manufacturer HP, product `HP ENVY Desktop 795-00xx`, and NVIDIA GeForce GTX 1060 3GB using the `nvidia` driver.
+- Confirmed NetworkManager Wi-Fi interface `wlp2s0` is connected through `Machine Network` at `192.168.1.203`; Ethernet interface `enp3s0` and profile `netplan-enp3s0` are currently unavailable.
+- Confirmed the default route is via `192.168.1.1` over Wi-Fi. SSH is currently inactive and has not yet been changed.
+- Validation commands: `/etc/os-release`, `nmcli device status`, `nmcli connection show`, `ip -brief address`, `ip route`, `/sys/class/dmi/id/*`, `lspci -nnk`, and `systemctl is-active ssh`.
+
+## 2026-09-04 — Spec 003 Recovery and Naming Decisions
+
+- Selected `orpheus` as the stable hostname and a router-side DHCP reservation as the address strategy; the actual reservation remains a router administration step.
+- Confirmed an active GDM/GNOME Wayland session for `dfish` and available local TTY devices, preserving physical-console recovery.
+- Confirmed NetworkManager autoconnect is enabled for both `Machine Network` (`wlp2s0`) and `netplan-enp3s0` (`enp3s0`), with both priorities currently `0`; Ethernet remains unavailable until a wired link is present.
+- Set NetworkManager autoconnect priority to `100` for `netplan-enp3s0` and `10` for `Machine Network`; validation confirmed Wi-Fi remains connected while Ethernet is unavailable.
+- OpenSSH installation is the next step, but `openssh-server` is not installed and passwordless `sudo` is unavailable in this session; no SSH configuration changes were made.
+
+## 2026-09-04 — Spec 003 OpenSSH Service
+
+- Installed `openssh-server` and dependencies from the Ubuntu `resolute` repositories.
+- Enabled and started `ssh.service`; validation reported `enabled`, `active`, and listeners on `0.0.0.0:22` and `[::]:22`.
+- Installed the existing ED25519 public key fingerprint `SHA256:eAKS7p54T5PPLAf6td/GKWTsgZeKFZ91hWnsq7inVQs` in `dfish`'s `authorized_keys` with mode `600`.
+- Validated key-only SSH locally to the appliance's own address; it returned hostname `orpheus`, user `dfish`, and active SSH status. This is not separate-client validation; the administrator client connection has not started.
+- Clarified that the repository and appliance are the same machine at this stage; the existing local key setup is diagnostic only, and laptop-based SSH/VS Code validation remains future work.
+
+## 2026-09-04 — Spec 003 Headless Boot Requirement
+
+- Added the requirement that the appliance boot normally without a keyboard or monitor attached.
+- Headless boot validation is intentionally deferred until a separate laptop can perform the post-reboot SSH check; reconnecting peripherals must still restore the normal desktop recovery path.
+- Observed headless-boot prerequisites already present: default target `graphical.target`, GDM alias enabled and active, NetworkManager enabled, SSH enabled, GDM automatic login enabled for `dfish`, and graphical seat `seat0` available. No automatic-login settings were changed.
+
 ## 2026-09-04 — 0.001 Publish Public Repository
 
 - Created the initial SpecKit specification, implementation plan, and task list for public repository publication.
