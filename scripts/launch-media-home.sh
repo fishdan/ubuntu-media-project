@@ -8,4 +8,4 @@ if ! command -v kodi >/dev/null 2>&1; then
 fi
 
 printf '%s\n' "Starting Kodi media home."
-exec kodi --standalone
+exec kodi -fs

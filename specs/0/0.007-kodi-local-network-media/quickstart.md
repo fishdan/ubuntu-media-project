@@ -17,6 +17,8 @@ apt-cache policy kodi nfs-common
 sudo scripts/install-kodi.sh
 command -v kodi
 kodi --version
+scripts/configure-kodi-session.sh --apply
+scripts/configure-kodi-session.sh --check
 ```
 
 Restart the existing entry point:
@@ -26,7 +28,7 @@ systemctl --user restart media-home.service
 journalctl --user -u media-home.service -b --no-pager
 ```
 
-Observe fullscreen launch on the attached monitor. Validate keyboard navigation, play a known local media sample, and intentionally exit to GNOME. Disable startup for recovery with `systemctl --user disable --now media-home.service`.
+Observe fullscreen launch on the attached monitor. Validate remote event-client navigation, play a known local media sample, and intentionally exit to GNOME. Disable startup for recovery with `systemctl --user disable --now media-home.service`. If Kodi hangs while an HDMI audio sink disappears, `systemctl --user stop media-home.service` bounds shutdown to ten seconds and restores GNOME.
 
 ## 3. Configure network media only when inputs are known
 

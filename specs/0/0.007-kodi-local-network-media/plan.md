@@ -10,7 +10,7 @@ Install Ubuntu's Kodi 21.3 packages reproducibly, activate them through the guar
 
 **Language/Version**: Bash, systemd units, Kodi 21.3, and Markdown on Ubuntu 26.04.1 LTS
 
-**Primary Dependencies**: Ubuntu `kodi`/`kodi-bin` packages; optional Ubuntu `nfs-common`; existing `media-home.service`, GNOME Wayland, PipeWire, and OpenSSH
+**Primary Dependencies**: Ubuntu `kodi`/`kodi-bin` and `kodi-eventclients-kodi-send` packages; optional Ubuntu `nfs-common`; existing `media-home.service`, GNOME Wayland, PipeWire, and OpenSSH
 
 **Storage**: Local media paths and optional NFS automounts; Kodi runtime userdata under `~/.kodi` remains untracked
 
