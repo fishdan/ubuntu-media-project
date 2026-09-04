@@ -1,5 +1,25 @@
 # Progress Log
 
+## 2026-09-04 — Spec 006 Reboot Acceptance
+
+- Rebooted after confirming SSH, GDM automatic-login configuration, and enabled `media-home.service`. The host booted at 16:51 and SSH reconnected successfully from the administrator laptop.
+- Confirmed active GDM, `AutomaticLoginEnable=true`, `AutomaticLogin=dfish`, an active GNOME Wayland graphical session on `seat0`, and active `graphical-session.target` after reboot.
+- The project owner visually confirmed that the attached monitor reached the GNOME desktop automatically without a login prompt.
+- Confirmed `media-home.service` ran once after login, logged the intentional missing-Kodi staged state, exited successfully, and did not restart-loop. The unit remains enabled for Spec 007.
+- Confirmed the GNOME desktop and local TTY devices remain available as recovery paths.
+- Re-ran shell syntax, systemd unit, deployed-file, SSH, GDM, user-service, and journal validations. Scans found no private keys or likely secret assignments, and `git diff --check` passed.
+- Spec 006 is complete. Kodi installation and visible media-home startup remain explicitly assigned to Spec 007.
+
+## 2026-09-04 — Spec 006 Reproducible Startup Configuration
+
+- Confirmed `display-manager.service` is an active alias to GDM, the default boot target is `graphical.target`, GDM already automatically logs in non-root user `dfish`, GNOME Wayland is active on `seat0`, and SSH and local TTY recovery are available.
+- Added and validated `scripts/configure-autologin.sh`. It checks/reconciles only the owned GDM daemon keys, rejects root and nonexistent users, creates one recovery backup before its first change, and is idempotent when the desired state already matches.
+- Added the guarded `scripts/launch-media-home.sh`, `media-home.service`, and idempotent `scripts/install-media-startup.sh`. The unit has no restart policy and currently logs that Kodi is absent before exiting successfully to the GNOME desktop.
+- `bash -n` passed for all scripts. `systemd-analyze --user verify` accepted `media-home.service`; it also reported an unrelated pre-existing `spice-vdagent.service` warning.
+- Ran the media-service disable/restore drill and the GDM automatic-login disable/restore drill. SSH remained active throughout, the service was re-enabled, and automatic login was restored for `dfish`.
+- Created `/etc/gdm3/custom.conf.before-media-appliance` as the recovery copy during the deliberate disable/restore test. The active GDM configuration is restored to its original automatic-login state.
+- Tasks T001-T007 are complete. T008 requires the planned reboot and human-visible confirmation on the attached monitor.
+
 ## 2026-09-04 — Spec 004 Hardware Inventory
 
 - Created the read-only `scripts/hardware-report.sh` collector and the reviewed inventory in `docs/hardware.md`; added the Spec 004 plan, research, data model, quickstart, and completed task list.
