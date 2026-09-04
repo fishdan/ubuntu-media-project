@@ -1,0 +1,11 @@
+[Unit]
+Description=FishDan media home
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/launch-media-home
+
+[Install]
+WantedBy=graphical-session.target
