@@ -78,16 +78,16 @@ fi
 
 section "PipeWire audio"
 if command -v wpctl >/dev/null 2>&1; then
-    wpctl status \
-        | sed -E 's/cookie:[0-9]+/cookie:[redacted]/g; s/pid:[0-9]+/pid:[runtime]/g'
+    timeout 5s wpctl status \
+        | sed -E 's/cookie:[0-9]+/cookie:[redacted]/g; s/pid:[0-9]+/pid:[runtime]/g' || printf '%s\n' 'PipeWire query failed or timed out'
 else
     printf '%s\n' "wpctl unavailable"
 fi
 if command -v pactl >/dev/null 2>&1; then
     printf '%s\n' "PulseAudio-compatible cards:"
-    pactl list cards short
+    timeout 5s pactl list cards short || printf '%s\n' 'Audio card query failed or timed out'
     printf '%s\n' "PulseAudio-compatible sinks:"
-    pactl list sinks short
+    timeout 5s pactl list sinks short || printf '%s\n' 'Audio sink query failed or timed out'
 else
     printf '%s\n' "pactl unavailable"
 fi

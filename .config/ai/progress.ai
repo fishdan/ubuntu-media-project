@@ -1,5 +1,55 @@
 # Progress Log
 
+## 2026-09-04 — Spec 005 Power-Cycle Acceptance Milestone
+
+- Owner confirmed sound following projector power-on, completing T010 observed recovery checks. Recovery times were not measured; post-event SSH checks passed.
+- Before boot testing: SSH is enabled/active, media-home is enabled/active, AC power-policy check passed, both Spec 005 scripts passed Bash syntax, and whitespace validation passed.
+- Saving the current AV milestone before coordinated reboot tests. T007/T009 and final T011/T012 remain open; no reboot initiated.
+
+## 2026-09-04 — Spec 005 Projector Power-Cycle Picture Accepted
+
+- Owner reports all good after projector off/on. SSH and default NVIDIA HDMI sink remain available; both bounded voice samples replayed successfully without service restart. Audible confirmation is pending before closing T010.
+- Next: coordinated AV-on reboot for T007/T009, then AV-off boot and later AV power-on. No reboot was initiated.
+
+## 2026-09-04 — Spec 005 HDMI Reconnection Audio Accepted
+
+- Owner confirmed the replayed samples were audible after PC-to-receiver HDMI reconnection. The observed reconnect check passed for picture, receiver sound, and post-event SSH without an audio-service restart.
+- Remaining acceptance: projector power cycle, AV-on/off boots, post-reboot audio, and final review. T010 remains open for the projector power cycle.
+
+## 2026-09-04 — Spec 005 Input Switching and HDMI Reconnection
+
+- Owner reported everything good after projector input switching and confirmed Kodi picture returned after PC-to-receiver HDMI disconnect/reconnect.
+- Post-reconnect SSH is active and PipeWire retains the default NVIDIA HDMI stereo sink. Both bounded voice-sample commands completed successfully without service restart; audible confirmation is pending.
+- T010 remains open for projector power-cycle acceptance. AV-on/off boots and post-reboot sound remain pending.
+
+## 2026-09-04 — Spec 005 Receiver Recovery Audio Accepted
+
+- Owner confirmed voice samples were audible after receiver off/on, completing the observed receiver-cycle video/audio/SSH check without audio-service restart.
+- T010 remains incomplete pending projector/input and HDMI disconnect/reconnect checks; AV-on/off boot and post-reboot audio tests also remain. Next physical test is projector input switching while leaving the PC and receiver running.
+
+## 2026-09-04 — Spec 005 Receiver Power-Cycle Check
+
+- Owner turned receiver off and on; Kodi stayed visible throughout. This accepts video continuity for that cycle, not HDMI disconnect recovery.
+- SSH is active after the cycle; PipeWire still exposes the default NVIDIA HDMI stereo sink at volume 0.40. Both bounded voice-sample replays succeeded without a service restart; audible confirmation remains pending. T010 remains open for remaining recovery cases.
+
+## 2026-09-04 — Spec 005 Receiver Audio and AC Power
+
+- Owner heard both HDMI voice samples through the receiver, completing T006 baseline stereo audibility. Connected projector identity and visual/audio confirmation complete T004; exact consumer model names remain unspecified.
+- T008: recorded AC action suspend, timeout 0, idle delay 0 before adding `scripts/configure-av-power.sh` with apply/check/restore-baseline commands. Applied action nothing; repeated apply/check passed. Timeout and idle delay remain 0, and SSH is active. Bash syntax passed. Manual power controls remain available.
+- Pending: receiver/projector/input/HDMI recovery testing, AV-on/off boots, post-reboot sound, and final acceptance. No reboot occurred in this step.
+
+## 2026-09-04 — Spec 005 Projector Visual Acceptance
+
+- Owner confirmed Kodi is clearly visible on the connected projector, accepting the observed preferred 1920×1080 60 Hz, primary-display baseline (T005).
+- Both stock ALSA voice samples played successfully via bounded `pw-play` commands to the default NVIDIA HDMI sink. Audible receiver confirmation remains pending; mono sample playback does not validate left/right channel assignment.
+
+## 2026-09-04 — Spec 005 Resumed with AV Connected
+
+- Confirmed PR #5 merged, switched to main, and pulled it. Preserved the existing Spec 005 branch and merged main into it; resolved the progress-only conflict by retaining both histories.
+- T004-T006 baseline: Mutter detects EPSON PJ at preferred 1920×1080 60 Hz, one primary display, scale 1.0. HDMI ELD advertises valid multichannel audio capabilities. Visual/audible acceptance and exact equipment models remain pending.
+- PipeWire queries hung; restarting the user pipewire, pipewire-pulse, and wireplumber services restored queries and the default NVIDIA HDMI stereo sink at volume 0.40. Kodi and SSH remain active. No persistent AV settings changed.
+- T013: bounded report audio queries at five seconds. Bash syntax and execution passed, including an observed timeout path before audio recovery. AC action remains suspend with timeout 0; Spec 007 idle delay remains 0. Ethernet is unavailable; Wi-Fi preserves SSH.
+
 ## 2026-09-04 — Spec 005 Postponed Before Physical AV Testing
 
 - The project owner postponed physical receiver/projector testing because the AV equipment is not currently available.

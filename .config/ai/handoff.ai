@@ -1,12 +1,11 @@
 # Handoff
 
-## 2026-09-04 — Paused Spec 005
+## 2026-09-04 — Spec 005 boot acceptance next
 
-- Branch: `feature/0.005-graphics-av-display-audio-power`
-- Current task: T004, connect GPU HDMI through the AV receiver to the projector while preserving SSH.
-- Completed: T001-T003 (planning, read-only AV report, and temporary-monitor/audio/power baseline).
-- Files modified: `.config/ai/progress.ai`, `.config/ai/handoff.ai`, `specs/0/0.005-graphics-av-display-audio-power/spec.md`.
-- Files added: `docs/av-setup.md`, `scripts/av-report.sh`, and the Spec 005 plan/research/data-model/quickstart/tasks artifacts.
-- Validation: `bash -n scripts/av-report.sh`; successful report execution; no-mutating-command source scan; `git diff --check`.
-- Known issue: The receiver/projector path is unavailable, so native projector mode, HDMI receiver audio, power behavior, hot-plug recovery, and AV-on/off boot cases are untested. PipeWire currently exposes only `Dummy Output` with the temporary monitor.
-- Recommended resumption: Connect GTX 1060 HDMI → receiver → projector, keep SSH open, and continue at T004. Do not mark Spec 005 complete before T004-T012 pass.
+- Branch: `feature/0.005-graphics-av-display-audio-power`.
+- Completed T001-T006, T008, T010, T013. Owner confirmed picture/sound after receiver cycle, projector input switch/power cycle, and HDMI reconnection. Recovery durations were not measured.
+- Current task: T007/T009 coordinated boot with AV on, then boot with AV off followed by AV power-on; confirm SSH, Kodi, and audible HDMI playback each time.
+- Modified milestone files: AV report, power configuration script, AV guide, tasks, progress, and handoff.
+- Validation: Bash syntax, bounded report queries, AC action nothing, SSH enabled/active, media-home enabled/active, HDMI samples heard, whitespace check.
+- Remaining: boot acceptance and final T011/T012 review. Initial PipeWire hang recovered with one audio-service restart; recurrence after boot must be checked. Exact receiver/projector models remain unspecified.
+- No reboot initiated. Coordinate readiness with owner before disrupting this remote session; leave receiver and projector on for first boot test.

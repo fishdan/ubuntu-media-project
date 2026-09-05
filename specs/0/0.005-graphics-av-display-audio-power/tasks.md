@@ -16,19 +16,19 @@ description: "Task list for Graphics, AV Display, HDMI Audio, and Power"
 
 ## Phase 2: Physical AV Display
 
-- [ ] T004 [US1] Connect GPU HDMI → AV receiver → projector while preserving SSH, and record the detected connector and EDID identity in `docs/av-setup.md`.
-- [ ] T005 [US1] Select and visually validate native projector resolution, refresh rate, scaling, and primary-display behavior.
+- [x] T004 [US1] Connect GPU HDMI → AV receiver → projector while preserving SSH, and record the detected connector and EDID identity in `docs/av-setup.md`.
+- [x] T005 [US1] Select and visually validate native projector resolution, refresh rate, scaling, and primary-display behavior.
 
 ## Phase 3: HDMI Audio
 
-- [ ] T006 [US2] Select the NVIDIA HDMI audio profile and receiver sink only after detection, then confirm audible playback through the receiver.
+- [x] T006 [US2] Select the NVIDIA HDMI audio profile and receiver sink only after detection, then confirm audible playback through the receiver.
 - [ ] T007 [US2] Reboot and confirm HDMI audio selection and playback persist.
 
 ## Phase 4: Power and Recovery
 
-- [ ] T008 [US3] Record original power settings, disable automatic suspend on AC, choose the media-session blanking behavior, and document exact rollback commands.
+- [x] T008 [US3] Record original power settings, disable automatic suspend on AC, choose the media-session blanking behavior, and document exact rollback commands.
 - [ ] T009 [US3] Validate boot with AV equipment on and boot with AV equipment off before later power-on.
-- [ ] T010 [US3] Validate receiver power-cycle, projector/input power-cycle, and HDMI disconnect/reconnect recovery while SSH remains available.
+- [x] T010 [US3] Validate receiver power-cycle, projector/input power-cycle, and HDMI disconnect/reconnect recovery while SSH remains available.
 
 ## Phase 5: Completion
 
@@ -43,3 +43,7 @@ description: "Task list for Graphics, AV Display, HDMI Audio, and Power"
 - T006 precedes T007.
 - T008 records rollback before T009 and T010.
 - T009 and T010 require human-visible acceptance and precede completion.
+
+## Resumed diagnostics
+
+- [x] T013 Bound audio report queries so an unresponsive audio service cannot block SSH diagnostics.
