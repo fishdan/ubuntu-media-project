@@ -16,6 +16,109 @@
 - Confirmed ALSA exposes Intel analog and NVIDIA HDMI playback devices, while PipeWire currently exposes only `Dummy Output`; no HDMI audio success is claimed.
 - Captured original GNOME power state: AC inactivity type `suspend`, AC timeout `0`, and desktop idle delay 300 seconds. No power setting has been changed.
 - The next blocking task is T004: physically connect GPU HDMI through the receiver to the projector while preserving SSH.
+## 2026-09-04 — Spec 008 Final Acceptance and PR Preparation
+
+- The owner confirmed controller reconnection and Kodi navigation following the 19:50 reboot, completing T011 alongside recorded SSH recovery. A later report found the controller disconnected; no new live input acceptance is claimed from that snapshot.
+- Completed T012-T013 by documenting explicit integration checkpoints for Specs 009-012 and retaining deferred projector/receiver acceptance in Spec 005.
+- Final review T014 removed suppression of remapper stop failures and labeled cached status as intent rather than verified injection. A temporary stub test confirmed exit code 7 propagates, preserves the state marker, and does not print a successful native-input claim.
+- Validation passed: Bash syntax for all three DualSense scripts, Python JSON parsing of the preset, feature scans for Bluetooth addresses/private keys/likely secret assignments, and `git diff --check`. ShellCheck is unavailable. The bounded hardware report verified installed packages and driver availability; SSH is active. Prior native-input and desktop mapping acceptance remains recorded above/below.
+- The staged whitespace check caught an extra EOF blank line in the new report script; removed it and reran the full branch whitespace check successfully.
+- Spec 008 current scope is complete and ready for PR review; no new reboot or live remapping was performed during final review.
+
+## 2026-09-04 — Spec 008 T011 Reboot Investigation
+
+- Investigated the owner-reported unexpected reboot around 19:50 EDT using boot history, previous/current kernel journals, sudo/logind records, and SSH service logs.
+- At 19:50:15, sudo recorded `dfish` running `/usr/bin/systemctl reboot` from `/home/dfish/dev/ubuntu-media-project`, in login session 4. This proves an explicit software reboot request; these records alone do not identify whether a human or automation issued it.
+- The system completed orderly service shutdown and filesystem synchronization at 19:50:19; the next boot began at 19:50:30. SSH started at 19:50:39 and accepted administrator public-key authentication at 19:51:07.
+- No kernel panic or abrupt power-loss sequence explains this reboot. Earlier Wi-Fi beacon-loss warnings were present, but the reboot trigger is the recorded sudo command.
+- Validation: `journalctl --list-boots`, previous-boot journal and kernel warning review, verbose sudo journal fields, `uptime -s`, and `systemctl is-active ssh` (active). No appliance configuration changed. T011 remains incomplete pending controller/native-input and human-visible Kodi acceptance.
+
+## 2026-09-04 — Spec 008 Native Controller and Media Mode
+
+- Installed the Ubuntu `evtest`, `input-remapper`, `joystick`, and `kodi-peripheral-joystick` packages with an idempotent tracked installer; the in-kernel `hid_playstation` module is available and loaded.
+- Paired the spare DualSense through BlueZ and confirmed it is bonded, trusted, and connected without recording its Bluetooth address or other unique identifiers in Git.
+- Kodi detected the native controller and motion-sensor interfaces. The project owner confirmed joystick control and later confirmed automatic reconnection after timeout by pressing PS once, without re-pairing.
+- Added a privacy-safe bounded diagnostic report. It confirms the main controller's 13 buttons, 8 axes, force-feedback capabilities, two joystick interfaces, and Kodi support while intentionally omitting addresses and unique IDs.
+- Added an address-free input-remapper preset and explicit `on`, `off`, and `status` wrapper. The mode maps pointer, click, navigation, back, playback, volume, Escape, and Enter primitives and refuses to overwrite local preset modifications.
+- Successfully started and stopped injection, confirmed the native device remained available afterward, and kept the mode off for Kodi/future Steam. On the GNOME desktop, the project owner confirmed the controller works well.
+- The input-remapper CLI emits a Python 3.14/Pydantic v1 compatibility warning but completed all start/stop operations successfully. Firmware updating remains an optional external action through a PS5 or Sony's Windows application.
+- Next task: reboot acceptance, followed by staged downstream checkpoints and final privacy/repository validation.
+
+## 2026-09-04 — Spec 008 DualSense Planning and Baseline
+
+- Confirmed PR #4 is merged on `main` and created `feature/0.008-dualsense-controller`.
+- Confirmed the Realtek Bluetooth controller is powered, but no Bluetooth device is currently paired or known. No controller address is recorded.
+- Confirmed Ubuntu kernel 7.0 includes signed in-tree `hid_playstation` support; the module is not loaded because no PlayStation controller is connected.
+- Confirmed Ubuntu 26.04 offers `kodi-peripheral-joystick` 21.1.23, `input-remapper` 2.2.0, `joystick` 1.8.1, and `evtest` 1.36; none is installed yet. AntiMicroX is not available from the configured repository.
+- Selected native `hid_playstation` and Kodi joystick input as the first layer, with input-remapper reserved for an explicit desktop/browser media mode that can be disabled before Steam.
+- Added Spec 008 acceptance criteria, plan, research, data model, quickstart, and tasks. Brave, on-screen keyboard, Steam, and universal-home integration remain staged for Specs 009-012.
+- SSH/Kodi remote control remains the recovery path during pairing and mapping. Next task: install support, then pair the physical DualSense without storing its Bluetooth address in Git.
+
+## 2026-09-04 — Spec 007 Reboot, Recovery, and Final Acceptance
+
+- Added `scripts/configure-kodi-session.sh` and disabled GNOME idle blanking for the media user at the owner's request; the previous value was 300 seconds and the tracked rollback resets the setting to the Ubuntu default.
+- Found that `kodi --standalone` could hang during Quit inside the managed GNOME session. Changed the launcher to `kodi -fs`, which is the appropriate fullscreen mode under the existing window manager.
+- Added `TimeoutStopSec=10s` to `media-home.service`. When Kodi hung after an HDMI audio sink failure, the bounded stop terminated the remaining process group and restored GNOME instead of hanging indefinitely.
+- Rebooted and confirmed SSH, GDM automatic login, disabled idle blanking, enabled `media-home.service`, and automatic fullscreen Kodi startup. The project owner visually confirmed Kodi after reboot.
+- Ran a final watched cycle: local `kodi-send Quit` exited normally with service result `success`, GNOME was visually confirmed, and a subsequent service start visibly restored Kodi. Kodi remains running as the intended appliance state.
+- Confirmed the Ubuntu Kodi and `kodi-send` packages are version `2:21.3+dfsg-1ubuntu1`. Shell syntax, systemd unit verification, service/package state, and `git diff --check` passed.
+- No Kodi runtime profile files are tracked. Scans found no private keys or likely secret assignments in the feature artifacts.
+- NFS remains explicitly out of scope. Spec 007 is complete; DualSense navigation is the next roadmap feature, while receiver/projector/audio acceptance remains deferred in Spec 005.
+
+## 2026-09-04 — Spec 007 Playback and Exit Validation
+
+- Installed Ubuntu's `kodi-eventclients-kodi-send` package and added it to `scripts/install-kodi.sh` for reproducible SSH-side navigation, playback, exit, and recovery without a physical keyboard.
+- The project owner visually confirmed fullscreen Kodi, remote menu movement, and playback of the local GNOME `display-dual-monitors.webm` test clip. Kodi selected its VP8 software decoder and fullscreen video window.
+- Replaced `kodi --standalone` with `kodi -fs`; the appliance runs Kodi inside the recoverable GNOME window-manager session.
+- A normal Quit completed successfully in one fullscreen-mode test. A later run hung after the HDMI audio sink failed/disappeared and Kodi stopped its event server. Added `TimeoutStopSec=10s` to `media-home.service`; bounded stops terminated the remaining process group and visibly restored GNOME.
+- At the owner's request, disabled GNOME idle blanking (`idle-delay=0`) after recording the previous 300-second value. Added `scripts/configure-kodi-session.sh` to reproduce, check, or restore the default setting; screen locking and manual power controls were not disabled.
+- Tasks T004-T007 pass with the HDMI-sink shutdown limitation documented. Final reboot and recovery acceptance remain.
+
+## 2026-09-04 — Spec 007 Kodi Installation and First Launch
+
+- Added and validated idempotent `scripts/install-kodi.sh`; installed Kodi `2:21.3+dfsg-1ubuntu1` and distribution-managed dependencies from Ubuntu `resolute/universe` without adding a third-party package source.
+- Verified `/usr/bin/kodi`, installed/candidate version equality, and the `kodi`, `kodi-bin`, `kodi-data`, and `kodi-repository-kodi` package versions.
+- Restarted `media-home.service`; it successfully replaced the staged missing-Kodi behavior with `kodi --standalone`. The Kodi process and Estuary UI initialization remain healthy with no service restart loop.
+- The project owner confirmed Kodi is visible and looks correct on the attached monitor after a one-time GNOME screen wake request.
+- Waking the monitor caused PipeWire to expose the NVIDIA HDMI sink; the live Kodi stream is routed to the HP 2310 monitor. Audible playback is not yet confirmed and permanent receiver audio remains Spec 005 work.
+- Selected the system-provided `display-dual-monitors.webm` GNOME help asset for local playback testing without adding media to Git.
+
+## 2026-09-04 — Spec 007 Kodi-Only Scope and Baseline
+
+- The project owner explicitly excluded NFS from Spec 007 because it is unlikely to be needed and can be added later. Tasks T008-T010 are not applicable; no server, export, mount, or credentials are configured.
+- Baseline validation confirmed SSH and GDM are active, the graphical seat is available, and `media-home.service` is enabled but inactive after its successful missing-Kodi staged run.
+- Confirmed Kodi is not installed, `~/.kodi` does not exist, and Ubuntu offers Kodi `2:21.3+dfsg-1ubuntu1` from `resolute/universe`.
+- Confirmed the existing audio limitation remains: PipeWire exposes `Dummy Output`. Local Kodi video can be tested on the attached monitor, but receiver/HDMI audio acceptance remains deferred to Spec 005.
+- Added the idempotent Ubuntu-package installer and Kodi setup/recovery documentation. Package installation has not yet run.
+
+## 2026-09-04 — Spec 007 Kodi and Network Media Planning
+
+- Confirmed PR #3 is merged on `main` and created `feature/0.007-kodi-local-network-media` for the next roadmap feature.
+- Confirmed Ubuntu 26.04 offers Kodi `2:21.3+dfsg-1ubuntu1` from `universe` and `nfs-common` `1:2.8.5-1ubuntu1` from `main`; neither package is installed yet.
+- Added the Spec 007 plan, research, data model, quickstart, acceptance criteria, and task list. No Kodi/NFS package or appliance configuration changes were made during planning.
+- Selected the Ubuntu Kodi package, the existing Spec 006 `media-home.service` entry point, untracked Kodi runtime userdata, and optional systemd NFS automounts with bounded failure behavior.
+- NFS implementation is blocked on an explicit scope decision and, if in scope, the server/export/local mount/read-only inputs. Controller acceptance remains in Spec 008, and receiver/projector/audio acceptance remains in paused Spec 005.
+- Next task: T002 baseline inspection, followed by the T003 NFS scope decision before installation.
+
+## 2026-09-04 — Spec 006 Reboot Acceptance
+
+- Rebooted after confirming SSH, GDM automatic-login configuration, and enabled `media-home.service`. The host booted at 16:51 and SSH reconnected successfully from the administrator laptop.
+- Confirmed active GDM, `AutomaticLoginEnable=true`, `AutomaticLogin=dfish`, an active GNOME Wayland graphical session on `seat0`, and active `graphical-session.target` after reboot.
+- The project owner visually confirmed that the attached monitor reached the GNOME desktop automatically without a login prompt.
+- Confirmed `media-home.service` ran once after login, logged the intentional missing-Kodi staged state, exited successfully, and did not restart-loop. The unit remains enabled for Spec 007.
+- Confirmed the GNOME desktop and local TTY devices remain available as recovery paths.
+- Re-ran shell syntax, systemd unit, deployed-file, SSH, GDM, user-service, and journal validations. Scans found no private keys or likely secret assignments, and `git diff --check` passed.
+- Spec 006 is complete. Kodi installation and visible media-home startup remain explicitly assigned to Spec 007.
+
+## 2026-09-04 — Spec 006 Reproducible Startup Configuration
+
+- Confirmed `display-manager.service` is an active alias to GDM, the default boot target is `graphical.target`, GDM already automatically logs in non-root user `dfish`, GNOME Wayland is active on `seat0`, and SSH and local TTY recovery are available.
+- Added and validated `scripts/configure-autologin.sh`. It checks/reconciles only the owned GDM daemon keys, rejects root and nonexistent users, creates one recovery backup before its first change, and is idempotent when the desired state already matches.
+- Added the guarded `scripts/launch-media-home.sh`, `media-home.service`, and idempotent `scripts/install-media-startup.sh`. The unit has no restart policy and currently logs that Kodi is absent before exiting successfully to the GNOME desktop.
+- `bash -n` passed for all scripts. `systemd-analyze --user verify` accepted `media-home.service`; it also reported an unrelated pre-existing `spice-vdagent.service` warning.
+- Ran the media-service disable/restore drill and the GDM automatic-login disable/restore drill. SSH remained active throughout, the service was re-enabled, and automatic login was restored for `dfish`.
+- Created `/etc/gdm3/custom.conf.before-media-appliance` as the recovery copy during the deliberate disable/restore test. The active GDM configuration is restored to its original automatic-login state.
+- Tasks T001-T007 are complete. T008 requires the planned reboot and human-visible confirmation on the attached monitor.
 
 ## 2026-09-04 — Spec 004 Hardware Inventory
 
