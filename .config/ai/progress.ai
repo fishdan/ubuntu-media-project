@@ -6,6 +6,7 @@
 - Completed T012-T013 by documenting explicit integration checkpoints for Specs 009-012 and retaining deferred projector/receiver acceptance in Spec 005.
 - Final review T014 removed suppression of remapper stop failures and labeled cached status as intent rather than verified injection. A temporary stub test confirmed exit code 7 propagates, preserves the state marker, and does not print a successful native-input claim.
 - Validation passed: Bash syntax for all three DualSense scripts, Python JSON parsing of the preset, feature scans for Bluetooth addresses/private keys/likely secret assignments, and `git diff --check`. ShellCheck is unavailable. The bounded hardware report verified installed packages and driver availability; SSH is active. Prior native-input and desktop mapping acceptance remains recorded above/below.
+- The staged whitespace check caught an extra EOF blank line in the new report script; removed it and reran the full branch whitespace check successfully.
 - Spec 008 current scope is complete and ready for PR review; no new reboot or live remapping was performed during final review.
 
 ## 2026-09-04 — Spec 008 T011 Reboot Investigation

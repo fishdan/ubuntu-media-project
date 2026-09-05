@@ -76,4 +76,3 @@ fi
 
 section 'Privacy'
 printf '%s\n' 'Bluetooth addresses and unique device identifiers are intentionally omitted.'
-
