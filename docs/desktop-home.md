@@ -88,8 +88,16 @@ To go back to the desktop-first home:
 
 ```
 systemctl --user disable --now media-home.service
+systemctl --user reset-failed media-home.service
 scripts/configure-desktop-home.sh --apply
 ```
+
+The `reset-failed` is expected and is not a sign of a problem. Kodi's main
+process exits on SIGTERM but its `kodi.bin` child survives to the unit's kill
+timeout, so stopping `media-home.service` always leaves it in a `failed` state.
+This is the defect that motivated the desktop-first change. The desktop-first
+appliance never stops the unit, so the failure is only reachable while you are
+deliberately switching between the two homes.
 
 Note that `scripts/install-media-startup.sh` installs `media-home.service` but
 deliberately leaves it disabled, so re-running the installer will not undo the

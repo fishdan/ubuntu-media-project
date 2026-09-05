@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-09-05 — Spec 015 T013: Revert Path Validated Both Directions
+
+- Exercised the documented revert without a reboot. `systemctl --user enable --now media-home.service` brought Kodi back immediately and `configure-desktop-home.sh --revert` restored `text-scaling-factor`, `cursor-size`, and `favorite-apps` to their exact captured values. No reinstallation or reconfiguration was required, satisfying the specification's reversibility criterion.
+- Returning to desktop-first with `disable --now` plus `--apply` restored the intended state; Kodi stopped, no Kodi process remained, and Zuzz was restarted successfully under `zuzz-media.service`.
+- The Kodi bounded-stop defect reproduced on the way back: `media-home.service` landed in `failed` because `kodi.bin` again survived to the kill timeout. This confirms the defect is real and reproducible rather than a one-off, and that the desktop-first appliance simply never reaches it, since nothing stops the unit any more. Added `systemctl --user reset-failed` to the documented switch-back procedure in `docs/desktop-home.md` with an explanation, so an operator following the instructions is not alarmed by it.
+- SSH remained active throughout both directions of the switch.
+- Remaining for Spec 015: T011 reboot validation and T012 owner couch acceptance, both of which need the owner and the appliance's console. T014 pre-PR checks follow those.
+
 ## 2026-09-05 — Spec 015 Phases 3-4: Couch-Legible Desktop and Roadmap Bookkeeping
 
 - T006 added `scripts/configure-desktop-home.sh` with `--apply`, `--revert`, and `--status`. It captures the prior value of every setting it writes into `~/.local/state/ubuntu-media-project/desktop-home.baseline` and never overwrites an existing capture, so the baseline always describes the appliance before this feature first touched it rather than after the previous run.
