@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-09-05 — Owner Confirmed Kodi Retirement; Spec 009 Acceptance Narrowed
+
+- The project owner confirmed the move away from Kodi, ratifying the 2026-09-04 architectural decision and authorizing Spec 015 to proceed.
+- Struck "Kodi restoration" from Spec 009 T005 and T011. That clause existed to accept a restore path Spec 015 removes, so accepting it would validate behavior the project is deliberately deleting. The rest of both tasks stands.
+- Recorded what the owner has already accepted on the projector (Zuzz visible; GNOME on-screen keyboard typing in a Firefox website field, 2026-09-04) directly in T011, so the remaining open items are explicit: projector/receiver audio, streaming login and playback, and close/relaunch account persistence.
+- Spec 016 remains blocked. The owner has not yet stated whether the phone is Android or iPhone, and the KDE Connect iOS client has historically lacked the remote-input feature that specification depends on.
+
 ## 2026-09-05 — Spec 009 Managed Firefox Launch Validated End to End
 
 - Closed the handoff's top loose end: `zuzz-media.service` had never been started since the snap-profile fix (`-P zuzz-media`) landed, so only the direct launch was proven. Stopped the stray unmanaged Firefox (pid 11642) left running from the profile test and started the service.

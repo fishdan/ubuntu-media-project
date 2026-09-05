@@ -4,7 +4,10 @@
 - [x] T002 Implement private-profile launcher, managed service, desktop entry, and idempotent installer with SSH recovery.
 - [x] T003 Validate syntax, unit, failure cleanup, and repeated installation before visible launch.
 - [ ] T004 Launch on projector; owner confirms presentation, login, streaming audio/video, and controller navigation.
-- [ ] T005 Validate normal close, administrator stop, Kodi restoration, and media-profile login persistence on relaunch.
+- [ ] T005 Validate normal close, administrator stop, and media-profile login persistence on relaunch.
+  (Kodi restoration struck from scope on 2026-09-05: the owner confirmed the move away from Kodi, so
+  Spec 015 retires the restore path this clause would have accepted. Remaining scope is the browser's
+  own close/stop behavior and profile persistence.)
 - [ ] T006 Review privacy, documentation, and progress; prepare PR after current-scope acceptance.
 
 - [x] T007 Resolve first-launch keyring interaction without a physical keyboard using temporary GNOME accessibility input; preserve keyring protection and record rollback. Full controller keyboard integration remains Spec 010.
@@ -20,4 +23,8 @@
   and the site rendered. Recorded a new defect: stopping `media-home.service` now leaves it `failed`
   because `kodi.bin` survives to the final-sigterm timeout. See `progress.ai` 2026-09-05.
 
-- [ ] T011 Owner acceptance on the new Firefox-based launcher: confirm projector presentation, on-screen-keyboard typing/backspace in a website field, streaming login/playback, close/relaunch account persistence, and Kodi restoration on stop.
+- [ ] T011 Owner acceptance on the new Firefox-based launcher. Partially accepted: the owner confirmed on
+  the projector that Zuzz is visible and that the GNOME on-screen keyboard types in a Firefox website
+  field (recorded 2026-09-04). Kodi restoration is struck from scope per the 2026-09-05 owner decision
+  to move away from Kodi. Still unconfirmed: projector/receiver audio, streaming login and playback,
+  and close/relaunch account persistence.
