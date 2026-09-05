@@ -53,7 +53,7 @@ scripts/dualsense-media-mode.sh status
 scripts/dualsense-media-mode.sh off
 ```
 
-The left stick moves the pointer; the D-pad emits arrow keys; Cross clicks; Circle emits browser Back; Triangle toggles play/pause; L1/R1 change volume; Create emits Escape; and Options emits Enter. The script installs the address-free tracked preset on first use and refuses to overwrite a locally modified copy. Always turn the mode off before launching Steam so Steam Input receives the native controller alone.
+The left stick moves the pointer; the D-pad emits arrow keys; Cross clicks; Circle emits browser Back; Triangle toggles play/pause; L1/R1 change volume; Create emits Escape; Options emits Enter; and **L2+R2 held together closes the focused window** (Alt+F4). The controller's own touchpad also moves the pointer natively, independently of this preset. The script installs the address-free tracked preset on first use and refuses to overwrite a locally modified copy. Always turn the mode off before launching Steam so Steam Input receives the native controller alone.
 
 
 ## Reboot acceptance and remaining integration
@@ -79,6 +79,20 @@ it did, closing the browser would leave the desktop with no pointer.
 
 Turn it off before launching Steam so Steam Input receives the native controller
 alone. That remains Spec 011's checkpoint.
+
+## Exiting a fullscreen or kiosk application
+
+Firefox's `--kiosk` mode has no window controls and ignores Escape, so before
+2026-09-05 there was no controller-only way back to the desktop. **L2+R2 held
+together** now emits Alt+F4, GNOME's close-window binding, which quits the
+browser and stops `zuzz-media.service` with it.
+
+A chord rather than a single button is deliberate: a stray press during playback
+would otherwise quit the browser and lose the viewer's place. L2 and R2 were both
+unmapped, so nothing else changed.
+
+The administrator fallback remains `systemctl --user stop zuzz-media.service`
+over SSH.
 
 ## Defect fixed 2026-09-05: injection silently did nothing
 

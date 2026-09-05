@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-05 — Pointer Accepted; Kiosk Exit Gap Found and Closed
+
+- **Spec 015's pointer criterion is accepted.** The owner confirmed the DualSense moves the cursor using both the left stick (the input-remapper preset) and the controller's own touchpad, which works natively as a mouse through the `DualSense Wireless Controller Touchpad` evdev device and is independent of the remapping. This is the first working confirmation of controller pointer input in the project; it never functioned before the injection fix earlier today.
+- **The owner then asked how to exit Zuzz from kiosk mode, exposing a gap that would have blocked the rest of T012.** Firefox `--kiosk` presents no window controls and ignores Escape, and the preset mapped nothing capable of closing a window: the free buttons were Square, L2, R2, PS, L3, and R3, and Create only emitted Escape. There was no controller-only route back to the desktop, so the specification's "return to the desktop by closing it" criterion was unmet in practice even though the desktop-first architecture was sound.
+- Closed it by mapping **L2+R2 held together** to `KEY_LEFTALT+KEY_F4`, GNOME's `close` binding (confirmed as `['<Alt>F4']`). Quitting Firefox also stops `zuzz-media.service`, since the unit is `Type=exec` on the browser process, so the appliance lands cleanly back on the desktop.
+- Chose a chord over a single button deliberately: a stray press during playback would otherwise quit the browser and lose the viewer's place. L2 and R2 were both previously unmapped, so no existing behaviour changed.
+- Verified the daemon accepted the new preset with no errors and that live injection continues, using the `... forwarded` device node. The deployed preset was refreshed by removing the old copy so the script's overwrite guard would reinstall from the updated template.
+- Remaining for Spec 015 T012: the owner should confirm L2+R2 actually returns to the desktop. Remaining for Spec 009: playback through the projector and receiver, and login persistence across a close and relaunch — the latter is now testable with the controller alone.
+
 ## 2026-09-05 — Owner Acceptance: Desktop Launch, Zuzz Login, and On-Screen Keyboard
 
 - The owner reported being logged into Zuzz, that the screen "looks great", and that the on-screen keyboard "looked amazing".
