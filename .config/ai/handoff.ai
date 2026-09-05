@@ -1,69 +1,57 @@
 # Handoff
 
-## 2026-09-05 — Spec 015 implemented through Phase 4; reboot and couch acceptance outstanding
+## 2026-09-05 — Specs 009 and 015 complete and accepted; ready to push and PR
 
-Supersedes all earlier handoff entries. The durable history remains in `progress.ai`; this file is current state only.
+Supersedes all earlier handoff entries. The durable history is in `progress.ai`; this file is current state only.
 
 ### Branch and repository state
 
-- Branch: `feature/0.015-desktop-first-home`, cut from `feature/0.009-brave-zuzz-browser-streaming`. Working tree is clean; everything below is committed.
-- `feature/0.009-brave-zuzz-browser-streaming` carries the committed Firefox switch and is ready for a PR once its remaining owner acceptance is either done or formally deferred.
-- Neither branch has been pushed and no pull request exists yet.
+- Branch: `feature/0.015-desktop-first-home`, 15 commits ahead of `main`. Working tree clean.
+- Those 15 commits are 3 for Spec 009 and 12 for Spec 015. `feature/0.015-desktop-first-home` is stacked on `feature/0.009-brave-zuzz-browser-streaming`.
+- **Nothing has been pushed and no pull request exists.** Push and PR 009 first, then 015 stacks cleanly as its own commits.
+- Specs 003-008 are already merged into `main`.
 
-### What changed this session
+### Status
 
-1. Ran the `start.ai` startup sequence and validated the managed Firefox launch that the previous handoff left unproven.
-2. Committed Spec 009 and the Spec 015/016 specifications.
-3. The owner confirmed the move away from Kodi, which narrowed Spec 009's remaining acceptance and authorised Spec 015.
-4. Implemented Spec 015 phases 1-4 and validated the revert path in both directions.
+- **Spec 009 (Firefox/Zuzz streaming): Complete, pending PR.** No unchecked tasks. Owner accepted projector presentation, on-screen-keyboard text entry, streaming login, flawless AV through the projector and receiver, and login persistence across close and relaunch.
+- **Spec 015 (desktop-first home): Complete, pending PR.** No unchecked tasks. Owner accepted the couch test in full: pointer via stick and native touchpad, launching Zuzz from the dock, and the PS button returning to the desktop, all with no keyboard or mouse.
+- **Spec 016 (GSConnect phone input): unblocked, not started.** Has only `spec.md`; needs `plan.md` and `tasks.md` on its own branch. The phone is Android. The desktop side is `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, available, not installed) — not the Plasma `kdeconnect` package.
 
-### Current appliance state (after the reboot)
+### Current appliance state
 
-- `media-home.service`: installed, **disabled**, inactive. Kodi is installed and launchable but no longer starts at login.
-- `zuzz-media.service`: **inactive**. This is correct: nothing starts automatically any more. Launch Zuzz from the desktop, or with `systemctl --user start zuzz-media.service`.
-- `dualsense-desktop-input.service`: **enabled and active**; pointer mode live-verified. The controller is connected. Turn the mode off before any Steam work (Spec 011).
-- Install/refresh the whole desktop-first home with `scripts/install-desktop-home.sh` (idempotent; never enables `media-home.service`).
-- Desktop settings applied for the couch: `text-scaling-factor` 1.5, `cursor-size` 48, favourites curated to Zuzz, Firefox, Kodi. Baseline captured at `~/.local/state/ubuntu-media-project/desktop-home.baseline`.
-- SSH active. GDM automatic login unchanged (`AutomaticLoginEnable=true`, `AutomaticLogin=dfish`).
-- `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` from Spec 009 T007.
+- Boots to the GNOME desktop with automatic login. Nothing media-related starts automatically.
+- `media-home.service`: installed, **disabled**, inactive. Kodi installed and launchable, so the retirement is reversible.
+- `zuzz-media.service`: static, inactive unless launched. Launch from the dock or `systemctl --user start zuzz-media.service`.
+- `dualsense-desktop-input.service`: enabled, active. Pointer mode live-verified via the `... forwarded` device node.
+- Return home: **PS button** emits `KEY_F14` (keysym `XF86Launch5`); a GNOME custom shortcut runs `scripts/return-home.sh`, which stops the fullscreen-application units.
+- Display: `text-scaling-factor` 1.5, `cursor-size` 48, dock pinned open with 64px icons, favourites Zuzz/Firefox/Kodi.
+- SSH active; tty1-6 available; GDM autologin unchanged.
 
-### Defects resolved this session
+### Install and revert
 
-- `media-home.service` failing on every stop: made unreachable by deleting every code path that stops it. The underlying Kodi behaviour is unchanged and still reproduces if the unit is stopped deliberately during a home switch, which is why the documented procedure includes `reset-failed`.
-- `zuzz-media.service` failing on every clean stop: `launch-zuzz.sh --restore` propagated `input-remapper-control`'s non-zero exit when the DualSense is not connected. It is now best-effort and warns instead.
+- Install or refresh: `scripts/install-desktop-home.sh` (idempotent; never enables `media-home.service`).
+- Revert to Kodi-first: `systemctl --user enable --now media-home.service`, `systemctl --user reset-failed media-home.service`, `scripts/configure-desktop-home.sh --revert`. Validated in both directions.
+- Full detail in `docs/desktop-home.md`.
 
-### Outstanding work
+### Defects found and fixed this session
 
-**Spec 015 — needs the owner and the console:**
-- ~~T011: reboot validation.~~ **Passed 2026-09-05** — see above.
-- **T015-T017 added and done (2026-09-05)**: the DualSense pointer did not work at the desktop. Spec 015 had left pointer mode tied to the browser lifecycle, creating a circular dependency, and separately input-remapper had never actually injected because `config.json` was missing and no client had called `set_config_dir`. Both fixed; see `progress.ai` and `docs/dualsense.md`. Pointer mode is now turned on at login by `dualsense-desktop-input.service`.
-- **T012 is the only open implementation task** (and is now genuinely testable — it was not before): owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse. The owner should also judge whether `text-scaling-factor` 1.5 is right at projector distance.
-- T014: pre-PR checks are done and clean. The pull request itself is held until T012.
-
-**Spec 009 — needs the owner at the projector:**
-- T004-T006 and T011: projector/receiver audio, streaming login and playback, and close/relaunch account persistence. Projector presentation and on-screen-keyboard typing were already accepted on 2026-09-04. Kodi restoration was struck from scope.
-
-**Spec 016 — unblocked, not started:**
-- **Unblocked 2026-09-05: the phone is Android.** Implementation may proceed. The desktop side is `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, available, not installed); the Plasma `kdeconnect` package is explicitly not used. Spec 016 still has only `spec.md` and needs `plan.md` and `tasks.md`.
+1. `media-home.service` failed on every stop (Kodi child outliving the kill timeout) — made unreachable by deleting every code path that stops it.
+2. `zuzz-media.service` failed on every clean stop — `--restore` propagated `input-remapper-control`'s non-zero exit when the controller was absent; now best-effort.
+3. **input-remapper had never actually injected.** The CLI printed success while the daemon rejected every request because `config.json` was missing and no client had called `set_config_dir`. Never caught because Spec 008 validated native joystick input in Kodi, a different path.
+4. Pointer mode was tied to the browser lifecycle, so the desktop home was unnavigable — a circular dependency introduced by Spec 015 and fixed with a login service.
+5. No controller-only exit from kiosk mode existed. Alt+F4 via an L2+R2 chord failed; the PS button on `KEY_F13` opened Settings because xkb maps `FK13` to `XF86Tools` and GNOME matches on keysym. Fixed with `KEY_F14`/`XF86Launch5`.
+6. `configure-desktop-home.sh` captured its rollback baseline per file rather than per key, so settings added later would have been unrevertable.
 
 ### Known issues and loose ends
 
-- `text-scaling-factor` 1.5 is an estimate for projector distance and has not been judged from the couch. Change it in `scripts/configure-desktop-home.sh`, not by hand, so it stays in version control.
-- Steam is deliberately absent from the dock favourites until Spec 011 installs `steam.desktop`; a favourite pointing at a missing desktop file renders as a blank tile.
-- Owner reported a saved password did not persist in Firefox. Likely the save prompt was not accepted on a new profile. Unverified.
+- ShellCheck is not installed, so no ShellCheck result is claimed anywhere in this project.
 - The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left deliberately; delete only on the owner's instruction. Brave itself is untouched.
-- ShellCheck is still not installed, so no ShellCheck result is claimed anywhere in this project.
-
-### Reboot completed — Spec 015 T011 PASSED
-
-Rebooted `2026-09-05 00:32:11`. Every criterion passed: `media-home.service` has
-no journal entries at all for this boot (it never attempted to start), no Kodi or
-Firefox process exists, `gdm-autologin` opened dfish's session at 00:32:20 onto an
-active Wayland session on seat0/tty2, SSH is enabled and active, tty1-6 are
-present, and all three couch settings survived the reboot without reapplication.
+- `~/.config/input-remapper-2/config.json` is generated at runtime and intentionally untracked.
+- The appliance's DHCP address drifted from `192.168.1.203` to `192.168.1.204`; the router-side reservation remains an outstanding external action.
+- Turn pointer mode off before any Steam work (`dualsense-media-mode.sh off`) so Steam Input receives the native controller alone. That remains Spec 011's checkpoint.
 
 ### Recommended next actions
 
-1. Get the owner in front of the projector for Spec 015 T012. The pointer now genuinely works, so this test is meaningful for the first time. This is the last open task in the feature. Launch Zuzz from the desktop with the DualSense, confirm closing it returns to the desktop, and judge whether 1.5 text scaling is right. Nothing starts automatically now, so the desktop is what appears at boot.
-3. ~~Answer the phone-platform question for Spec 016.~~ Resolved 2026-09-05: Android. Spec 016 is unblocked and uses GSConnect (the GNOME implementation of the KDE Connect protocol), not the Plasma `kdeconnect` package.
-4. Finish T014, then decide whether to PR Spec 009 and Spec 015 separately or merge 009 first.
+1. Push both branches and open the pull requests, 009 first, then 015.
+2. After merge, start Spec 016 on its own branch: write `plan.md` and `tasks.md`, then install GSConnect and pair the Android phone. This closes the appliance's last major usability gap, text entry without a physical keyboard.
+3. Spec 011 (Steam) is the remaining roadmap feature, now simplified to launch-from and exit-to the desktop, and it should extend `scripts/return-home.sh`'s `units` array.

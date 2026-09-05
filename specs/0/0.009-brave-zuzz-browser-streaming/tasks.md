@@ -3,12 +3,16 @@
 - [x] T001 Verify installed Brave and signed package source; define spec, plan, and acceptance scope.
 - [x] T002 Implement private-profile launcher, managed service, desktop entry, and idempotent installer with SSH recovery.
 - [x] T003 Validate syntax, unit, failure cleanup, and repeated installation before visible launch.
-- [ ] T004 Launch on projector; owner confirms presentation, login, streaming audio/video, and controller navigation.
-- [ ] T005 Validate normal close, administrator stop, and media-profile login persistence on relaunch.
+- [x] T004 Launch on projector; owner confirms presentation, login, streaming audio/video, and controller navigation. Accepted 2026-09-05: presentation and login confirmed, AV playback through the projector and receiver reported flawless, and controller navigation confirmed with both the DualSense stick and its native touchpad.
+- [x] T005 Validate normal close, administrator stop, and media-profile login persistence on relaunch.
+  Accepted 2026-09-05. Normal close is the PS button via Spec 015's return-home shortcut, confirmed by the
+  owner and corroborated in the journal. Administrator stop over SSH (`systemctl --user stop
+  zuzz-media.service`) was validated repeatedly this session. **The Zuzz login persists across close and
+  relaunch**, which resolves the earlier unverified report that a saved password had not been kept; that
+  was a first-login prompt not being accepted, not a defect.
   (Kodi restoration struck from scope on 2026-09-05: the owner confirmed the move away from Kodi, so
-  Spec 015 retires the restore path this clause would have accepted. Remaining scope is the browser's
-  own close/stop behavior and profile persistence.)
-- [ ] T006 Review privacy, documentation, and progress; prepare PR after current-scope acceptance.
+  Spec 015 retires the restore path this clause would have accepted.)
+- [~] T006 Review privacy, documentation, and progress; prepare PR after current-scope acceptance. Review complete: no browser profile, cookie, or credential file is tracked; docs and progress are current. The PR itself awaits the owner's go-ahead to push.
 
 - [x] T007 Resolve first-launch keyring interaction without a physical keyboard using temporary GNOME accessibility input; preserve keyring protection and record rollback. Full controller keyboard integration remains Spec 010.
 
@@ -23,10 +27,7 @@
   and the site rendered. Recorded a new defect: stopping `media-home.service` now leaves it `failed`
   because `kodi.bin` survives to the final-sigterm timeout. See `progress.ai` 2026-09-05.
 
-- [ ] T011 Owner acceptance on the new Firefox-based launcher. Largely accepted on 2026-09-05: the owner
-  launched Zuzz from the desktop dock entry (journal shows `app-gnome-zuzz-14159.scope - Application
-  launched by gnome-shell`), logged in successfully, reported the screen looks great, and reported the
-  on-screen keyboard "looked amazing" in the site's login fields. Kodi restoration is struck from scope
-  per the 2026-09-05 decision to move away from Kodi. Playback through the projector and
-  receiver was accepted as flawless on 2026-09-05. Still unconfirmed: whether the login persists across a
-  close and relaunch, which only became testable once a controller-only exit from kiosk mode existed.
+- [x] T011 Owner acceptance on the new Firefox-based launcher. **Fully accepted 2026-09-05**: projector
+  presentation, on-screen-keyboard typing in a website field (reported as "amazing"), streaming login,
+  flawless AV playback through the projector and receiver, and login persistence across close and
+  relaunch. Kodi restoration was struck from scope per the decision to move away from Kodi.

@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-05 — Specs 009 and 015 Fully Accepted
+
+- The owner confirmed the PS button returns to the desktop and that the Zuzz login is preserved across close and relaunch. Corroborated in the journal: `return-home invoked` at 09:55:30 followed immediately by `Stopped zuzz-media.service`, which is the compositor shortcut firing from the controller and stopping the browser unit.
+- **Spec 015 is complete.** T012 is accepted in full: the cursor moves with both the left stick and the controller's native touchpad, Zuzz launches from the dock, and the PS button returns to the desktop, all with no keyboard or mouse. The display settings are accepted as well; the owner reports the screen "looks great" at projector distance with 1.5 text scaling and 64px dock icons.
+- **Spec 009 is complete.** T004, T005, and T011 are accepted: projector presentation, on-screen-keyboard text entry, streaming login, flawless AV playback through the projector and receiver, and login persistence across close and relaunch.
+- **The earlier saved-password report is resolved as not a defect.** It was a first-login save prompt not being accepted on a brand-new profile. The profile now persists credentials correctly across a full close and relaunch under the managed service.
+- Both specification status fields moved to "Complete (pending PR)". No unchecked tasks remain in either.
+- **Process note:** while marking these accepted, an earlier edit to Spec 015 T012 was found to have silently failed, leaving the task unchecked and its acceptance text missing. It was caught by asserting on the replacement target rather than trusting a plain string replace. Bookkeeping edits to task files should be verified after writing, not assumed.
+- Remaining work is repository-side only: push `feature/0.009-brave-zuzz-browser-streaming` and `feature/0.015-desktop-first-home` and open the pull requests, 009 first since 015 is stacked on it. Nothing has been pushed and no PR exists. Spec 016 is unblocked and has only `spec.md`.
+
 ## 2026-09-05 — Return Home: Keysym Mismatch Diagnosed and Fixed
 
 - The owner reported the PS button opened Settings. That failure was informative rather than merely negative: it proved the controller mapping works end to end, since a keypress plainly reached GNOME and was acted upon. The fault was in which key was chosen, not in input-remapper or the preset.

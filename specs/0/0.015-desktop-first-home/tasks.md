@@ -62,7 +62,12 @@ every browser exit.
   so it never attempted to start; no Kodi or Firefox process exists; GDM autologin opened dfish's session
   at 00:32:20 onto an active Wayland session on seat0/tty2; SSH enabled and active; tty1-6 present.
   All three couch settings survived the reboot.
-- [ ] T012 Owner acceptance from the couch: the DualSense pointer mode navigates the desktop, launches the streaming browser, and returns to the desktop by closing it, with no keyboard or mouse.
+- [x] T012 Owner acceptance from the couch: the DualSense pointer mode navigates the desktop, launches the streaming browser, and returns to the desktop by closing it, with no keyboard or mouse.
+  **Fully accepted 2026-09-05.** The owner confirmed the cursor moves with both the left stick and the
+  controller's native touchpad, launched Zuzz from the dock, and confirmed the PS button returns to the
+  desktop. Corroborated in the journal: `return-home invoked` followed by `Stopped zuzz-media.service`
+  at 09:55:30. Display settings accepted too — the screen "looks great" at projector distance with 1.5
+  text scaling and 64px dock icons.
 - [x] T013 Validate the documented revert path end to end: re-enable `media-home.service`, confirm Kodi-first startup returns without reinstalling or reconfiguring anything, then disable it again and confirm the desktop-first state is restored.
   Verified without a reboot: enabling started Kodi and `--revert` restored all three settings exactly;
   disabling stopped Kodi and `--apply` restored the couch settings. Confirmed the Kodi bounded-stop
@@ -72,7 +77,8 @@ every browser exit.
   Checks done and clean: `bash -n` on all 14 scripts, both systemd units verify clean, `desktop-file-validate`
   clean, `git diff --check` clean, and private-key/secret/MAC scans across all 27 files changed against `main`
   found nothing. No browser profile, cookie, or credential file is tracked. ShellCheck is not installed, so no
-  ShellCheck result is claimed. The pull request itself is held pending T012 owner acceptance.
+  ShellCheck result is claimed. T012 is now accepted, so the pull request awaits only the owner's
+  go-ahead to push.
 
 ## Explicitly not in this feature
 

@@ -1,6 +1,6 @@
 # Feature Specification: Desktop-First Home and Kodi Retirement
 
-**Status**: In progress
+**Status**: Complete (pending PR)
 
 Replace the Kodi-first media home with the ordinary GNOME desktop as the appliance's home experience. The project owner has confirmed there will never be a local media library, which removes Kodi's primary value and leaves it acting only as a launcher shell. Booting to the desktop and launching streaming or gaming applications directly deletes the session stop/restore orchestration that has been the most failure-prone part of the appliance.
 
