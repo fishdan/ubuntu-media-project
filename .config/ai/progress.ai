@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-09-05 — Spec 015: Dock Pinned Open; Per-Key Baseline Capture Fixed
+
+- Checked what the owner would actually see before writing test instructions. Ubuntu Dock is enabled and active and hot corners are on, so the pointer alone can reach both the dock and the Activities overview; the preset sends no Super key, so this mattered. But the dock defaulted to auto-hide, which means hunting for a screen edge with a controller stick from across the room.
+- Pinned the dock open and enlarged its icons through the tracked settings script: `dash-to-dock dock-fixed` true (was false), `autohide` false (was true), `dash-max-icon-size` 64 (was 48).
+- **Fixed a real flaw in `configure-desktop-home.sh` found while doing this.** `capture_baseline` guarded on the whole file, so once a baseline existed no further keys were ever captured. Any setting added to the script after the first `--apply` would have been applied with no recorded prior value and would not have been restored by `--revert`. Capture is now per key: existing keys keep their original captured value, and newly added keys are captured on the next run. Verified the three original values were preserved untouched while the three new ones were captured correctly.
+
 ## 2026-09-05 — Spec 015: Desktop Pointer Fixed; input-remapper Injection Had Never Worked
 
 The owner asked whether the mouse is supposed to be movable with the DualSense. Checking rather than assuming exposed two defects, one of them mine and one long-standing.

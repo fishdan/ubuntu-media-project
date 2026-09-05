@@ -78,6 +78,12 @@ of everything it writes before writing it:
 | `org.gnome.desktop.interface text-scaling-factor` | `1.5` | `1.0` |
 | `org.gnome.desktop.interface cursor-size` | `48` | `24` |
 | `org.gnome.shell favorite-apps` | Zuzz, Firefox, Kodi | Ubuntu defaults |
+| `dash-to-dock dock-fixed` | `true` | `false` |
+| `dash-to-dock autohide` | `false` | `true` |
+| `dash-to-dock dash-max-icon-size` | `64` | `48` |
+
+The dock is pinned open deliberately. By default it auto-hides, which means
+hunting for a screen edge with a controller stick from across the room.
 
 ```
 scripts/configure-desktop-home.sh --apply     # configure for the couch

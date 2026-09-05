@@ -21,6 +21,11 @@ readonly settings=(
     "org.gnome.desktop.interface${sep}text-scaling-factor${sep}1.5"
     "org.gnome.desktop.interface${sep}cursor-size${sep}48"
     "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'firefox_firefox.desktop', 'kodi.desktop']"
+    # The dock auto-hides by default, which means hunting for a screen edge with
+    # a controller stick from across the room. Pin it open and enlarge the icons.
+    "org.gnome.shell.extensions.dash-to-dock${sep}dock-fixed${sep}true"
+    "org.gnome.shell.extensions.dash-to-dock${sep}autohide${sep}false"
+    "org.gnome.shell.extensions.dash-to-dock${sep}dash-max-icon-size${sep}64"
 )
 
 usage() {
@@ -33,21 +38,23 @@ require_user_session() {
     command -v gsettings >/dev/null || { printf '%s\n' 'gsettings is not available.' >&2; exit 1; }
 }
 
+# Capture is per key, not per file. A key already in the baseline keeps its
+# original value, so repeated --apply runs never overwrite the true pre-feature
+# state. A key added to `settings` after the first run still gets captured, which
+# a whole-file guard would have silently skipped, leaving it unrevertable.
 capture_baseline() {
-    if [[ -e $baseline_path ]]; then
-        printf 'Keeping the existing baseline: %s\n' "$baseline_path"
-        return 0
-    fi
     mkdir -p -- "$state_dir"
+    [[ -e $baseline_path ]] || { : >"$baseline_path"; chmod 0600 -- "$baseline_path"; }
     local entry schema key current
-    : >"$baseline_path"
     for entry in "${settings[@]}"; do
         IFS="$sep" read -r schema key _ <<<"$entry"
+        if grep -qF "$schema$sep$key$sep" "$baseline_path"; then
+            continue
+        fi
         current=$(gsettings get "$schema" "$key")
         printf '%s%s%s%s%s\n' "$schema" "$sep" "$key" "$sep" "$current" >>"$baseline_path"
+        printf '  captured %s %s = %s\n' "$schema" "$key" "$current"
     done
-    chmod 0600 -- "$baseline_path"
-    printf 'Captured rollback baseline: %s\n' "$baseline_path"
 }
 
 apply_settings() {
