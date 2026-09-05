@@ -40,8 +40,8 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 **Spec 009 — needs the owner at the projector:**
 - T004-T006 and T011: projector/receiver audio, streaming login and playback, and close/relaunch account persistence. Projector presentation and on-screen-keyboard typing were already accepted on 2026-09-04. Kodi restoration was struck from scope.
 
-**Spec 016 — blocked:**
-- Still unknown whether the owner's phone is Android or iPhone. The KDE Connect iOS client has historically lacked the remote-input feature the specification depends on, so this can invalidate it before any work starts.
+**Spec 016 — unblocked, not started:**
+- **Unblocked 2026-09-05: the phone is Android.** Implementation may proceed. The desktop side is `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, available, not installed); the Plasma `kdeconnect` package is explicitly not used. Spec 016 still has only `spec.md` and needs `plan.md` and `tasks.md`.
 
 ### Known issues and loose ends
 
@@ -51,9 +51,36 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 - The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left deliberately; delete only on the owner's instruction. Brave itself is untouched.
 - ShellCheck is still not installed, so no ShellCheck result is claimed anywhere in this project.
 
+### REBOOT IN PROGRESS — first thing to do on reconnect
+
+The appliance was rebooted on 2026-09-05 to validate Spec 015 T011. This session
+runs on the appliance through VS Code Remote SSH, so it ended with the reboot.
+Pre-reboot state: boot time `2026-09-04 22:15:53`, `media-home.service`
+disabled/inactive, `zuzz-media.service` active, SSH enabled/active, GDM
+autologin on, `text-scaling-factor` 1.5, host at `192.168.1.204`.
+
+Run this and record the result in `progress.ai` as T011 evidence:
+
+```
+uptime -s                                             # must differ from 2026-09-04 22:15:53
+systemctl is-active ssh                               # active
+systemctl --user is-enabled media-home.service        # disabled
+systemctl --user is-active media-home.service         # inactive
+ps -eo cmd | grep -c '[k]odi.bin'                     # 0
+ps -eo cmd | grep -c '[f]irefox --no-remote -P zuzz'  # 0 (nothing auto-starts)
+loginctl list-sessions                                # a seat0 graphical session for dfish
+grep AutomaticLogin /etc/gdm3/custom.conf             # still true / dfish
+gsettings get org.gnome.desktop.interface text-scaling-factor   # 1.5
+```
+
+T011 passes if the desktop is reached with automatic login intact, nothing
+media-related started on its own, and SSH plus the local TTY still work. If
+Kodi starts anyway, `media-home.service` was re-enabled by something and that
+must be investigated before anything else.
+
 ### Recommended next actions
 
 1. Reboot the appliance and complete Spec 015 T011. This is the feature's central claim and is the one thing that cannot be inferred from the current running state.
 2. Get the owner in front of the projector for T012, and judge whether 1.5 text scaling is right.
-3. Answer the phone-platform question for Spec 016.
+3. ~~Answer the phone-platform question for Spec 016.~~ Resolved 2026-09-05: Android. Spec 016 is unblocked and uses GSConnect (the GNOME implementation of the KDE Connect protocol), not the Plasma `kdeconnect` package.
 4. Finish T014, then decide whether to PR Spec 009 and Spec 015 separately or merge 009 first.

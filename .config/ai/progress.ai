@@ -1,5 +1,18 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 Unblocked: Android Confirmed; GSConnect vs KDE Connect Clarified
+
+- The owner confirmed the phone is **Android**, resolving the risk that could have invalidated Spec 016 before implementation. The KDE Connect Android client provides the remote keyboard and touchpad input the feature depends on.
+- The owner asked whether the project is using KDE Connect or the GNOME equivalent. Clarified and recorded in the specification: "KDE Connect" is a protocol with two independent desktop implementations. This appliance runs GNOME, so it uses `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, Ubuntu universe, confirmed available and not installed), a native GNOME Shell extension speaking that protocol. The `kdeconnect` package (`25.12.3-0ubuntu1`) is the Plasma application and would pull Qt and KDE libraries onto a GNOME appliance for no benefit; it is explicitly not used. The phone side is the ordinary KDE Connect Android app, which pairs with GSConnect normally.
+- Spec 016 status moved to "Planned (unblocked 2026-09-05)" and the phone-platform risk struck.
+
+## 2026-09-05 — Spec 015 T011: Reboot Authorized and Pre-Reboot State Captured
+
+- The owner authorized rebooting the appliance to validate the desktop-first boot, which is Spec 015's central claim and cannot be inferred from the running state.
+- State captured immediately before the reboot: boot time `2026-09-04 22:15:53`; `media-home.service` disabled and inactive; `zuzz-media.service` active; `ssh.service` enabled and active; default target `graphical.target`; GDM active with `AutomaticLoginEnable=true` and `AutomaticLogin=dfish`; `text-scaling-factor` 1.5; appliance reachable at `192.168.1.204`.
+- Note the address changed from the `192.168.1.203` recorded during Spec 003 to `192.168.1.204`. The host uses DHCP and the router-side reservation remains an outstanding external action, so this drift is expected rather than a fault.
+- This session runs on the appliance itself through VS Code Remote SSH, so the reboot terminates it. The post-reboot T011 verification steps are recorded in `handoff.ai` for the next session.
+
 ## 2026-09-05 — Spec 015 T013: Revert Path Validated Both Directions
 
 - Exercised the documented revert without a reboot. `systemctl --user enable --now media-home.service` brought Kodi back immediately and `configure-desktop-home.sh --revert` restored `text-scaling-factor`, `cursor-size`, and `favorite-apps` to their exact captured values. No reinstallation or reconfiguration was required, satisfying the specification's reversibility criterion.

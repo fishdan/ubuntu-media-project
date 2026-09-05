@@ -1,6 +1,17 @@
 # Feature Specification: Phone-Based Remote Input (GSConnect)
 
-**Status**: Planned
+**Status**: Planned (unblocked 2026-09-05)
+
+> **Phone platform resolved on 2026-09-05: Android.** The risk that closed this specification before it
+> started is gone — the KDE Connect Android client provides the remote keyboard and touchpad input this
+> feature depends on. Implementation may proceed.
+>
+> **Desktop side is GSConnect, not KDE.** "KDE Connect" is a protocol with two independent desktop
+> implementations. This appliance runs GNOME, so it uses `gnome-shell-extension-gsconnect`
+> (`71-1ubuntu1`, Ubuntu universe), a native GNOME Shell extension that speaks the KDE Connect protocol.
+> The `kdeconnect` package (`25.12.3-0ubuntu1`) is the Plasma application and would pull Qt and KDE
+> libraries onto a GNOME appliance for no benefit; it is explicitly not used. The phone side is the
+> ordinary KDE Connect Android app, which pairs with GSConnect normally.
 
 Provide keyboard and pointer input from the owner's phone using GSConnect, the GNOME Shell implementation of the KDE Connect protocol, packaged by Ubuntu as `gnome-shell-extension-gsconnect` (`71-1ubuntu1`). This resolves the text-entry problem that Spec 009 investigated and could not solve.
 
@@ -14,7 +25,7 @@ Spec 009 established through a captured Wayland protocol trace that GNOME's on-s
 
 ## Prerequisites and Open Questions
 
-- **Phone platform must be confirmed before implementation.** The KDE Connect Android client provides remote keyboard and touchpad input. The iOS client has historically offered a reduced feature set, and remote input may be unavailable. If the owner's phone is an iPhone, this approach must be validated early or replaced with an alternative before further work.
+- ~~**Phone platform must be confirmed before implementation.**~~ **Resolved 2026-09-05: the owner's phone is Android**, so the KDE Connect Android client's remote keyboard and touchpad input is available. The iOS concern that motivated this risk no longer applies.
 - Phone and appliance must be on the same trusted LAN, with the appliance reachable at its existing address.
 
 ## Acceptance Criteria
