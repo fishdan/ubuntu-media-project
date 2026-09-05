@@ -1,5 +1,10 @@
 # Kodi Setup and Recovery
 
+> **Superseded on 2026-09-05.** Kodi is no longer the appliance's home. `media-home.service` is
+> disabled and the desktop is the home; see `docs/desktop-home.md`. Kodi remains installed and
+> launchable as an ordinary application, and this document still describes how it is configured
+> and how to bring the Kodi-first home back.
+
 ## Scope
 
 Spec 007 installs Kodi from Ubuntu's repository and integrates it with the existing `media-home.service`. NFS is explicitly out of scope by owner decision. Kodi can use local media now; a separate feature can add network media later if it becomes necessary.

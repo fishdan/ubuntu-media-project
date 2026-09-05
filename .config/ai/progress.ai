@@ -1,5 +1,17 @@
 # Progress Log
 
+## 2026-09-05 — Spec 015 Phases 3-4: Couch-Legible Desktop and Roadmap Bookkeeping
+
+- T006 added `scripts/configure-desktop-home.sh` with `--apply`, `--revert`, and `--status`. It captures the prior value of every setting it writes into `~/.local/state/ubuntu-media-project/desktop-home.baseline` and never overwrites an existing capture, so the baseline always describes the appliance before this feature first touched it rather than after the previous run.
+- T007 applied `text-scaling-factor` 1.5 (was 1.0), `cursor-size` 48 (was 24), and curated `favorite-apps` to Zuzz, Firefox, and Kodi (was the Ubuntu default set). Validated the full round trip: applied twice with the baseline correctly preserved, reverted and byte-compared all three values against the baseline recorded in `plan.md` (all matched), confirmed `--revert` with no baseline fails clearly with exit 1, then re-applied.
+- Deliberately did not add a Steam favourite. `steam.desktop` does not exist until Spec 011 installs it, and a favourite pointing at a missing desktop file renders as a blank tile. Recorded as a decision in `tasks.md` rather than silently dropping the task's wording.
+- T008 confirmed `zuzz.desktop` is installed, passes `desktop-file-validate`, and that all three curated favourites resolve to real desktop files.
+- T009 updated specification status fields: Spec 007 and Spec 012 superseded, Spec 010 reduced, Spec 011 simplified, Spec 006 annotated as amended. Each carries a short block quote explaining what changed and why, so the status is self-explanatory to a reader who was not in the conversation.
+- T010 rewrote the `README.md` mission, feature list, and delivery-order table from Kodi-first to desktop-first, and wrote `docs/desktop-home.md` covering boot behaviour, launchers, the applied settings with their prior values, the full revert procedure, and the known limitations.
+- `setup.md` and `docs/kodi.md` were annotated rather than rewritten. `setup.md` is the owner's original design brief and is kept as the record of original intent; `docs/kodi.md` still correctly describes how Kodi is configured and how to bring the Kodi-first home back.
+- Validation: `bash -n` on all 14 scripts, `desktop-file-validate` clean, `git diff --check` clean, private-key and MAC scans over all changed files with no matches.
+- Remaining: T011 reboot validation, T012 owner couch acceptance, T013 revert-path end-to-end test, T014 pre-PR checks.
+
 ## 2026-09-05 — Spec 015 Phases 1-2: Kodi Retired from Startup, Orchestration Removed
 
 - Branched `feature/0.015-desktop-first-home` from the committed Spec 009 work and wrote `plan.md` and `tasks.md` before touching the appliance.

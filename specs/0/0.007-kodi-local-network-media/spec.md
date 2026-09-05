@@ -1,6 +1,11 @@
 # Feature Specification: Kodi and Local/Network Media
 
-**Status**: Complete
+**Status**: Superseded by Spec 015
+
+> **Superseded by Spec 015 on 2026-09-05.** The owner confirmed the appliance will never hold a
+> local media library, so Kodi as the media home is retired. Kodi remains installed and
+> launchable as an ordinary desktop application, and this specification stays as history of how
+> it was configured. NFS and network media were never implemented and are not reintroduced.
 
 Provide a fullscreen, controller-navigable Kodi home for local and network media and supported streaming add-ons. Where media lives on another Linux system, use documented and recoverable NFS/systemd automount configuration so unavailable shares do not block boot.
 

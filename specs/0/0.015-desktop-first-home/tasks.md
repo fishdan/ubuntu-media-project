@@ -21,14 +21,14 @@ every browser exit.
 
 ## Phase 3 — Couch-legible desktop
 
-- [ ] T006 Write `scripts/configure-desktop-home.sh` with idempotent `--apply` and `--revert` modes. It must capture prior values before writing, refuse to overwrite an existing capture, and be safe to run repeatedly.
-- [ ] T007 Apply projector-distance display settings (text scaling, cursor size) and curate `org.gnome.shell favorite-apps` to the streaming browser, Kodi as an ordinary application, and a placeholder for the future Steam entry. Verify `--revert` restores the exact baseline in `plan.md`.
-- [ ] T008 Confirm the Zuzz desktop entry is present in the desktop's application list and launches the browser from the desktop without a terminal.
+- [x] T006 Write `scripts/configure-desktop-home.sh` with idempotent `--apply` and `--revert` modes. It must capture prior values before writing, refuse to overwrite an existing capture, and be safe to run repeatedly.
+- [x] T007 Apply projector-distance display settings (text scaling, cursor size) and curate `org.gnome.shell favorite-apps` to the streaming browser, Kodi as an ordinary application, and Kodi. No Steam placeholder was added: `steam.desktop` does not exist until Spec 011 installs it, and a favourite pointing at a missing desktop file renders as a blank tile. Verify `--revert` restores the exact baseline in `plan.md`.
+- [x] T008 Confirm the Zuzz desktop entry is present in the desktop's application list and launches the browser from the desktop without a terminal.
 
 ## Phase 4 — Roadmap bookkeeping
 
-- [ ] T009 Update specification status fields: Spec 007 superseded, Spec 012 retired or reduced to its remaining value, Spec 010 reduced to what Spec 016 will not cover, Spec 011 simplified to launch-from-and-exit-to desktop, and Spec 006 annotated as amended (automatic login retained).
-- [ ] T010 Update `README.md` and `setup.md` from a Kodi-first home to a desktop-first home, and write `docs/desktop-home.md` covering the home experience, applied settings, and the full revert procedure.
+- [x] T009 Update specification status fields: Spec 007 superseded, Spec 012 retired or reduced to its remaining value, Spec 010 reduced to what Spec 016 will not cover, Spec 011 simplified to launch-from-and-exit-to desktop, and Spec 006 annotated as amended (automatic login retained).
+- [x] T010 Update `README.md` and `setup.md` from a Kodi-first home to a desktop-first home, and write `docs/desktop-home.md` covering the home experience, applied settings, and the full revert procedure.
 
 ## Phase 5 — Validation and acceptance
 

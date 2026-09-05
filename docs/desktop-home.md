@@ -1,0 +1,108 @@
+# Desktop Home
+
+The appliance boots to the ordinary GNOME desktop. There is no media shell, no
+session takeover, and nothing to restore when an application exits.
+
+This replaced a Kodi-first home on 2026-09-05. The owner confirmed the appliance
+will never hold a local media library, which left Kodi acting only as a launcher
+shell that the desktop already provides. Retiring it deleted the stop/restore
+orchestration that had been the appliance's most failure-prone component — it
+caused visible faults on multiple occasions, including a `media-home.service`
+that ended in a `failed` state on every stop because Kodi's child process
+survived to the unit's kill timeout.
+
+See `specs/0/0.015-desktop-first-home/` for the specification, plan, and tasks.
+
+## What happens at boot
+
+1. GDM logs in `dfish` automatically (Spec 006, unchanged).
+2. The GNOME Wayland session starts.
+3. Nothing else. No media application launches automatically.
+
+`media-home.service` is installed but **disabled**. It is kept only as the
+revert path.
+
+## Launching things
+
+| Application | How |
+| --- | --- |
+| Zuzz streaming | The **Zuzz** launcher, or `~/.local/bin/launch-zuzz` |
+| Firefox | The normal Firefox launcher (separate from the media profile) |
+| Kodi | The normal Kodi launcher; still installed, just no longer the home |
+
+The dock favourites are curated to Zuzz, Firefox, and Kodi. Steam is added by
+Spec 011; it is deliberately absent from the favourites until then, because a
+favourite pointing at a missing desktop file renders as a blank tile.
+
+Zuzz runs under `zuzz-media.service`, which exists so an administrator can stop
+the browser over SSH:
+
+```
+systemctl --user start zuzz-media.service
+systemctl --user stop  zuzz-media.service
+```
+
+Stopping it now only resets the DualSense controller mapping. It no longer
+starts Kodi.
+
+## Couch-legible display settings
+
+Applied by `scripts/configure-desktop-home.sh`, which captures the prior value
+of everything it writes before writing it:
+
+| Setting | Appliance value | Prior value |
+| --- | --- | --- |
+| `org.gnome.desktop.interface text-scaling-factor` | `1.5` | `1.0` |
+| `org.gnome.desktop.interface cursor-size` | `48` | `24` |
+| `org.gnome.shell favorite-apps` | Zuzz, Firefox, Kodi | Ubuntu defaults |
+
+```
+scripts/configure-desktop-home.sh --apply     # configure for the couch
+scripts/configure-desktop-home.sh --status    # show current vs desired
+scripts/configure-desktop-home.sh --revert    # restore the captured values
+```
+
+The rollback baseline is written once to
+`~/.local/state/ubuntu-media-project/desktop-home.baseline` and is never
+overwritten by a later `--apply`, so it always describes the appliance as it was
+before this feature first touched it. `--revert` restores those values and
+removes the file.
+
+If the desktop is still hard to read from the couch, raise
+`text-scaling-factor` in the script rather than by hand, so the change stays in
+version control.
+
+## Reverting to the Kodi-first home
+
+Nothing was uninstalled, so this needs no reinstallation or reconfiguration:
+
+```
+systemctl --user enable --now media-home.service
+scripts/configure-desktop-home.sh --revert
+```
+
+The first command restores Kodi at login. The second restores the original
+display settings and dock favourites. Reboot to confirm.
+
+To go back to the desktop-first home:
+
+```
+systemctl --user disable --now media-home.service
+scripts/configure-desktop-home.sh --apply
+```
+
+Note that `scripts/install-media-startup.sh` installs `media-home.service` but
+deliberately leaves it disabled, so re-running the installer will not undo the
+retirement. Enablement is now a deliberate act.
+
+## Known limitations
+
+- **GNOME is not a ten-foot interface.** Scaling and large text reduce but do
+  not eliminate this.
+- **Text entry without a physical keyboard is not solved here.** Spec 009
+  established that GNOME's on-screen keyboard depends on application
+  cooperation that the browser did not reliably provide. Phone-based remote
+  input is Spec 016, which is itself blocked until the owner's phone platform
+  is known.
+- **No local media library, NFS export, or network mount** is assumed,
+  configured, or reintroduced.
