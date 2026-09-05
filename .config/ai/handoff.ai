@@ -1,41 +1,59 @@
 # Handoff
 
-## 2026-09-05 — Spec 009 committed; managed launch validated; Spec 015 ready to branch
+## 2026-09-05 — Spec 015 implemented through Phase 4; reboot and couch acceptance outstanding
 
 Supersedes all earlier handoff entries. The durable history remains in `progress.ai`; this file is current state only.
 
 ### Branch and repository state
 
-- Branch: `feature/0.009-brave-zuzz-browser-streaming`. Spec 009's Firefox switch is now **committed** on this branch (see `git log`), including the launcher, installer, `zuzz-media.service`, desktop entry, docs, spec/plan/research/quickstart/tasks, and the new Specs 015 and 016.
-- `config/systemd/user/brave-media.service` was renamed to `zuzz-media.service` before it was ever tracked, so Git records only the new file.
-- Constitution rule X requires each feature on its own non-`main` branch. Spec 015 work must NOT begin on this branch — cut a new branch first.
+- Branch: `feature/0.015-desktop-first-home`, cut from `feature/0.009-brave-zuzz-browser-streaming`. Working tree is clean; everything below is committed.
+- `feature/0.009-brave-zuzz-browser-streaming` carries the committed Firefox switch and is ready for a PR once its remaining owner acceptance is either done or formally deferred.
+- Neither branch has been pushed and no pull request exists yet.
 
 ### What changed this session
 
-1. Ran the `start.ai` startup sequence; runtime state matched the prior handoff exactly.
-2. Stopped the stray unmanaged Firefox (pid 11642) and started `zuzz-media.service`, closing the prior handoff's top loose end. The managed path works: Firefox runs inside the unit cgroup with `--no-remote -P zuzz-media --kiosk https://zuzz.tv` and the site rendered.
-3. Found and recorded a new defect (below) in the Kodi stop path.
-4. Ran full pre-commit validation and committed Spec 009.
+1. Ran the `start.ai` startup sequence and validated the managed Firefox launch that the previous handoff left unproven.
+2. Committed Spec 009 and the Spec 015/016 specifications.
+3. The owner confirmed the move away from Kodi, which narrowed Spec 009's remaining acceptance and authorised Spec 015.
+4. Implemented Spec 015 phases 1-4 and validated the revert path in both directions.
 
-### Current appliance runtime state
+### Current appliance state
 
-- `zuzz-media.service`: static, **active** (Firefox kiosk on zuzz.tv). This is the intended arrangement.
-- `media-home.service`: enabled but **failed** — see the defect below. Kodi is not running.
-- SSH is active; the normal GNOME desktop and Wi-Fi fallback are untouched.
-- `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` (set for T007). Rollback is the same command with `false`.
+- `media-home.service`: installed, **disabled**, inactive. Kodi is installed and launchable but no longer starts at login.
+- `zuzz-media.service`: **active**, Firefox kiosk on zuzz.tv.
+- Desktop settings applied for the couch: `text-scaling-factor` 1.5, `cursor-size` 48, favourites curated to Zuzz, Firefox, Kodi. Baseline captured at `~/.local/state/ubuntu-media-project/desktop-home.baseline`.
+- SSH active. GDM automatic login unchanged (`AutomaticLoginEnable=true`, `AutomaticLogin=dfish`).
+- `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` from Spec 009 T007.
+
+### Defects resolved this session
+
+- `media-home.service` failing on every stop: made unreachable by deleting every code path that stops it. The underlying Kodi behaviour is unchanged and still reproduces if the unit is stopped deliberately during a home switch, which is why the documented procedure includes `reset-failed`.
+- `zuzz-media.service` failing on every clean stop: `launch-zuzz.sh --restore` propagated `input-remapper-control`'s non-zero exit when the DualSense is not connected. It is now best-effort and warns instead.
+
+### Outstanding work
+
+**Spec 015 — needs the owner and the console:**
+- T011: reboot and confirm automatic login still works, the desktop is reached, no media application starts, `media-home.service` stays disabled, and SSH plus local TTY recovery are intact. **Not yet done — the appliance has not been rebooted since these changes.**
+- T012: owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse.
+- T014: pre-PR checks and PR preparation, after T011 and T012.
+
+**Spec 009 — needs the owner at the projector:**
+- T004-T006 and T011: projector/receiver audio, streaming login and playback, and close/relaunch account persistence. Projector presentation and on-screen-keyboard typing were already accepted on 2026-09-04. Kodi restoration was struck from scope.
+
+**Spec 016 — blocked:**
+- Still unknown whether the owner's phone is Android or iPhone. The KDE Connect iOS client has historically lacked the remote-input feature the specification depends on, so this can invalidate it before any work starts.
 
 ### Known issues and loose ends
 
-- **New defect: `media-home.service` ends in `failed` state when the launcher stops it.** Kodi's main process exits on SIGTERM (status 143) but the `kodi.bin` child survives to the unit's `final-sigterm` timeout and is SIGKILLed, leaving `Result: exit-code`. Firefox still launches, because `launch-zuzz --run` does not gate on the stop's exit status. Recoverable via `launch-zuzz --restore`, which starts the unit and clears the failed state. **Deliberately not fixed** — it is direct evidence for the Spec 015 decision to retire the Kodi-launch half of `media-home.service` rather than harden it.
-- Spec 009 T004-T006 and T011 remain unaccepted. They all need the owner at the projector: presentation, on-screen-keyboard typing/backspace in a website field, streaming login and playback, close/relaunch account persistence, and Kodi restoration on stop.
-- Owner reported a saved password did not persist. Likely the Firefox save-password prompt was not accepted on a brand-new profile rather than a defect. Unverified.
-- The default Firefox profile `wamx1xaj.default` holds zuzz.tv history from an early ad-hoc test. Harmless; clear it only if the owner cares.
-- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left in place deliberately; delete only on the owner's instruction. Brave itself is untouched with its personal profile intact.
-- **Open question blocking Spec 016**: whether the owner's phone is Android or iPhone. KDE Connect's iOS client has historically lacked the remote-input feature the spec depends on, so the answer can invalidate Spec 016 before any work starts.
+- `text-scaling-factor` 1.5 is an estimate for projector distance and has not been judged from the couch. Change it in `scripts/configure-desktop-home.sh`, not by hand, so it stays in version control.
+- Steam is deliberately absent from the dock favourites until Spec 011 installs `steam.desktop`; a favourite pointing at a missing desktop file renders as a blank tile.
+- Owner reported a saved password did not persist in Firefox. Likely the save prompt was not accepted on a new profile. Unverified.
+- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left deliberately; delete only on the owner's instruction. Brave itself is untouched.
 - ShellCheck is still not installed, so no ShellCheck result is claimed anywhere in this project.
 
 ### Recommended next actions
 
-1. Get the owner to the projector for Spec 009 T004-T006/T011 acceptance, or explicitly defer them; that is all that stands between Spec 009 and a PR.
-2. Answer the phone-platform question for Spec 016.
-3. Cut a new branch for Spec 015 and begin by disabling `media-home.service` and simplifying `launch-zuzz.sh --restore`, keeping the documented revert path intact. Spec 015 has only `spec.md`; it still needs `plan.md` and `tasks.md`.
+1. Reboot the appliance and complete Spec 015 T011. This is the feature's central claim and is the one thing that cannot be inferred from the current running state.
+2. Get the owner in front of the projector for T012, and judge whether 1.5 text scaling is right.
+3. Answer the phone-platform question for Spec 016.
+4. Finish T014, then decide whether to PR Spec 009 and Spec 015 separately or merge 009 first.
