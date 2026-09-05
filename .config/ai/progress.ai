@@ -1,5 +1,43 @@
 # Progress Log
 
+## 2026-09-04 — Spec 008 Final Acceptance and PR Preparation
+
+- The owner confirmed controller reconnection and Kodi navigation following the 19:50 reboot, completing T011 alongside recorded SSH recovery. A later report found the controller disconnected; no new live input acceptance is claimed from that snapshot.
+- Completed T012-T013 by documenting explicit integration checkpoints for Specs 009-012 and retaining deferred projector/receiver acceptance in Spec 005.
+- Final review T014 removed suppression of remapper stop failures and labeled cached status as intent rather than verified injection. A temporary stub test confirmed exit code 7 propagates, preserves the state marker, and does not print a successful native-input claim.
+- Validation passed: Bash syntax for all three DualSense scripts, Python JSON parsing of the preset, feature scans for Bluetooth addresses/private keys/likely secret assignments, and `git diff --check`. ShellCheck is unavailable. The bounded hardware report verified installed packages and driver availability; SSH is active. Prior native-input and desktop mapping acceptance remains recorded above/below.
+- The staged whitespace check caught an extra EOF blank line in the new report script; removed it and reran the full branch whitespace check successfully.
+- Spec 008 current scope is complete and ready for PR review; no new reboot or live remapping was performed during final review.
+
+## 2026-09-04 — Spec 008 T011 Reboot Investigation
+
+- Investigated the owner-reported unexpected reboot around 19:50 EDT using boot history, previous/current kernel journals, sudo/logind records, and SSH service logs.
+- At 19:50:15, sudo recorded `dfish` running `/usr/bin/systemctl reboot` from `/home/dfish/dev/ubuntu-media-project`, in login session 4. This proves an explicit software reboot request; these records alone do not identify whether a human or automation issued it.
+- The system completed orderly service shutdown and filesystem synchronization at 19:50:19; the next boot began at 19:50:30. SSH started at 19:50:39 and accepted administrator public-key authentication at 19:51:07.
+- No kernel panic or abrupt power-loss sequence explains this reboot. Earlier Wi-Fi beacon-loss warnings were present, but the reboot trigger is the recorded sudo command.
+- Validation: `journalctl --list-boots`, previous-boot journal and kernel warning review, verbose sudo journal fields, `uptime -s`, and `systemctl is-active ssh` (active). No appliance configuration changed. T011 remains incomplete pending controller/native-input and human-visible Kodi acceptance.
+
+## 2026-09-04 — Spec 008 Native Controller and Media Mode
+
+- Installed the Ubuntu `evtest`, `input-remapper`, `joystick`, and `kodi-peripheral-joystick` packages with an idempotent tracked installer; the in-kernel `hid_playstation` module is available and loaded.
+- Paired the spare DualSense through BlueZ and confirmed it is bonded, trusted, and connected without recording its Bluetooth address or other unique identifiers in Git.
+- Kodi detected the native controller and motion-sensor interfaces. The project owner confirmed joystick control and later confirmed automatic reconnection after timeout by pressing PS once, without re-pairing.
+- Added a privacy-safe bounded diagnostic report. It confirms the main controller's 13 buttons, 8 axes, force-feedback capabilities, two joystick interfaces, and Kodi support while intentionally omitting addresses and unique IDs.
+- Added an address-free input-remapper preset and explicit `on`, `off`, and `status` wrapper. The mode maps pointer, click, navigation, back, playback, volume, Escape, and Enter primitives and refuses to overwrite local preset modifications.
+- Successfully started and stopped injection, confirmed the native device remained available afterward, and kept the mode off for Kodi/future Steam. On the GNOME desktop, the project owner confirmed the controller works well.
+- The input-remapper CLI emits a Python 3.14/Pydantic v1 compatibility warning but completed all start/stop operations successfully. Firmware updating remains an optional external action through a PS5 or Sony's Windows application.
+- Next task: reboot acceptance, followed by staged downstream checkpoints and final privacy/repository validation.
+
+## 2026-09-04 — Spec 008 DualSense Planning and Baseline
+
+- Confirmed PR #4 is merged on `main` and created `feature/0.008-dualsense-controller`.
+- Confirmed the Realtek Bluetooth controller is powered, but no Bluetooth device is currently paired or known. No controller address is recorded.
+- Confirmed Ubuntu kernel 7.0 includes signed in-tree `hid_playstation` support; the module is not loaded because no PlayStation controller is connected.
+- Confirmed Ubuntu 26.04 offers `kodi-peripheral-joystick` 21.1.23, `input-remapper` 2.2.0, `joystick` 1.8.1, and `evtest` 1.36; none is installed yet. AntiMicroX is not available from the configured repository.
+- Selected native `hid_playstation` and Kodi joystick input as the first layer, with input-remapper reserved for an explicit desktop/browser media mode that can be disabled before Steam.
+- Added Spec 008 acceptance criteria, plan, research, data model, quickstart, and tasks. Brave, on-screen keyboard, Steam, and universal-home integration remain staged for Specs 009-012.
+- SSH/Kodi remote control remains the recovery path during pairing and mapping. Next task: install support, then pair the physical DualSense without storing its Bluetooth address in Git.
+
 ## 2026-09-04 — Spec 007 Reboot, Recovery, and Final Acceptance
 
 - Added `scripts/configure-kodi-session.sh` and disabled GNOME idle blanking for the media user at the owner's request; the previous value was 300 seconds and the tracked rollback resets the setting to the Ubuntu default.
