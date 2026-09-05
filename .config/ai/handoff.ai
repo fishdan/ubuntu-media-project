@@ -1,1 +1,10 @@
 # Handoff
+
+## 2026-09-04 — Spec 005 ready for review
+
+- Branch: `feature/0.005-graphics-av-display-audio-power`.
+- Current scope complete; owner explicitly waived AV-off boot and requested PR creation. That scenario remains untested.
+- Passed: owner-visible projector output and stereo sound; receiver/projector cycles, projector input switch, HDMI reconnect, AV-on reboot; SSH recovery and persisted AC policy.
+- Final checks: Bash syntax, bounded AV report execution, power-policy check, privacy scans, and full-branch whitespace check. ShellCheck unavailable.
+- Limitations: initial PipeWire hang resolved by user-service restart; cause unknown, no recurrence during subsequent tests. Multichannel/passthrough untested; recovery durations unmeasured.
+- Next: review and merge Spec 005 PR. No further reboot requested.
