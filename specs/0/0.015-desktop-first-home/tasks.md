@@ -42,8 +42,13 @@ every browser exit.
   First attempt mapped L2+R2 to Alt+F4, GNOME's close-window binding. The owner tested it and it did not
   return the appliance to the desktop, so it was removed rather than left in as a mapping that looks right
   and does nothing.
-  Replaced with a mechanism that does not depend on the focused window at all: the **PS button** emits
-  `KEY_F13`, which no application binds, and a GNOME compositor-level custom shortcut runs
+  Second attempt used the **PS button** emitting `KEY_F13` bound as `'F13'`. The owner tested it and it
+  opened Settings. Root cause: GNOME matches shortcuts on the X keysym, and xkb maps `FK13` to
+  `XF86Tools`, so our binding never matched while something else consumed that keysym. The button and the
+  mapping were proven correct by this failure, since a keypress plainly reached GNOME.
+  Now uses `KEY_F14`, whose keysym is `XF86Launch5`, verified unbound across the media-keys, wm, shell,
+  and mutter schemas, with the shortcut registered under that keysym name. A GNOME compositor-level
+  custom shortcut runs
   `scripts/return-home.sh`, which stops the units presenting fullscreen applications. Verified the script
   closes Zuzz and returns to the desktop with the pointer still live, is a safe no-op when nothing is
   running, and that the shortcut applies and reverts cleanly with the rest of the desktop settings.

@@ -18,7 +18,11 @@ readonly sep=$'\x1f'
 # plain schema/key table below and is applied and reverted separately.
 readonly keybinding_path='/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/return-home/'
 readonly keybinding_schema='org.gnome.settings-daemon.plugins.media-keys.custom-keybinding'
-readonly keybinding_key='F13'
+# The controller emits evdev KEY_F14, which xkb maps to the XF86Launch5 keysym.
+# GNOME shortcuts are matched on the keysym, not the evdev name, so this must be
+# 'XF86Launch5'. An earlier attempt used KEY_F13 bound as 'F13'; that never
+# matched, because xkb maps FK13 to XF86Tools, which opened Settings instead.
+readonly keybinding_key='XF86Launch5'
 
 # schema <sep> key <sep> desired value.
 # No Steam entry: steam.desktop does not exist until Spec 011 installs it, and a

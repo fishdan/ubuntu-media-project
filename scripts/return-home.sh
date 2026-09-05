@@ -16,6 +16,11 @@ readonly units=(
     zuzz-media.service
 )
 
+# Logged so that "the button did nothing" can be diagnosed: if this line is in
+# the journal the shortcut fired and the fault is downstream; if it is absent the
+# key never reached GNOME.
+logger -t return-home 'return-home invoked'
+
 stopped=0
 for unit in "${units[@]}"; do
     if systemctl --user is-active --quiet "$unit"; then

@@ -91,9 +91,17 @@ attempt mapped L2+R2 to Alt+F4, GNOME's close-window binding; the owner tested i
 and it did not return the appliance to the desktop, so it was removed rather than
 left in place as a mapping that looks right and does nothing.
 
-Instead the PS button emits `KEY_F13` — a key no application binds, so a
-fullscreen or kiosk application cannot swallow it — and GNOME runs
-`scripts/return-home.sh` from a compositor-level custom shortcut. That script
+Instead the PS button emits `KEY_F14` and GNOME runs `scripts/return-home.sh`
+from a compositor-level custom shortcut, which a fullscreen application cannot
+swallow.
+
+**The keysym matters, not the evdev name.** GNOME matches shortcuts on the X
+keysym. A first attempt used `KEY_F13` bound as `'F13'`; that never matched,
+because xkb maps `FK13` to `XF86Tools`, so pressing PS opened Settings instead.
+`KEY_F14` maps to `XF86Launch5`, which nothing in GNOME binds, and the shortcut
+is registered under that name. If this button is ever remapped, check
+`/usr/share/X11/xkb/symbols/inet` for the keysym the evdev key actually
+produces. That script
 stops the units that present fullscreen applications. Each is `Type=exec` on the
 application process, so stopping the unit stops the application.
 

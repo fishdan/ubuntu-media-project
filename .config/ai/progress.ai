@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-05 — Return Home: Keysym Mismatch Diagnosed and Fixed
+
+- The owner reported the PS button opened Settings. That failure was informative rather than merely negative: it proved the controller mapping works end to end, since a keypress plainly reached GNOME and was acted upon. The fault was in which key was chosen, not in input-remapper or the preset.
+- **Root cause: GNOME matches keyboard shortcuts on the X keysym, not the evdev key name.** The preset emitted `KEY_F13` and the custom shortcut was registered as `'F13'`, but `/usr/share/X11/xkb/symbols/inet` maps `key <FK13>` to `XF86Tools`. Our binding therefore never matched, while `XF86Tools` was consumed elsewhere as "open Settings".
+- Fixed by switching the PS button to `KEY_F14`, whose keysym is `XF86Launch5`, and registering the custom shortcut under that keysym name. Verified `XF86Launch5` is unbound across the `media-keys`, `wm.keybindings`, `shell.keybindings`, and `mutter.keybindings` schemas before adopting it.
+- Documented the general trap in `docs/dualsense.md`: anyone remapping this button must check the keysym the evdev key actually produces, not assume the evdev name carries through.
+- Added a `logger -t return-home` line to `scripts/return-home.sh` so the next failure can be diagnosed instead of guessed: if the journal records the invocation the shortcut fired and the fault is downstream, and if it is absent the key never reached GNOME. Verified the log line appears.
+- Note that the earlier L2+R2 Alt+F4 attempt is now partly explained too. Its input side was almost certainly fine; the likely fault was Alt+F4 not closing kiosk Firefox. Stopping the unit directly, as `return-home.sh` does, avoids depending on the application at all.
+- Operational note: `return-home.sh` was run directly to verify the new log line, which stopped a Zuzz session the owner had relaunched in the meantime.
+
 ## 2026-09-05 — Return Home Rebuilt on the PS Button After Alt+F4 Failed; AV Playback Accepted
 
 - **AV playback accepted.** The owner reports video and audio through the projector and receiver are flawless, closing that part of Spec 009 T004/T011.

@@ -66,7 +66,7 @@ scripts/dualsense-media-mode.sh off      # required before launching Steam
 
 **To return to the desktop, press the PS button.** Firefox's kiosk mode has no
 window controls and ignores Escape, so this is the only controller-only way out.
-It emits `KEY_F13`, which no application binds, and GNOME runs
+It emits `KEY_F14` (the `XF86Launch5` keysym) and GNOME runs
 `scripts/return-home.sh` at the compositor level so a fullscreen application
 cannot swallow it. Over SSH, `systemctl --user stop zuzz-media.service` does the
 same thing.
