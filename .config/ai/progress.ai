@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-09-05 — Return Home Rebuilt on the PS Button After Alt+F4 Failed; AV Playback Accepted
+
+- **AV playback accepted.** The owner reports video and audio through the projector and receiver are flawless, closing that part of Spec 009 T004/T011.
+- **The L2+R2 Alt+F4 chord did not work.** The owner tested it and it did not return the appliance to the desktop. Diagnosis narrowed it to two possibilities that could not be separated from the console: either input-remapper's combination semantics were not triggering on two simultaneous trigger pulls, or Alt+F4 was not closing Firefox in kiosk mode. Confirmed from `evtest` capabilities that `BTN_TL2` (312) and `BTN_TR2` (313) do exist on the device and that the daemon loaded both without error, so the mapping itself was valid.
+- Rather than guess between the two causes, removed the dependency on the focused window entirely. The mapping was deleted rather than left in place, since a mapping that looks correct and does nothing is worse than none.
+- **Rebuilt on the PS button**, which is what that button means on a console and revives the remaining value of the superseded Spec 012. `BTN_MODE` (316) emits `KEY_F13`, chosen because no application binds it and therefore no fullscreen or kiosk application can swallow it. A GNOME compositor-level custom shortcut on F13 runs the new `scripts/return-home.sh`, which stops the units presenting fullscreen applications; each is `Type=exec` on the application process, so stopping the unit stops the application.
+- Verified `return-home.sh` directly: it stopped `zuzz-media.service`, Firefox exited, the desktop returned, and pointer injection remained live. Re-running it is a safe no-op that reports the appliance is already at the desktop. Extending it for Steam in Spec 011 means adding one unit name to its array.
+- Extended `configure-desktop-home.sh` to own the shortcut. It lives on a relocatable schema so it could not go in the plain schema/key table and is applied and reverted by dedicated functions. Verified the full round trip: `--revert` cleared the shortcut and restored all six plain settings to their captured values, and `--apply` restored the desktop-first state including the shortcut.
+- Added `scripts/return-home.sh` to the installer's symlinks so the shortcut's command path resolves.
+- Remaining: the owner should confirm the PS button returns to the desktop, and whether the Zuzz login persists across a relaunch. The latter was previously untestable because there was no way to exit kiosk mode; the browser has now been stopped, so it can be checked by relaunching from the dock.
+
 ## 2026-09-05 — Pointer Accepted; Kiosk Exit Gap Found and Closed
 
 - **Spec 015's pointer criterion is accepted.** The owner confirmed the DualSense moves the cursor using both the left stick (the input-remapper preset) and the controller's own touchpad, which works natively as a mouse through the `DualSense Wireless Controller Touchpad` evdev device and is independent of the remapping. This is the first working confirmation of controller pointer input in the project; it never functioned before the injection fix earlier today.

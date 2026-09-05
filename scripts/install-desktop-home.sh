@@ -27,6 +27,7 @@ link_script() {
 
 link_script "$repo/scripts/dualsense-media-mode.sh" dualsense-media-mode
 link_script "$repo/scripts/configure-desktop-home.sh" configure-desktop-home
+link_script "$repo/scripts/return-home.sh" return-home
 
 install -m 0644 "$repo/config/systemd/user/dualsense-desktop-input.service" \
     "$unit_dir/dualsense-desktop-input.service"

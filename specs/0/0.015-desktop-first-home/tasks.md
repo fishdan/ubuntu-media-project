@@ -38,7 +38,17 @@ every browser exit.
 - [x] T016 Fix input-remapper injection, which had never actually worked. `input-remapper-control` printed `Starting injection ... Done` while the daemon rejected the request because `config.json` did not exist and no client had called `set_config_dir`. `dualsense-media-mode.sh` now creates `config.json` with an autoload entry and passes `--config-dir` on every call. Replaced the `status` command's cached-intent report with a real check for the per-device `... forwarded` node, and verified both the on and off states report correctly.
 - [x] T017 Add `scripts/install-desktop-home.sh` to install the pointer service and helper symlinks and apply the display settings. Verified idempotent across repeated runs; it never enables `media-home.service`.
 
-- [x] T018 Provide a controller-only way out of a fullscreen or kiosk application. Firefox `--kiosk` has no window controls and ignores Escape, so nothing in the preset could return the owner to the desktop, leaving the specification's "return to the desktop by closing it" criterion unmet in practice. Mapped L2+R2 held together to `KEY_LEFTALT+KEY_F4` (GNOME's close-window binding). A chord rather than a single button, so a stray press during playback cannot quit the browser.
+- [x] T018 Provide a controller-only way out of a fullscreen or kiosk application. Firefox `--kiosk` has no window controls and ignores Escape, so nothing in the preset could return the owner to the desktop, leaving the specification's "return to the desktop by closing it" criterion unmet in practice.
+  First attempt mapped L2+R2 to Alt+F4, GNOME's close-window binding. The owner tested it and it did not
+  return the appliance to the desktop, so it was removed rather than left in as a mapping that looks right
+  and does nothing.
+  Replaced with a mechanism that does not depend on the focused window at all: the **PS button** emits
+  `KEY_F13`, which no application binds, and a GNOME compositor-level custom shortcut runs
+  `scripts/return-home.sh`, which stops the units presenting fullscreen applications. Verified the script
+  closes Zuzz and returns to the desktop with the pointer still live, is a safe no-op when nothing is
+  running, and that the shortcut applies and reverts cleanly with the rest of the desktop settings.
+  This also delivers the remaining value of the superseded Spec 012 (a single controller action that
+  returns home).
 
 ## Phase 5 — Validation and acceptance
 

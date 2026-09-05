@@ -14,6 +14,12 @@ readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/ubuntu-media-project"
 readonly baseline_path="$state_dir/desktop-home.baseline"
 readonly sep=$'\x1f'
 
+# The return-home shortcut lives on a relocatable schema, so it cannot go in the
+# plain schema/key table below and is applied and reverted separately.
+readonly keybinding_path='/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/return-home/'
+readonly keybinding_schema='org.gnome.settings-daemon.plugins.media-keys.custom-keybinding'
+readonly keybinding_key='F13'
+
 # schema <sep> key <sep> desired value.
 # No Steam entry: steam.desktop does not exist until Spec 011 installs it, and a
 # favourite pointing at a missing desktop file renders as a blank tile.
@@ -26,6 +32,7 @@ readonly settings=(
     "org.gnome.shell.extensions.dash-to-dock${sep}dock-fixed${sep}true"
     "org.gnome.shell.extensions.dash-to-dock${sep}autohide${sep}false"
     "org.gnome.shell.extensions.dash-to-dock${sep}dash-max-icon-size${sep}64"
+    "org.gnome.settings-daemon.plugins.media-keys${sep}custom-keybindings${sep}['$keybinding_path']"
 )
 
 usage() {
@@ -55,6 +62,19 @@ capture_baseline() {
         printf '%s%s%s%s%s\n' "$schema" "$sep" "$key" "$sep" "$current" >>"$baseline_path"
         printf '  captured %s %s = %s\n' "$schema" "$key" "$current"
     done
+}
+
+apply_keybinding() {
+    local command="$HOME/.local/bin/return-home"
+    gsettings set "$keybinding_schema:$keybinding_path" name 'Return to desktop'
+    gsettings set "$keybinding_schema:$keybinding_path" command "$command"
+    gsettings set "$keybinding_schema:$keybinding_path" binding "$keybinding_key"
+    printf '  set return-home shortcut %s = %s\n' "$keybinding_key" "$command"
+}
+
+revert_keybinding() {
+    gsettings reset-recursively "$keybinding_schema:$keybinding_path" 2>/dev/null || true
+    printf '%s\n' '  cleared return-home shortcut'
 }
 
 apply_settings() {
@@ -94,6 +114,9 @@ show_status() {
         printf '  %s %s\n    now:     %s\n    desired: %s\n' \
             "$schema" "$key" "$(gsettings get "$schema" "$key")" "$value"
     done
+    printf '  return-home shortcut\n    now:     %s -> %s\n' \
+        "$(gsettings get "$keybinding_schema:$keybinding_path" binding 2>/dev/null || echo unset)" \
+        "$(gsettings get "$keybinding_schema:$keybinding_path" command 2>/dev/null || echo unset)"
 }
 
 case ${1:-} in
@@ -101,10 +124,12 @@ case ${1:-} in
         require_user_session
         capture_baseline
         apply_settings
+        apply_keybinding
         printf '%s\n' 'Desktop home configured. Revert with: configure-desktop-home.sh --revert'
         ;;
     --revert)
         require_user_session
+        revert_keybinding
         revert_settings
         ;;
     --status)

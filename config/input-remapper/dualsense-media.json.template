@@ -143,14 +143,10 @@
     "input_combination": [
       {
         "type": 1,
-        "code": 312
-      },
-      {
-        "type": 1,
-        "code": 313
+        "code": 316
       }
     ],
     "target_uinput": "keyboard",
-    "output_symbol": "KEY_LEFTALT+KEY_F4"
+    "output_symbol": "KEY_F13"
   }
 ]

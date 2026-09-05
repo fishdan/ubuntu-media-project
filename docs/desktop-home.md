@@ -64,10 +64,12 @@ scripts/dualsense-media-mode.sh on       # after reconnecting the controller
 scripts/dualsense-media-mode.sh off      # required before launching Steam
 ```
 
-**To exit a fullscreen or kiosk application, hold L2+R2.** That emits Alt+F4 and
-closes the focused window, returning you to the desktop. Firefox's kiosk mode has
-no window controls and ignores Escape, so this chord is the only controller-only
-way out. Over SSH, `systemctl --user stop zuzz-media.service` does the same.
+**To return to the desktop, press the PS button.** Firefox's kiosk mode has no
+window controls and ignores Escape, so this is the only controller-only way out.
+It emits `KEY_F13`, which no application binds, and GNOME runs
+`scripts/return-home.sh` at the compositor level so a fullscreen application
+cannot swallow it. Over SSH, `systemctl --user stop zuzz-media.service` does the
+same thing.
 
 If the controller is not connected at login the service exits cleanly and leaves
 the mode off; connect the controller and run `on`. See `docs/dualsense.md` for

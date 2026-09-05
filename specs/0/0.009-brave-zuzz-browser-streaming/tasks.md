@@ -27,5 +27,6 @@
   launched Zuzz from the desktop dock entry (journal shows `app-gnome-zuzz-14159.scope - Application
   launched by gnome-shell`), logged in successfully, reported the screen looks great, and reported the
   on-screen keyboard "looked amazing" in the site's login fields. Kodi restoration is struck from scope
-  per the 2026-09-05 decision to move away from Kodi. Still unconfirmed: video/audio playback through the
-  projector and receiver, and whether the login persists across a close and relaunch.
+  per the 2026-09-05 decision to move away from Kodi. Playback through the projector and
+  receiver was accepted as flawless on 2026-09-05. Still unconfirmed: whether the login persists across a
+  close and relaunch, which only became testable once a controller-only exit from kiosk mode existed.
