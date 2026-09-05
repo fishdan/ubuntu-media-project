@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-09-05 — Owner Acceptance: Desktop Launch, Zuzz Login, and On-Screen Keyboard
+
+- The owner reported being logged into Zuzz, that the screen "looks great", and that the on-screen keyboard "looked amazing".
+- Corroborated from the journal that Zuzz was launched from the desktop dock entry rather than by hand: `app-gnome-zuzz-14159.scope - Application launched by gnome-shell` at 09:07:22, immediately followed by `zuzz-media.service` starting. This is the first real-world use of the Spec 015 desktop launch path and it worked. The service had been left stopped by the preceding test, so the start was the owner's.
+- Accepted as a result: Spec 015 T007's display settings (1.5 text scaling and 64px dock icons are readable at projector distance) and T008's desktop launcher; and the bulk of Spec 009 T011 (projector presentation, streaming login, and on-screen-keyboard text entry on the Firefox-based launcher).
+- The on-screen keyboard result is worth noting against the project's history: Spec 009 spent significant effort failing to get GNOME's keyboard to appear in Brave, root-caused it to Chromium's Wayland text-input behaviour, and switched to Firefox on that basis. This is the first owner confirmation that the keyboard works well in the finished managed launcher, which validates that decision.
+- **Not yet confirmed and still open**: whether the DualSense stick actually moves the pointer. The owner has not stated whether the dock icon was clicked with the controller or with a mouse, so the Spec 015 T012 pointer criterion cannot be marked accepted on this evidence. Also open: video and audio playback through the projector and receiver, and whether the Zuzz login persists across a close and relaunch.
+
 ## 2026-09-05 — Spec 015: Dock Pinned Open; Per-Key Baseline Capture Fixed
 
 - Checked what the owner would actually see before writing test instructions. Ubuntu Dock is enabled and active and hot corners are on, so the pointer alone can reach both the dock and the Activities overview; the preset sends no Super key, so this mattered. But the dock defaulted to auto-hide, which means hunting for a screen edge with a controller stick from across the room.

@@ -23,8 +23,9 @@
   and the site rendered. Recorded a new defect: stopping `media-home.service` now leaves it `failed`
   because `kodi.bin` survives to the final-sigterm timeout. See `progress.ai` 2026-09-05.
 
-- [ ] T011 Owner acceptance on the new Firefox-based launcher. Partially accepted: the owner confirmed on
-  the projector that Zuzz is visible and that the GNOME on-screen keyboard types in a Firefox website
-  field (recorded 2026-09-04). Kodi restoration is struck from scope per the 2026-09-05 owner decision
-  to move away from Kodi. Still unconfirmed: projector/receiver audio, streaming login and playback,
-  and close/relaunch account persistence.
+- [ ] T011 Owner acceptance on the new Firefox-based launcher. Largely accepted on 2026-09-05: the owner
+  launched Zuzz from the desktop dock entry (journal shows `app-gnome-zuzz-14159.scope - Application
+  launched by gnome-shell`), logged in successfully, reported the screen looks great, and reported the
+  on-screen keyboard "looked amazing" in the site's login fields. Kodi restoration is struck from scope
+  per the 2026-09-05 decision to move away from Kodi. Still unconfirmed: video/audio playback through the
+  projector and receiver, and whether the login persists across a close and relaunch.

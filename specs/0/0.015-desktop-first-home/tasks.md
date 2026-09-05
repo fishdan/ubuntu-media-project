@@ -23,6 +23,8 @@ every browser exit.
 
 - [x] T006 Write `scripts/configure-desktop-home.sh` with idempotent `--apply` and `--revert` modes. It must capture prior values before writing, refuse to overwrite an existing capture, and be safe to run repeatedly.
 - [x] T007 Apply projector-distance display settings (text scaling, cursor size) and curate `org.gnome.shell favorite-apps` to the streaming browser, Kodi as an ordinary application, and Kodi. No Steam placeholder was added: `steam.desktop` does not exist until Spec 011 installs it, and a favourite pointing at a missing desktop file renders as a blank tile. Verify `--revert` restores the exact baseline in `plan.md`.
+  Owner confirmed on 2026-09-05 that the screen "looks great" at projector distance, accepting the 1.5
+  text scaling and 64px dock icons.
 - [x] T008 Confirm the Zuzz desktop entry is present in the desktop's application list and launches the browser from the desktop without a terminal.
 
 ## Phase 4 — Roadmap bookkeeping
