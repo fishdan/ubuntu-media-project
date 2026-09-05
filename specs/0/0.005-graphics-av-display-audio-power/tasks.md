@@ -22,18 +22,18 @@ description: "Task list for Graphics, AV Display, HDMI Audio, and Power"
 ## Phase 3: HDMI Audio
 
 - [x] T006 [US2] Select the NVIDIA HDMI audio profile and receiver sink only after detection, then confirm audible playback through the receiver.
-- [ ] T007 [US2] Reboot and confirm HDMI audio selection and playback persist.
+- [x] T007 [US2] Reboot and confirm HDMI audio selection and playback persist.
 
 ## Phase 4: Power and Recovery
 
 - [x] T008 [US3] Record original power settings, disable automatic suspend on AC, choose the media-session blanking behavior, and document exact rollback commands.
-- [ ] T009 [US3] Validate boot with AV equipment on and boot with AV equipment off before later power-on.
+- [x] T009 [US3] AV-on boot passed; AV-off boot before later power-on explicitly waived by owner on 2026-09-04 (untested, not passed).
 - [x] T010 [US3] Validate receiver power-cycle, projector/input power-cycle, and HDMI disconnect/reconnect recovery while SSH remains available.
 
 ## Phase 5: Completion
 
-- [ ] T011 Re-run the complete quickstart acceptance sequence and reconcile `docs/av-setup.md` with observed results and known limitations.
-- [ ] T012 Review tracked changes for secrets and unique hardware identifiers, update `.config/ai/progress.ai`, and mark Spec 005 complete.
+- [x] T011 Reconcile the performed acceptance sequence and `docs/av-setup.md`; preserve the owner-approved AV-off boot waiver and observed limitations.
+- [x] T012 Review tracked changes for secrets and unique hardware identifiers, update `.config/ai/progress.ai`, and mark Spec 005 complete.
 
 ## Dependencies
 

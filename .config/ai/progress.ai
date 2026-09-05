@@ -1,5 +1,26 @@
 # Progress Log
 
+## 2026-09-04 — Spec 005 Final Review and Owner Waiver
+
+- Owner explicitly requested skipping the AV-off boot scenario and creating the PR. Updated the spec, tasks, and final AV guide to label it untested, not passed. Current scope is complete with this acceptance waiver.
+- Reconciled final documentation around observed projector/receiver behavior, stereo-only sound acceptance, unmeasured recovery durations, and the initial PipeWire hang/recovery.
+- Final validation passed: Bash syntax for AV report and power script, bounded report execution, live AC policy check, full-branch whitespace check, and feature scans for MAC addresses/private keys/likely secret assignments. Prior repeated apply/check verified power-script idempotence. ShellCheck is unavailable.
+- No additional reboot or AV setting change was made during final review. Preparing PR on the existing Spec 005 branch.
+
+## 2026-09-04 — Spec 005 AV-On Boot Accepted
+
+- Owner confirmed visible Kodi and audible samples after the AV-on reboot. T007 is complete; the AV-on portion of T009 passed with automatic HDMI selection, working SSH, and persisted AC power policy.
+- T009 remains open for boot with receiver/projector off followed by later AV power-on. No second reboot has been requested yet.
+
+## 2026-09-04 — Spec 005 AV-On Boot System Checks
+
+- Confirmed new boot at 20:22:27 EDT and administrator public-key SSH login at 20:23:04. SSH and media-home are active; AC inactivity action remains nothing.
+- PipeWire responded normally without intervention, selected NVIDIA HDMI stereo at volume 0.40, and exposed Kodi output connected to EPSON PJ. Both bounded voice samples played successfully. Owner confirmation of visible Kodi and audible post-boot samples remains pending for T007/T009.
+
+## 2026-09-04 — Spec 005 AV-On Reboot Authorized
+
+- Owner explicitly requested the PC reboot with receiver/projector left on. Recording handoff before issuing `sudo -n systemctl reboot`; post-boot acceptance remains pending.
+
 ## 2026-09-04 — Spec 005 Power-Cycle Acceptance Milestone
 
 - Owner confirmed sound following projector power-on, completing T010 observed recovery checks. Recovery times were not measured; post-event SSH checks passed.

@@ -1,6 +1,6 @@
 # Feature Specification: Graphics, AV Display, HDMI Audio, and Power
 
-**Status**: Planned
+**Status**: Complete with owner-approved AV-off boot test waiver (2026-09-04).
 
 Configure the verified display hardware for projector output through the AV receiver, including correct resolution/refresh, HDMI audio, no unwanted blanking or suspend during use, and predictable recovery from receiver/projector power or hot-plug changes. Validate boots with the AV equipment on and off.
 
@@ -13,3 +13,7 @@ Configure the verified display hardware for projector output through the AV rece
 - The graphical session recovers after receiver/projector power cycling and HDMI hot-plug events without requiring a reinstall or destructive reset.
 - Boots with AV equipment powered on and powered off are both tested and documented.
 - Every persistent change has a documented rollback or recovery command.
+
+## Owner-approved acceptance scope
+
+On September 4, 2026, the owner explicitly requested skipping the remaining AV-off boot scenario and creating the PR. AV-on boot passed. AV-off boot followed by later AV power-on remains untested, not passed. Recovery durations were not measured.
