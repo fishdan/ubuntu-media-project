@@ -21,6 +21,8 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 
 - `media-home.service`: installed, **disabled**, inactive. Kodi is installed and launchable but no longer starts at login.
 - `zuzz-media.service`: **inactive**. This is correct: nothing starts automatically any more. Launch Zuzz from the desktop, or with `systemctl --user start zuzz-media.service`.
+- `dualsense-desktop-input.service`: **enabled and active**; pointer mode live-verified. The controller is connected. Turn the mode off before any Steam work (Spec 011).
+- Install/refresh the whole desktop-first home with `scripts/install-desktop-home.sh` (idempotent; never enables `media-home.service`).
 - Desktop settings applied for the couch: `text-scaling-factor` 1.5, `cursor-size` 48, favourites curated to Zuzz, Firefox, Kodi. Baseline captured at `~/.local/state/ubuntu-media-project/desktop-home.baseline`.
 - SSH active. GDM automatic login unchanged (`AutomaticLoginEnable=true`, `AutomaticLogin=dfish`).
 - `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` from Spec 009 T007.
@@ -34,7 +36,8 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 
 **Spec 015 — needs the owner and the console:**
 - ~~T011: reboot validation.~~ **Passed 2026-09-05** — see above.
-- **T012 is the only open implementation task**: owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse. The owner should also judge whether `text-scaling-factor` 1.5 is right at projector distance.
+- **T015-T017 added and done (2026-09-05)**: the DualSense pointer did not work at the desktop. Spec 015 had left pointer mode tied to the browser lifecycle, creating a circular dependency, and separately input-remapper had never actually injected because `config.json` was missing and no client had called `set_config_dir`. Both fixed; see `progress.ai` and `docs/dualsense.md`. Pointer mode is now turned on at login by `dualsense-desktop-input.service`.
+- **T012 is the only open implementation task** (and is now genuinely testable — it was not before): owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse. The owner should also judge whether `text-scaling-factor` 1.5 is right at projector distance.
 - T014: pre-PR checks are done and clean. The pull request itself is held until T012.
 
 **Spec 009 — needs the owner at the projector:**
@@ -61,6 +64,6 @@ present, and all three couch settings survived the reboot without reapplication.
 
 ### Recommended next actions
 
-1. Get the owner in front of the projector for Spec 015 T012. This is the last open task in the feature. Launch Zuzz from the desktop with the DualSense, confirm closing it returns to the desktop, and judge whether 1.5 text scaling is right. Nothing starts automatically now, so the desktop is what appears at boot.
+1. Get the owner in front of the projector for Spec 015 T012. The pointer now genuinely works, so this test is meaningful for the first time. This is the last open task in the feature. Launch Zuzz from the desktop with the DualSense, confirm closing it returns to the desktop, and judge whether 1.5 text scaling is right. Nothing starts automatically now, so the desktop is what appears at boot.
 3. ~~Answer the phone-platform question for Spec 016.~~ Resolved 2026-09-05: Android. Spec 016 is unblocked and uses GSConnect (the GNOME implementation of the KDE Connect protocol), not the Plasma `kdeconnect` package.
 4. Finish T014, then decide whether to PR Spec 009 and Spec 015 separately or merge 009 first.
