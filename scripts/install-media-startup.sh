@@ -17,7 +17,11 @@ install -m 0755 "$REPO_ROOT/scripts/launch-media-home.sh" "$USER_BIN_DIR/launch-
 install -m 0644 "$REPO_ROOT/config/systemd/user/media-home.service" "$USER_UNIT_DIR/media-home.service"
 
 systemctl --user daemon-reload
-systemctl --user enable --now media-home.service
 
-printf '%s\n' "Installed and enabled media-home.service."
-systemctl --user --no-pager --full status media-home.service || true
+# Spec 015 retired the Kodi-first home in favour of the GNOME desktop, so this
+# installer no longer enables the unit. The unit and its launcher are still
+# installed, because leaving them in place is what makes the retirement
+# reversible without a reinstallation. Enablement is now a deliberate act.
+printf '%s\n' "Installed media-home.service (left disabled; the desktop is the home)."
+printf '%s\n' "Current state: $(systemctl --user is-enabled media-home.service 2>&1)."
+printf '%s\n' "To revert to the Kodi-first home: systemctl --user enable --now media-home.service"

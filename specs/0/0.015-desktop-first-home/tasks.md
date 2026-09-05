@@ -6,14 +6,18 @@ every browser exit.
 
 ## Phase 1 — Retire the automatic Kodi launch
 
-- [ ] T001 Capture the pre-change baseline: `media-home.service` enabled/active state, the GNOME settings listed in `plan.md`, and confirmation that SSH and automatic login are currently healthy. Record in `progress.ai`.
-- [ ] T002 Disable `media-home.service` and reset its failed state. Leave the unit file and `launch-media-home` installed so the revert path needs no reinstallation. Confirm Kodi is not running and the GNOME desktop is present.
-- [ ] T003 Update `scripts/install-media-startup.sh` to install the launcher and unit without `enable --now`, and to print the revert command. Verify idempotence by running it twice and confirming the unit stays disabled.
+- [x] T001 Capture the pre-change baseline: `media-home.service` enabled/active state, the GNOME settings listed in `plan.md`, and confirmation that SSH and automatic login are currently healthy. Record in `progress.ai`.
+- [x] T002 Disable `media-home.service` and reset its failed state. Leave the unit file and `launch-media-home` installed so the revert path needs no reinstallation. Confirm Kodi is not running and the GNOME desktop is present.
+- [x] T003 Update `scripts/install-media-startup.sh` to install the launcher and unit without `enable --now`, and to print the revert command. Verify idempotence by running it twice and confirming the unit stays disabled.
 
 ## Phase 2 — Remove the stop/restore orchestration
 
-- [ ] T004 Remove `systemctl --user stop media-home.service` from `launch-zuzz.sh --run` and `systemctl --user start media-home.service` from `--restore`, leaving `--restore` as the DualSense mode reset only. Keep `zuzz-media.service` as the administrator's SSH-side stop path.
-- [ ] T005 Validate the simplified launcher: `bash -n`, then start and stop `zuzz-media.service` and confirm Firefox launches and exits without touching `media-home.service`, which must remain disabled and inactive throughout.
+- [x] T004 Remove `systemctl --user stop media-home.service` from `launch-zuzz.sh --run` and `systemctl --user start media-home.service` from `--restore`, leaving `--restore` as the DualSense mode reset only. Keep `zuzz-media.service` as the administrator's SSH-side stop path.
+- [x] T005 Validate the simplified launcher: `bash -n`, then start and stop `zuzz-media.service` and confirm Firefox launches and exits without touching `media-home.service`, which must remain disabled and inactive throughout.
+  Surfaced a latent defect while validating: `input-remapper-control` exits non-zero when the DualSense is
+  not connected, so `ExecStopPost` marked `zuzz-media.service` failed after every clean stop. `--restore` is
+  now best-effort and warns instead of propagating. Verified a full stop/start cycle leaves the unit
+  `inactive` and `media-home.service` disabled and inactive throughout.
 
 ## Phase 3 — Couch-legible desktop
 

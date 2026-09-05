@@ -1,5 +1,17 @@
 # Progress Log
 
+## 2026-09-05 — Spec 015 Phases 1-2: Kodi Retired from Startup, Orchestration Removed
+
+- Branched `feature/0.015-desktop-first-home` from the committed Spec 009 work and wrote `plan.md` and `tasks.md` before touching the appliance.
+- T001 baseline before any change: `media-home.service` enabled but failed, GDM `AutomaticLoginEnable=true` / `AutomaticLogin=dfish`, SSH active, graphical seat0 session present, Kodi installed at `2:21.3+dfsg-1ubuntu1`. GNOME settings baseline recorded in `plan.md`.
+- T002 disabled `media-home.service` and reset its failed state. The unit file and `~/.local/bin/launch-media-home` were deliberately left installed, so reverting is `systemctl --user enable --now media-home.service` with no reinstallation.
+- T003 changed `scripts/install-media-startup.sh` to install the launcher and unit without `enable --now`, and to print the current enablement state and the revert command. Ran it twice; the unit stayed disabled both times, confirming it no longer fights the retirement.
+- T004 removed the stop/restore orchestration from `scripts/launch-zuzz.sh`: the `systemctl --user stop media-home.service` in `--run` and the `systemctl --user start media-home.service` in `--restore` are gone. `--restore` is now only the DualSense mode reset. No `media-home` references remain in the launcher.
+- **T005 surfaced a latent defect.** `input-remapper-control --command stop` exits 4 ("Did not find any input device") when the DualSense is not connected, and `--restore` propagated it, so `ExecStopPost` marked `zuzz-media.service` **failed after every clean stop**. The pre-existing `--restore` also propagated this status, so it was latent rather than newly introduced, but it was reachable any time the browser was stopped with the controller off. `--restore` is now best-effort: it warns and exits 0, because a controller that is not connected has no remapping left to undo.
+- Verified after the fix: a full `stop` then `start` cycle leaves `zuzz-media.service` `inactive` then `active`, Firefox relaunches in kiosk, `media-home.service` stays disabled and inactive throughout, no Kodi process ever appears, and SSH stays active.
+- Both stop-path failures the appliance carried into this session are now resolved: the `media-home.service` failed-stop by deleting every code path that stops it, and the `zuzz-media.service` failed-stop by the best-effort `--restore`.
+- Phases 3-5 remain: couch-legible desktop settings, roadmap bookkeeping, reboot validation, and owner acceptance.
+
 ## 2026-09-05 — Owner Confirmed Kodi Retirement; Spec 009 Acceptance Narrowed
 
 - The project owner confirmed the move away from Kodi, ratifying the 2026-09-04 architectural decision and authorizing Spec 015 to proceed.
