@@ -53,7 +53,7 @@ scripts/dualsense-media-mode.sh status
 scripts/dualsense-media-mode.sh off
 ```
 
-The left stick moves the pointer; the D-pad emits arrow keys; Cross clicks; Circle emits browser Back; Triangle toggles play/pause; L1/R1 change volume; Create emits Escape; and Options emits Enter. The script installs the address-free tracked preset on first use and refuses to overwrite a locally modified copy. Always turn the mode off before launching Steam so Steam Input receives the native controller alone.
+The left stick moves the pointer; the D-pad emits arrow keys; Cross clicks; Circle emits browser Back; Triangle toggles play/pause; L1/R1 change volume; Create emits Escape; Options emits Enter; and the **PS button returns to the desktop**. The controller's own touchpad also moves the pointer natively, independently of this preset. The script installs the address-free tracked preset on first use and refuses to overwrite a locally modified copy. Always turn the mode off before launching Steam so Steam Input receives the native controller alone.
 
 
 ## Reboot acceptance and remaining integration
@@ -69,4 +69,81 @@ Spec 008's current scope is accepted on the attached monitor. Projector/receiver
 | 011 — Steam | Disable media mode, validate native Steam Input and absence of duplicate events, then validate exit. |
 | 012 — Return home | Implement a stable home command and validate its controller mapping across applications. |
 
-The status command reports cached intent, not live injection state. A reboot, controller disconnect, or external remapper command can invalidate that intent. Stop failures propagate to the caller so launch integrations must honor a nonzero exit status.
+## Pointer mode is on at the desktop (Spec 015)
+
+Since Spec 015 made the GNOME desktop the appliance's home, pointer mode is no
+longer opt-in. `dualsense-desktop-input.service` turns it on at login, waiting up
+to 60 seconds for the controller to finish connecting over Bluetooth and exiting
+cleanly if it never appears. The browser no longer turns the mode on or off; if
+it did, closing the browser would leave the desktop with no pointer.
+
+Turn it off before launching Steam so Steam Input receives the native controller
+alone. That remains Spec 011's checkpoint.
+
+## Return home: the PS button
+
+Firefox's `--kiosk` mode has no window controls and ignores Escape, so there was
+no controller-only way back to the desktop. **The PS button** now returns to it,
+which is what that button means on a console.
+
+The mechanism deliberately avoids depending on the focused window. An earlier
+attempt mapped L2+R2 to Alt+F4, GNOME's close-window binding; the owner tested it
+and it did not return the appliance to the desktop, so it was removed rather than
+left in place as a mapping that looks right and does nothing.
+
+Instead the PS button emits `KEY_F14` and GNOME runs `scripts/return-home.sh`
+from a compositor-level custom shortcut, which a fullscreen application cannot
+swallow.
+
+**The keysym matters, not the evdev name.** GNOME matches shortcuts on the X
+keysym. A first attempt used `KEY_F13` bound as `'F13'`; that never matched,
+because xkb maps `FK13` to `XF86Tools`, so pressing PS opened Settings instead.
+`KEY_F14` maps to `XF86Launch5`, which nothing in GNOME binds, and the shortcut
+is registered under that name. If this button is ever remapped, check
+`/usr/share/X11/xkb/symbols/inet` for the keysym the evdev key actually
+produces. That script
+stops the units that present fullscreen applications. Each is `Type=exec` on the
+application process, so stopping the unit stops the application.
+
+Adding a future fullscreen application, such as Steam in Spec 011, means adding
+its unit to the `units` array in `scripts/return-home.sh`. Nothing else changes.
+
+The administrator fallback remains `systemctl --user stop zuzz-media.service`
+over SSH.
+
+## Defect fixed 2026-09-05: injection silently did nothing
+
+`input-remapper-control` printed `Starting injection ... Done` while the daemon
+logged:
+
+```
+ERROR: "/home/dfish/.config/input-remapper-2/config.json" does not exist
+ERROR: Request to start an injectoin before a user told the service about
+       their session using set_config_dir
+```
+
+The daemon rejects every request until a client names the session's config
+directory, and it will not accept that unless `config.json` exists. The CLI
+reports success regardless, so the mode appeared to work and never had. Kodi's
+controller navigation was unaffected because it used native joystick events
+through `kodi-peripheral-joystick`, never this remapping — which is why the gap
+went unnoticed while Kodi was the home.
+
+`dualsense-media-mode.sh` now creates `config.json` on first use, records the
+autoload entry so the preset reapplies when the controller reconnects, and
+passes `--config-dir` on every daemon call.
+
+## Verifying the mode for real
+
+`status` no longer reports intent. It checks for the
+`input-remapper DualSense Wireless Controller forwarded` device node, which
+exists only while the daemon is actually injecting for this controller. The
+generic `input-remapper mouse` and `input-remapper keyboard` nodes are not a
+valid signal: they persist once created, whether or not injection is running.
+
+```bash
+scripts/dualsense-media-mode.sh status
+```
+
+It exits non-zero if the mode was requested but is not injecting, which normally
+means the controller disconnected.

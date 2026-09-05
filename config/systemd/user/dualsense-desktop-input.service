@@ -1,0 +1,16 @@
+[Unit]
+Description=DualSense pointer mode for the desktop home
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+# Spec 015: the desktop is the home, so the controller must be able to drive it
+# from login. Type=oneshot with RemainAfterExit so the unit reflects "mode was
+# requested" rather than a running process; input-remapper owns the injection.
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/dualsense-media-mode on-when-present 60
+ExecStop=%h/.local/bin/dualsense-media-mode off
+
+[Install]
+WantedBy=graphical-session.target

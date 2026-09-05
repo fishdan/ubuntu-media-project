@@ -1,6 +1,11 @@
 # Feature Specification: Automatic Login and Appliance Startup
 
-**Status**: Complete
+**Status**: Complete (amended by Spec 015)
+
+> **Amended by Spec 015 on 2026-09-05.** GDM automatic login and the reproducible startup
+> configuration remain required and unchanged. Only the Kodi-launching half of
+> `media-home.service` retired; the unit and its launcher stay installed, disabled, as the
+> documented revert path.
 
 After remote recovery is proven, configure GNOME automatic login and a deliberate user-session startup mechanism for the media home. Use maintainable systemd user services or GNOME autostart entries, prevent restart loops, and document how to temporarily disable or recover the startup behavior.
 

@@ -1,5 +1,13 @@
 # FishDan Ubuntu Media PC — Setup Guide
 
+> **Historical design brief.** This document records the original plan, which was built around
+> Kodi as the media home. On 2026-09-05 the owner confirmed the appliance will never hold a local
+> media library, and Spec 015 retired the Kodi-first home in favour of the GNOME desktop. Sections
+> below that assume a Kodi home, a universal return-home action, or Brave as the streaming browser
+> have been overtaken by that decision. It is kept unedited as the record of the original intent;
+> see `specs/0/0.015-desktop-first-home/` and `docs/desktop-home.md` for what the appliance
+> actually does.
+
 ## Project Goal
 
 Turn the auction-purchased **HP ENVY Desktop 795-00XX** into a reproducible, remotely managed Ubuntu living-room media appliance.

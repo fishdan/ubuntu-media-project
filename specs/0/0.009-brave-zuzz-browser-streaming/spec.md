@@ -1,6 +1,6 @@
 # Feature Specification: Zuzz Browser Streaming
 
-**Status**: In progress
+**Status**: Complete (pending PR)
 
 Launch https://zuzz.tv in Firefox with a dedicated media profile outside Git, fullscreen app-style presentation, controller primitives, and a managed exit back to Kodi.
 

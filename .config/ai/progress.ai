@@ -1,5 +1,134 @@
 # Progress Log
 
+## 2026-09-05 — Specs 009 and 015 Fully Accepted
+
+- The owner confirmed the PS button returns to the desktop and that the Zuzz login is preserved across close and relaunch. Corroborated in the journal: `return-home invoked` at 09:55:30 followed immediately by `Stopped zuzz-media.service`, which is the compositor shortcut firing from the controller and stopping the browser unit.
+- **Spec 015 is complete.** T012 is accepted in full: the cursor moves with both the left stick and the controller's native touchpad, Zuzz launches from the dock, and the PS button returns to the desktop, all with no keyboard or mouse. The display settings are accepted as well; the owner reports the screen "looks great" at projector distance with 1.5 text scaling and 64px dock icons.
+- **Spec 009 is complete.** T004, T005, and T011 are accepted: projector presentation, on-screen-keyboard text entry, streaming login, flawless AV playback through the projector and receiver, and login persistence across close and relaunch.
+- **The earlier saved-password report is resolved as not a defect.** It was a first-login save prompt not being accepted on a brand-new profile. The profile now persists credentials correctly across a full close and relaunch under the managed service.
+- Both specification status fields moved to "Complete (pending PR)". No unchecked tasks remain in either.
+- **Process note:** while marking these accepted, an earlier edit to Spec 015 T012 was found to have silently failed, leaving the task unchecked and its acceptance text missing. It was caught by asserting on the replacement target rather than trusting a plain string replace. Bookkeeping edits to task files should be verified after writing, not assumed.
+- Remaining work is repository-side only: push `feature/0.009-brave-zuzz-browser-streaming` and `feature/0.015-desktop-first-home` and open the pull requests, 009 first since 015 is stacked on it. Nothing has been pushed and no PR exists. Spec 016 is unblocked and has only `spec.md`.
+
+## 2026-09-05 — Return Home: Keysym Mismatch Diagnosed and Fixed
+
+- The owner reported the PS button opened Settings. That failure was informative rather than merely negative: it proved the controller mapping works end to end, since a keypress plainly reached GNOME and was acted upon. The fault was in which key was chosen, not in input-remapper or the preset.
+- **Root cause: GNOME matches keyboard shortcuts on the X keysym, not the evdev key name.** The preset emitted `KEY_F13` and the custom shortcut was registered as `'F13'`, but `/usr/share/X11/xkb/symbols/inet` maps `key <FK13>` to `XF86Tools`. Our binding therefore never matched, while `XF86Tools` was consumed elsewhere as "open Settings".
+- Fixed by switching the PS button to `KEY_F14`, whose keysym is `XF86Launch5`, and registering the custom shortcut under that keysym name. Verified `XF86Launch5` is unbound across the `media-keys`, `wm.keybindings`, `shell.keybindings`, and `mutter.keybindings` schemas before adopting it.
+- Documented the general trap in `docs/dualsense.md`: anyone remapping this button must check the keysym the evdev key actually produces, not assume the evdev name carries through.
+- Added a `logger -t return-home` line to `scripts/return-home.sh` so the next failure can be diagnosed instead of guessed: if the journal records the invocation the shortcut fired and the fault is downstream, and if it is absent the key never reached GNOME. Verified the log line appears.
+- Note that the earlier L2+R2 Alt+F4 attempt is now partly explained too. Its input side was almost certainly fine; the likely fault was Alt+F4 not closing kiosk Firefox. Stopping the unit directly, as `return-home.sh` does, avoids depending on the application at all.
+- Operational note: `return-home.sh` was run directly to verify the new log line, which stopped a Zuzz session the owner had relaunched in the meantime.
+
+## 2026-09-05 — Return Home Rebuilt on the PS Button After Alt+F4 Failed; AV Playback Accepted
+
+- **AV playback accepted.** The owner reports video and audio through the projector and receiver are flawless, closing that part of Spec 009 T004/T011.
+- **The L2+R2 Alt+F4 chord did not work.** The owner tested it and it did not return the appliance to the desktop. Diagnosis narrowed it to two possibilities that could not be separated from the console: either input-remapper's combination semantics were not triggering on two simultaneous trigger pulls, or Alt+F4 was not closing Firefox in kiosk mode. Confirmed from `evtest` capabilities that `BTN_TL2` (312) and `BTN_TR2` (313) do exist on the device and that the daemon loaded both without error, so the mapping itself was valid.
+- Rather than guess between the two causes, removed the dependency on the focused window entirely. The mapping was deleted rather than left in place, since a mapping that looks correct and does nothing is worse than none.
+- **Rebuilt on the PS button**, which is what that button means on a console and revives the remaining value of the superseded Spec 012. `BTN_MODE` (316) emits `KEY_F13`, chosen because no application binds it and therefore no fullscreen or kiosk application can swallow it. A GNOME compositor-level custom shortcut on F13 runs the new `scripts/return-home.sh`, which stops the units presenting fullscreen applications; each is `Type=exec` on the application process, so stopping the unit stops the application.
+- Verified `return-home.sh` directly: it stopped `zuzz-media.service`, Firefox exited, the desktop returned, and pointer injection remained live. Re-running it is a safe no-op that reports the appliance is already at the desktop. Extending it for Steam in Spec 011 means adding one unit name to its array.
+- Extended `configure-desktop-home.sh` to own the shortcut. It lives on a relocatable schema so it could not go in the plain schema/key table and is applied and reverted by dedicated functions. Verified the full round trip: `--revert` cleared the shortcut and restored all six plain settings to their captured values, and `--apply` restored the desktop-first state including the shortcut.
+- Added `scripts/return-home.sh` to the installer's symlinks so the shortcut's command path resolves.
+- Remaining: the owner should confirm the PS button returns to the desktop, and whether the Zuzz login persists across a relaunch. The latter was previously untestable because there was no way to exit kiosk mode; the browser has now been stopped, so it can be checked by relaunching from the dock.
+
+## 2026-09-05 — Pointer Accepted; Kiosk Exit Gap Found and Closed
+
+- **Spec 015's pointer criterion is accepted.** The owner confirmed the DualSense moves the cursor using both the left stick (the input-remapper preset) and the controller's own touchpad, which works natively as a mouse through the `DualSense Wireless Controller Touchpad` evdev device and is independent of the remapping. This is the first working confirmation of controller pointer input in the project; it never functioned before the injection fix earlier today.
+- **The owner then asked how to exit Zuzz from kiosk mode, exposing a gap that would have blocked the rest of T012.** Firefox `--kiosk` presents no window controls and ignores Escape, and the preset mapped nothing capable of closing a window: the free buttons were Square, L2, R2, PS, L3, and R3, and Create only emitted Escape. There was no controller-only route back to the desktop, so the specification's "return to the desktop by closing it" criterion was unmet in practice even though the desktop-first architecture was sound.
+- Closed it by mapping **L2+R2 held together** to `KEY_LEFTALT+KEY_F4`, GNOME's `close` binding (confirmed as `['<Alt>F4']`). Quitting Firefox also stops `zuzz-media.service`, since the unit is `Type=exec` on the browser process, so the appliance lands cleanly back on the desktop.
+- Chose a chord over a single button deliberately: a stray press during playback would otherwise quit the browser and lose the viewer's place. L2 and R2 were both previously unmapped, so no existing behaviour changed.
+- Verified the daemon accepted the new preset with no errors and that live injection continues, using the `... forwarded` device node. The deployed preset was refreshed by removing the old copy so the script's overwrite guard would reinstall from the updated template.
+- Remaining for Spec 015 T012: the owner should confirm L2+R2 actually returns to the desktop. Remaining for Spec 009: playback through the projector and receiver, and login persistence across a close and relaunch — the latter is now testable with the controller alone.
+
+## 2026-09-05 — Owner Acceptance: Desktop Launch, Zuzz Login, and On-Screen Keyboard
+
+- The owner reported being logged into Zuzz, that the screen "looks great", and that the on-screen keyboard "looked amazing".
+- Corroborated from the journal that Zuzz was launched from the desktop dock entry rather than by hand: `app-gnome-zuzz-14159.scope - Application launched by gnome-shell` at 09:07:22, immediately followed by `zuzz-media.service` starting. This is the first real-world use of the Spec 015 desktop launch path and it worked. The service had been left stopped by the preceding test, so the start was the owner's.
+- Accepted as a result: Spec 015 T007's display settings (1.5 text scaling and 64px dock icons are readable at projector distance) and T008's desktop launcher; and the bulk of Spec 009 T011 (projector presentation, streaming login, and on-screen-keyboard text entry on the Firefox-based launcher).
+- The on-screen keyboard result is worth noting against the project's history: Spec 009 spent significant effort failing to get GNOME's keyboard to appear in Brave, root-caused it to Chromium's Wayland text-input behaviour, and switched to Firefox on that basis. This is the first owner confirmation that the keyboard works well in the finished managed launcher, which validates that decision.
+- **Not yet confirmed and still open**: whether the DualSense stick actually moves the pointer. The owner has not stated whether the dock icon was clicked with the controller or with a mouse, so the Spec 015 T012 pointer criterion cannot be marked accepted on this evidence. Also open: video and audio playback through the projector and receiver, and whether the Zuzz login persists across a close and relaunch.
+
+## 2026-09-05 — Spec 015: Dock Pinned Open; Per-Key Baseline Capture Fixed
+
+- Checked what the owner would actually see before writing test instructions. Ubuntu Dock is enabled and active and hot corners are on, so the pointer alone can reach both the dock and the Activities overview; the preset sends no Super key, so this mattered. But the dock defaulted to auto-hide, which means hunting for a screen edge with a controller stick from across the room.
+- Pinned the dock open and enlarged its icons through the tracked settings script: `dash-to-dock dock-fixed` true (was false), `autohide` false (was true), `dash-max-icon-size` 64 (was 48).
+- **Fixed a real flaw in `configure-desktop-home.sh` found while doing this.** `capture_baseline` guarded on the whole file, so once a baseline existed no further keys were ever captured. Any setting added to the script after the first `--apply` would have been applied with no recorded prior value and would not have been restored by `--revert`. Capture is now per key: existing keys keep their original captured value, and newly added keys are captured on the next run. Verified the three original values were preserved untouched while the three new ones were captured correctly.
+
+## 2026-09-05 — Spec 015: Desktop Pointer Fixed; input-remapper Injection Had Never Worked
+
+The owner asked whether the mouse is supposed to be movable with the DualSense. Checking rather than assuming exposed two defects, one of them mine and one long-standing.
+
+- **Circular dependency introduced by Spec 015 (my error).** Pointer mode was turned on only by `launch-zuzz.sh --run` and turned off again by `--restore`. Under the Kodi home this was coherent, because Kodi used native joystick events through `kodi-peripheral-joystick` and did not need remapping. Spec 015 deleted Kodi and with it the thing that made the home navigable, but did not move the pointer mode in to fill the gap. The result was unusable: the controller was needed to reach the launcher that enabled the controller, and closing the browser took the pointer away again. Spec 015's own acceptance criterion requires the pointer to navigate the desktop, launch the browser, and return, so T012 would have failed when the owner tried it.
+- Fixed with `config/systemd/user/dualsense-desktop-input.service`, which turns the mode on at login using a new `on-when-present` subcommand that waits up to 60 seconds for the Bluetooth controller and exits 0 if it never appears, so a missing controller does not fail the login. The browser no longer touches the mode; `--restore` and `zuzz-media.service`'s `ExecStopPost` were removed entirely, further simplifying the launcher.
+- **input-remapper injection had never actually worked.** `input-remapper-control` printed `Starting injection ... Done` while the daemon logged `ERROR: "config.json" does not exist` and `ERROR: Request to start an injectoin before a user told the service about their session using set_config_dir`. The daemon rejects every request until a client names the session config directory, and will not accept that without `config.json`. The CLI reports success regardless, so the mode looked healthy and injected nothing. No virtual input devices existed. This predates Spec 015 and was never caught because Spec 008's acceptance validated native joystick navigation in Kodi, a completely different input path, and the docs recorded only that status was "cached intent, not live injection".
+- Fixed in `dualsense-media-mode.sh`: it now creates `config.json` on first use with an autoload entry so the preset reapplies on controller reconnect, and passes `--config-dir` on every daemon call. Confirmed live: `input-remapper mouse`, `input-remapper keyboard`, and `input-remapper DualSense Wireless Controller forwarded` device nodes now exist while injecting.
+- Replaced the `status` command's cached-intent report with a real liveness check. It tests for the per-device `... forwarded` node, which exists only while this controller is being injected; the generic `input-remapper mouse` and `keyboard` nodes are not valid signals because they persist once created. Verified the command reports correctly in both the on and off states and exits non-zero when the mode is requested but not injecting.
+- Added `scripts/install-desktop-home.sh` to install the pointer service and helper symlinks and apply the display settings; verified idempotent and confirmed it never enables `media-home.service`. Also fixed `dualsense-media-mode.sh` to resolve its own path through symlinks with `readlink -f`, which it needed once installed into `~/.local/bin`.
+- Validated end to end: stopping and starting the login service turns the mode off and on with live injection confirmed each time, and a full browser start/stop cycle leaves the pointer untouched and `media-home.service` disabled and inactive throughout.
+- T012 owner couch acceptance is now actually testable. It was not before.
+
+## 2026-09-05 — Spec 015 T014 Pre-PR Checks Clean
+
+- `bash -n` passes on all 14 repository scripts. `systemd-analyze --user verify` is clean for both `media-home.service` and `zuzz-media.service`, with the unrelated pre-existing `spice-vdagent` warning filtered. `desktop-file-validate` is clean for `zuzz.desktop`. `git diff --check` is clean.
+- Scanned all 27 files changed against `main` for private-key headers, likely secret assignments, and MAC addresses; no matches. Confirmed no browser profile, cookie, or credential file is tracked, satisfying the constitution's requirement that browser profiles and streaming credentials stay outside version control.
+- ShellCheck remains uninstalled, so no ShellCheck result is claimed.
+- The pull request is deliberately not opened yet. Spec 015 T012 (owner couch acceptance) is the last open item, and the owner has not yet judged whether 1.5 text scaling is correct at projector distance.
+
+## 2026-09-05 — Spec 015 T011 Passed: Desktop-First Boot Validated
+
+- The appliance rebooted at `2026-09-05 00:32:11`, changing from the pre-reboot boot time of `2026-09-04 22:15:53`.
+- **Every T011 acceptance criterion passed.** `media-home.service` is disabled and inactive, and has **no journal entries whatsoever for this boot**, which is the strongest available evidence that it never attempted to start rather than starting and failing. No `kodi.bin` process exists and no Firefox process exists, confirming nothing media-related starts automatically.
+- Automatic login survived unchanged: `gdm-autologin` opened dfish's session at `00:32:20`, nine seconds after boot, producing an active Wayland session on `seat0`/`tty2`. `/etc/gdm3/custom.conf` still carries `AutomaticLoginEnable=true` and `AutomaticLogin=dfish`. Spec 006's guarantee is intact.
+- Recovery paths intact: `ssh.service` enabled and active with this session reconnecting over it, and `/dev/tty1` through `/dev/tty6` present for physical-console recovery.
+- The couch display settings persisted across the reboot without reapplication: `text-scaling-factor` 1.5, `cursor-size` 48, and `favorite-apps` curated to Zuzz, Firefox, and Kodi. This confirms `gsettings` values are durable and the configuration script does not need to run at every boot.
+- A pre-existing, unrelated journal line was observed during autologin: `gkr-pam: couldn't unlock the login keyring`. This is the same GNOME keyring behaviour Spec 009 already handled through its keyring-unlock work and is not caused by this feature.
+- Spec 015 is now complete except for T012 (owner couch acceptance of DualSense desktop navigation and a judgement on whether 1.5 text scaling is right at projector distance) and T014 (pre-PR checks).
+
+## 2026-09-05 — Spec 016 Unblocked: Android Confirmed; GSConnect vs KDE Connect Clarified
+
+- The owner confirmed the phone is **Android**, resolving the risk that could have invalidated Spec 016 before implementation. The KDE Connect Android client provides the remote keyboard and touchpad input the feature depends on.
+- The owner asked whether the project is using KDE Connect or the GNOME equivalent. Clarified and recorded in the specification: "KDE Connect" is a protocol with two independent desktop implementations. This appliance runs GNOME, so it uses `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, Ubuntu universe, confirmed available and not installed), a native GNOME Shell extension speaking that protocol. The `kdeconnect` package (`25.12.3-0ubuntu1`) is the Plasma application and would pull Qt and KDE libraries onto a GNOME appliance for no benefit; it is explicitly not used. The phone side is the ordinary KDE Connect Android app, which pairs with GSConnect normally.
+- Spec 016 status moved to "Planned (unblocked 2026-09-05)" and the phone-platform risk struck.
+
+## 2026-09-05 — Spec 015 T011: Reboot Authorized and Pre-Reboot State Captured
+
+- The owner authorized rebooting the appliance to validate the desktop-first boot, which is Spec 015's central claim and cannot be inferred from the running state.
+- State captured immediately before the reboot: boot time `2026-09-04 22:15:53`; `media-home.service` disabled and inactive; `zuzz-media.service` active; `ssh.service` enabled and active; default target `graphical.target`; GDM active with `AutomaticLoginEnable=true` and `AutomaticLogin=dfish`; `text-scaling-factor` 1.5; appliance reachable at `192.168.1.204`.
+- Note the address changed from the `192.168.1.203` recorded during Spec 003 to `192.168.1.204`. The host uses DHCP and the router-side reservation remains an outstanding external action, so this drift is expected rather than a fault.
+- This session runs on the appliance itself through VS Code Remote SSH, so the reboot terminates it. The post-reboot T011 verification steps are recorded in `handoff.ai` for the next session.
+
+## 2026-09-05 — Spec 015 T013: Revert Path Validated Both Directions
+
+- Exercised the documented revert without a reboot. `systemctl --user enable --now media-home.service` brought Kodi back immediately and `configure-desktop-home.sh --revert` restored `text-scaling-factor`, `cursor-size`, and `favorite-apps` to their exact captured values. No reinstallation or reconfiguration was required, satisfying the specification's reversibility criterion.
+- Returning to desktop-first with `disable --now` plus `--apply` restored the intended state; Kodi stopped, no Kodi process remained, and Zuzz was restarted successfully under `zuzz-media.service`.
+- The Kodi bounded-stop defect reproduced on the way back: `media-home.service` landed in `failed` because `kodi.bin` again survived to the kill timeout. This confirms the defect is real and reproducible rather than a one-off, and that the desktop-first appliance simply never reaches it, since nothing stops the unit any more. Added `systemctl --user reset-failed` to the documented switch-back procedure in `docs/desktop-home.md` with an explanation, so an operator following the instructions is not alarmed by it.
+- SSH remained active throughout both directions of the switch.
+- Remaining for Spec 015: T011 reboot validation and T012 owner couch acceptance, both of which need the owner and the appliance's console. T014 pre-PR checks follow those.
+
+## 2026-09-05 — Spec 015 Phases 3-4: Couch-Legible Desktop and Roadmap Bookkeeping
+
+- T006 added `scripts/configure-desktop-home.sh` with `--apply`, `--revert`, and `--status`. It captures the prior value of every setting it writes into `~/.local/state/ubuntu-media-project/desktop-home.baseline` and never overwrites an existing capture, so the baseline always describes the appliance before this feature first touched it rather than after the previous run.
+- T007 applied `text-scaling-factor` 1.5 (was 1.0), `cursor-size` 48 (was 24), and curated `favorite-apps` to Zuzz, Firefox, and Kodi (was the Ubuntu default set). Validated the full round trip: applied twice with the baseline correctly preserved, reverted and byte-compared all three values against the baseline recorded in `plan.md` (all matched), confirmed `--revert` with no baseline fails clearly with exit 1, then re-applied.
+- Deliberately did not add a Steam favourite. `steam.desktop` does not exist until Spec 011 installs it, and a favourite pointing at a missing desktop file renders as a blank tile. Recorded as a decision in `tasks.md` rather than silently dropping the task's wording.
+- T008 confirmed `zuzz.desktop` is installed, passes `desktop-file-validate`, and that all three curated favourites resolve to real desktop files.
+- T009 updated specification status fields: Spec 007 and Spec 012 superseded, Spec 010 reduced, Spec 011 simplified, Spec 006 annotated as amended. Each carries a short block quote explaining what changed and why, so the status is self-explanatory to a reader who was not in the conversation.
+- T010 rewrote the `README.md` mission, feature list, and delivery-order table from Kodi-first to desktop-first, and wrote `docs/desktop-home.md` covering boot behaviour, launchers, the applied settings with their prior values, the full revert procedure, and the known limitations.
+- `setup.md` and `docs/kodi.md` were annotated rather than rewritten. `setup.md` is the owner's original design brief and is kept as the record of original intent; `docs/kodi.md` still correctly describes how Kodi is configured and how to bring the Kodi-first home back.
+- Validation: `bash -n` on all 14 scripts, `desktop-file-validate` clean, `git diff --check` clean, private-key and MAC scans over all changed files with no matches.
+- Remaining: T011 reboot validation, T012 owner couch acceptance, T013 revert-path end-to-end test, T014 pre-PR checks.
+
+## 2026-09-05 — Spec 015 Phases 1-2: Kodi Retired from Startup, Orchestration Removed
+
+- Branched `feature/0.015-desktop-first-home` from the committed Spec 009 work and wrote `plan.md` and `tasks.md` before touching the appliance.
+- T001 baseline before any change: `media-home.service` enabled but failed, GDM `AutomaticLoginEnable=true` / `AutomaticLogin=dfish`, SSH active, graphical seat0 session present, Kodi installed at `2:21.3+dfsg-1ubuntu1`. GNOME settings baseline recorded in `plan.md`.
+- T002 disabled `media-home.service` and reset its failed state. The unit file and `~/.local/bin/launch-media-home` were deliberately left installed, so reverting is `systemctl --user enable --now media-home.service` with no reinstallation.
+- T003 changed `scripts/install-media-startup.sh` to install the launcher and unit without `enable --now`, and to print the current enablement state and the revert command. Ran it twice; the unit stayed disabled both times, confirming it no longer fights the retirement.
+- T004 removed the stop/restore orchestration from `scripts/launch-zuzz.sh`: the `systemctl --user stop media-home.service` in `--run` and the `systemctl --user start media-home.service` in `--restore` are gone. `--restore` is now only the DualSense mode reset. No `media-home` references remain in the launcher.
+- **T005 surfaced a latent defect.** `input-remapper-control --command stop` exits 4 ("Did not find any input device") when the DualSense is not connected, and `--restore` propagated it, so `ExecStopPost` marked `zuzz-media.service` **failed after every clean stop**. The pre-existing `--restore` also propagated this status, so it was latent rather than newly introduced, but it was reachable any time the browser was stopped with the controller off. `--restore` is now best-effort: it warns and exits 0, because a controller that is not connected has no remapping left to undo.
+- Verified after the fix: a full `stop` then `start` cycle leaves `zuzz-media.service` `inactive` then `active`, Firefox relaunches in kiosk, `media-home.service` stays disabled and inactive throughout, no Kodi process ever appears, and SSH stays active.
+- Both stop-path failures the appliance carried into this session are now resolved: the `media-home.service` failed-stop by deleting every code path that stops it, and the `zuzz-media.service` failed-stop by the best-effort `--restore`.
+- Phases 3-5 remain: couch-legible desktop settings, roadmap bookkeeping, reboot validation, and owner acceptance.
+
 ## 2026-09-05 — Owner Confirmed Kodi Retirement; Spec 009 Acceptance Narrowed
 
 - The project owner confirmed the move away from Kodi, ratifying the 2026-09-04 architectural decision and authorizing Spec 015 to proceed.
