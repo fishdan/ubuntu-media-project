@@ -30,6 +30,12 @@ every browser exit.
 - [x] T009 Update specification status fields: Spec 007 superseded, Spec 012 retired or reduced to its remaining value, Spec 010 reduced to what Spec 016 will not cover, Spec 011 simplified to launch-from-and-exit-to desktop, and Spec 006 annotated as amended (automatic login retained).
 - [x] T010 Update `README.md` and `setup.md` from a Kodi-first home to a desktop-first home, and write `docs/desktop-home.md` covering the home experience, applied settings, and the full revert procedure.
 
+## Phase 6 — Desktop pointer (found during T012 preparation)
+
+- [x] T015 Fix the circular dependency that made the desktop unnavigable: pointer mode was turned on only by the browser launcher and off again when it stopped, so the controller could not reach the launcher that enables it. Added `config/systemd/user/dualsense-desktop-input.service` to turn the mode on at login, added an `on-when-present` mode that waits for the Bluetooth controller and exits cleanly if absent, and removed the mode toggling from `launch-zuzz.sh` along with the now-empty `--restore` and its `ExecStopPost`.
+- [x] T016 Fix input-remapper injection, which had never actually worked. `input-remapper-control` printed `Starting injection ... Done` while the daemon rejected the request because `config.json` did not exist and no client had called `set_config_dir`. `dualsense-media-mode.sh` now creates `config.json` with an autoload entry and passes `--config-dir` on every call. Replaced the `status` command's cached-intent report with a real check for the per-device `... forwarded` node, and verified both the on and off states report correctly.
+- [x] T017 Add `scripts/install-desktop-home.sh` to install the pointer service and helper symlinks and apply the display settings. Verified idempotent across repeated runs; it never enables `media-home.service`.
+
 ## Phase 5 — Validation and acceptance
 
 - [x] T011 Reboot the appliance and confirm the acceptance criteria that depend on boot: automatic login still works, the GNOME desktop is reached, no media application starts automatically, `media-home.service` stays disabled, and SSH plus local TTY recovery are intact.

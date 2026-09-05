@@ -6,6 +6,5 @@ PartOf=graphical-session.target
 [Service]
 Type=exec
 ExecStart=%h/.local/bin/launch-zuzz --run
-ExecStopPost=%h/.local/bin/launch-zuzz --restore
 TimeoutStopSec=15s
 KillMode=control-group

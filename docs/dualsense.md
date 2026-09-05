@@ -69,4 +69,50 @@ Spec 008's current scope is accepted on the attached monitor. Projector/receiver
 | 011 — Steam | Disable media mode, validate native Steam Input and absence of duplicate events, then validate exit. |
 | 012 — Return home | Implement a stable home command and validate its controller mapping across applications. |
 
-The status command reports cached intent, not live injection state. A reboot, controller disconnect, or external remapper command can invalidate that intent. Stop failures propagate to the caller so launch integrations must honor a nonzero exit status.
+## Pointer mode is on at the desktop (Spec 015)
+
+Since Spec 015 made the GNOME desktop the appliance's home, pointer mode is no
+longer opt-in. `dualsense-desktop-input.service` turns it on at login, waiting up
+to 60 seconds for the controller to finish connecting over Bluetooth and exiting
+cleanly if it never appears. The browser no longer turns the mode on or off; if
+it did, closing the browser would leave the desktop with no pointer.
+
+Turn it off before launching Steam so Steam Input receives the native controller
+alone. That remains Spec 011's checkpoint.
+
+## Defect fixed 2026-09-05: injection silently did nothing
+
+`input-remapper-control` printed `Starting injection ... Done` while the daemon
+logged:
+
+```
+ERROR: "/home/dfish/.config/input-remapper-2/config.json" does not exist
+ERROR: Request to start an injectoin before a user told the service about
+       their session using set_config_dir
+```
+
+The daemon rejects every request until a client names the session's config
+directory, and it will not accept that unless `config.json` exists. The CLI
+reports success regardless, so the mode appeared to work and never had. Kodi's
+controller navigation was unaffected because it used native joystick events
+through `kodi-peripheral-joystick`, never this remapping — which is why the gap
+went unnoticed while Kodi was the home.
+
+`dualsense-media-mode.sh` now creates `config.json` on first use, records the
+autoload entry so the preset reapplies when the controller reconnects, and
+passes `--config-dir` on every daemon call.
+
+## Verifying the mode for real
+
+`status` no longer reports intent. It checks for the
+`input-remapper DualSense Wireless Controller forwarded` device node, which
+exists only while the daemon is actually injecting for this controller. The
+generic `input-remapper mouse` and `input-remapper keyboard` nodes are not a
+valid signal: they persist once created, whether or not injection is running.
+
+```bash
+scripts/dualsense-media-mode.sh status
+```
+
+It exits non-zero if the mode was requested but is not injecting, which normally
+means the controller disconnected.

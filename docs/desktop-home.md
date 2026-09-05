@@ -45,6 +45,29 @@ systemctl --user stop  zuzz-media.service
 Stopping it now only resets the DualSense controller mapping. It no longer
 starts Kodi.
 
+## Controller pointer at the desktop
+
+The desktop is the home, so the DualSense must be able to drive it. Pointer mode
+is turned on at login by `dualsense-desktop-input.service`: the left stick moves
+the pointer, Cross clicks, the D-pad sends arrow keys, Circle is Back, and L1/R1
+change volume.
+
+This is a change from the Kodi era, when pointer mode was opt-in and was switched
+on only while the browser ran. That arrangement cannot work with a desktop home:
+you would need the pointer to launch the browser, but the pointer only appeared
+once the browser had launched, and closing it took the pointer away again. The
+browser no longer touches the mode at all.
+
+```bash
+scripts/dualsense-media-mode.sh status   # confirms live injection, not intent
+scripts/dualsense-media-mode.sh on       # after reconnecting the controller
+scripts/dualsense-media-mode.sh off      # required before launching Steam
+```
+
+If the controller is not connected at login the service exits cleanly and leaves
+the mode off; connect the controller and run `on`. See `docs/dualsense.md` for
+the injection defect fixed on 2026-09-05.
+
 ## Couch-legible display settings
 
 Applied by `scripts/configure-desktop-home.sh`, which captures the prior value
@@ -71,6 +94,17 @@ removes the file.
 If the desktop is still hard to read from the couch, raise
 `text-scaling-factor` in the script rather than by hand, so the change stays in
 version control.
+
+## Installing
+
+```bash
+scripts/install-desktop-home.sh
+```
+
+Idempotent and safe to re-run. It links the helper scripts into `~/.local/bin`,
+installs and enables `dualsense-desktop-input.service`, and applies the display
+settings. It never enables `media-home.service`, so re-running it will not undo
+the Kodi retirement.
 
 ## Reverting to the Kodi-first home
 
