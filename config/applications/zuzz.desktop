@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Zuzz
+Comment=Watch Zuzz in the media browser
+Exec=systemctl --user start zuzz-media.service
+Icon=firefox
+Terminal=false
+Categories=AudioVideo;

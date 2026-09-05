@@ -1,10 +1,41 @@
 # Handoff
 
-## 2026-09-04 — Spec 005 ready for review
+## 2026-09-05 — Spec 009 committed; managed launch validated; Spec 015 ready to branch
 
-- Branch: `feature/0.005-graphics-av-display-audio-power`.
-- Current scope complete; owner explicitly waived AV-off boot and requested PR creation. That scenario remains untested.
-- Passed: owner-visible projector output and stereo sound; receiver/projector cycles, projector input switch, HDMI reconnect, AV-on reboot; SSH recovery and persisted AC policy.
-- Final checks: Bash syntax, bounded AV report execution, power-policy check, privacy scans, and full-branch whitespace check. ShellCheck unavailable.
-- Limitations: initial PipeWire hang resolved by user-service restart; cause unknown, no recurrence during subsequent tests. Multichannel/passthrough untested; recovery durations unmeasured.
-- Next: review and merge Spec 005 PR. No further reboot requested.
+Supersedes all earlier handoff entries. The durable history remains in `progress.ai`; this file is current state only.
+
+### Branch and repository state
+
+- Branch: `feature/0.009-brave-zuzz-browser-streaming`. Spec 009's Firefox switch is now **committed** on this branch (see `git log`), including the launcher, installer, `zuzz-media.service`, desktop entry, docs, spec/plan/research/quickstart/tasks, and the new Specs 015 and 016.
+- `config/systemd/user/brave-media.service` was renamed to `zuzz-media.service` before it was ever tracked, so Git records only the new file.
+- Constitution rule X requires each feature on its own non-`main` branch. Spec 015 work must NOT begin on this branch — cut a new branch first.
+
+### What changed this session
+
+1. Ran the `start.ai` startup sequence; runtime state matched the prior handoff exactly.
+2. Stopped the stray unmanaged Firefox (pid 11642) and started `zuzz-media.service`, closing the prior handoff's top loose end. The managed path works: Firefox runs inside the unit cgroup with `--no-remote -P zuzz-media --kiosk https://zuzz.tv` and the site rendered.
+3. Found and recorded a new defect (below) in the Kodi stop path.
+4. Ran full pre-commit validation and committed Spec 009.
+
+### Current appliance runtime state
+
+- `zuzz-media.service`: static, **active** (Firefox kiosk on zuzz.tv). This is the intended arrangement.
+- `media-home.service`: enabled but **failed** — see the defect below. Kodi is not running.
+- SSH is active; the normal GNOME desktop and Wi-Fi fallback are untouched.
+- `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` (set for T007). Rollback is the same command with `false`.
+
+### Known issues and loose ends
+
+- **New defect: `media-home.service` ends in `failed` state when the launcher stops it.** Kodi's main process exits on SIGTERM (status 143) but the `kodi.bin` child survives to the unit's `final-sigterm` timeout and is SIGKILLed, leaving `Result: exit-code`. Firefox still launches, because `launch-zuzz --run` does not gate on the stop's exit status. Recoverable via `launch-zuzz --restore`, which starts the unit and clears the failed state. **Deliberately not fixed** — it is direct evidence for the Spec 015 decision to retire the Kodi-launch half of `media-home.service` rather than harden it.
+- Spec 009 T004-T006 and T011 remain unaccepted. They all need the owner at the projector: presentation, on-screen-keyboard typing/backspace in a website field, streaming login and playback, close/relaunch account persistence, and Kodi restoration on stop.
+- Owner reported a saved password did not persist. Likely the Firefox save-password prompt was not accepted on a brand-new profile rather than a defect. Unverified.
+- The default Firefox profile `wamx1xaj.default` holds zuzz.tv history from an early ad-hoc test. Harmless; clear it only if the owner cares.
+- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left in place deliberately; delete only on the owner's instruction. Brave itself is untouched with its personal profile intact.
+- **Open question blocking Spec 016**: whether the owner's phone is Android or iPhone. KDE Connect's iOS client has historically lacked the remote-input feature the spec depends on, so the answer can invalidate Spec 016 before any work starts.
+- ShellCheck is still not installed, so no ShellCheck result is claimed anywhere in this project.
+
+### Recommended next actions
+
+1. Get the owner to the projector for Spec 009 T004-T006/T011 acceptance, or explicitly defer them; that is all that stands between Spec 009 and a PR.
+2. Answer the phone-platform question for Spec 016.
+3. Cut a new branch for Spec 015 and begin by disabling `media-home.service` and simplifying `launch-zuzz.sh --restore`, keeping the documented revert path intact. Spec 015 has only `spec.md`; it still needs `plan.md` and `tasks.md`.

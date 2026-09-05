@@ -1,5 +1,61 @@
 # Progress Log
 
+## 2026-09-05 — Owner Confirmed Kodi Retirement; Spec 009 Acceptance Narrowed
+
+- The project owner confirmed the move away from Kodi, ratifying the 2026-09-04 architectural decision and authorizing Spec 015 to proceed.
+- Struck "Kodi restoration" from Spec 009 T005 and T011. That clause existed to accept a restore path Spec 015 removes, so accepting it would validate behavior the project is deliberately deleting. The rest of both tasks stands.
+- Recorded what the owner has already accepted on the projector (Zuzz visible; GNOME on-screen keyboard typing in a Firefox website field, 2026-09-04) directly in T011, so the remaining open items are explicit: projector/receiver audio, streaming login and playback, and close/relaunch account persistence.
+- Spec 016 remains blocked. The owner has not yet stated whether the phone is Android or iPhone, and the KDE Connect iOS client has historically lacked the remote-input feature that specification depends on.
+
+## 2026-09-05 — Spec 009 Managed Firefox Launch Validated End to End
+
+- Closed the handoff's top loose end: `zuzz-media.service` had never been started since the snap-profile fix (`-P zuzz-media`) landed, so only the direct launch was proven. Stopped the stray unmanaged Firefox (pid 11642) left running from the profile test and started the service.
+- The managed path works. `zuzz-media.service` reports active/running with main PID 16535 executing `/snap/firefox/8763/usr/lib/firefox/firefox --no-remote -P zuzz-media --kiosk https://zuzz.tv` inside the unit cgroup, with the expected Firefox content/tab/rdd/utility children indicating the site rendered. No AppArmor profile-lock denials and no re-creation of the existing profile.
+- Confirmed the deployed launcher at `~/.local/bin/launch-zuzz` is byte-identical to `scripts/launch-zuzz.sh`, so the validated behavior is the behavior in version control.
+- **New defect observed: `media-home.service` now ends in `failed` state when the launcher stops it.** Kodi's main process exited on SIGTERM (status 143) at 00:14:07, but the `kodi.bin` child (pid 10707) survived to the unit's `final-sigterm` timeout and was SIGKILLed at 00:14:17, leaving `Result: exit-code`. Firefox still launched correctly, because the launcher does not gate on the stop's exit status. This is the same Kodi bounded-stop fragility recorded earlier in this spec and in Spec 007, now reproducing as a hard unit failure rather than a slow stop.
+- The failure is recoverable: `launch-zuzz --restore` runs `systemctl --user start media-home.service`, which resets the failed state. It is not being fixed here — it is direct evidence for the Spec 015 decision to retire the Kodi-launch half of `media-home.service`, which removes this orchestration entirely rather than hardening it.
+- Validation run before commit: `bash -n` on all 13 repository scripts; `systemd-analyze --user verify config/systemd/user/zuzz-media.service` clean (the unrelated pre-existing `spice-vdagent` warning filtered); `desktop-file-validate config/applications/zuzz.desktop` clean; `git diff --check` clean; and a scan of every new/changed file for private-key headers, likely secret assignments, and MAC addresses, with no matches. ShellCheck remains unavailable.
+- Monthly security check: the stack is Bash, systemd units, desktop entries, and Markdown with no application package manager, so no dependency-vulnerability scan applies. Secret and key scans were performed this session and on 2026-09-04, satisfying the 30-day requirement.
+- Spec 009 T011 owner acceptance remains open: projector presentation, on-screen-keyboard typing in a website field, streaming login/playback, close/relaunch account persistence, and Kodi restoration on stop all still need couch confirmation. T004-T006 remain open for the same reason.
+
+## 2026-09-04 — Spec 009 Keyboard Activation Diagnosis
+
+- Confirmed the live Brave command had native Wayland, enabled IME, and text-input-v3 flags; GNOME accessibility keyboard setting remains true. Inspected installed GNOME keyboard/input-method source and Chromium input source. Text-input-v3 does not explicitly show/hide the input panel in Chromium; this is a limitation, not a proven cause of the observed failure.
+- Installed GTK3 and GTK4 libraries are available. T009 adds a controlled GTK4 trial (`--gtk-version=4`) while retaining the existing media profile and security settings. Bash syntax passed and restarted the managed browser. Owner keyboard appearance, text entry, and backspace acceptance are pending; no fix is claimed yet.
+
+## 2026-09-04 — Spec 009 Post-Reboot Retry
+
+- Owner rebooted; confirmed boot at 21:07:33, active SSH/Kodi, and GNOME screen-keyboard-enabled still true.
+- Started the installed media launcher with explicit Wayland IME/text-input-v3 flags. Service reports active/running; owner keyboard and site acceptance remain pending.
+
+## 2026-09-04 — Spec 009 Browser Text-Input Keyboard Fix
+
+- GNOME keyboard was enabled but owner reported no keyboard in website fields. GNOME exposes no keyboard show method at the checked D-Bus paths.
+- Added T008 and launcher flags `--ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3` based on Chromium Wayland input support. Bash syntax passed; restarted only the managed media browser, which reports active/running. Owner field-focus/text-entry/backspace acceptance remains pending.
+- Reference: https://issues.chromium.org/issues/409585882 and Chromium ozone switches source. Keyring and browser security settings unchanged.
+
+## 2026-09-04 — Spec 009 Keyring Accessibility Accepted
+
+- Owner confirmed GNOME on-screen keyboard worked for the keyring interaction using the controller touchpad. T007 accepted; accessibility keyboard remains enabled with its false-baseline rollback documented. No credentials were handled by the assistant.
+- Streaming audio/video, browser close/Kodi restoration, and profile-session persistence still require acceptance (T004-T005).
+
+## 2026-09-04 — Spec 009 Temporary On-Screen Keyboard
+
+- Owner confirmed the DualSense touchpad can focus the keyring password field, but no keyboard appeared. T007: enabled `org.gnome.desktop.a11y.applications screen-keyboard-enabled` from false to true for local password entry. Readback confirmed true.
+- Rollback: `gsettings set org.gnome.desktop.a11y.applications screen-keyboard-enabled false`. No password was requested, read, or recorded; keyboard appearance and keyring unlock remain owner acceptance. Full keyboard integration remains Spec 010.
+
+## 2026-09-04 — Spec 009 Keyring Prompt Recovery
+
+- Owner reported a locked-keyring authentication modal with no keyboard/mouse. Stopped brave-media; Kodi returned active. Cleanup correctly reported the absent DualSense device rather than claiming remapping success.
+- Read-only input report found no connected controller and hid_playstation not loaded. GNOME screen-keyboard-enabled baseline is false. Added T007 for narrowly scoped first-launch accessibility assistance; no keyring protection or password storage setting changed. Next: owner powers on controller before retrying accessible login.
+
+## 2026-09-04 — Spec 009 Planning and Launcher Implementation
+
+- Verified owner-installed Brave 1.94.121 and signed Brave APT source; created the Spec 009 branch, acceptance criteria, plan, research, quickstart, and tasks.
+- Implemented dedicated private media profile, managed browser service, desktop launcher, installer, and SSH stop/return-to-Kodi recovery. Controller mapping is enabled when a DualSense is detected; later keyboard/Home integration remains explicitly staged.
+- Bash syntax, unit verification, repeated installer runs, and isolated remapper-failure cleanup test passed. Unit verification reports an unrelated existing spice-vdagent Install-section warning. No browser credentials/profile contents were read.
+- Next: first visible launch, owner login/playback/controller acceptance, and normal close/relaunch validation.
+
 ## 2026-09-04 — Spec 005 Final Review and Owner Waiver
 
 - Owner explicitly requested skipping the AV-off boot scenario and creating the PR. Updated the spec, tasks, and final AV guide to label it untested, not passed. Current scope is complete with this acceptance waiver.
@@ -283,3 +339,34 @@
 
 - Added a constitution rule requiring future feature, fix, refactor, configuration, and documentation work to use a non-`main` branch and merge into `main` after validation.
 - The direct commit to `main` for this governance update is explicitly authorized by the project owner in this session.
+
+- Spec 009 first launch: Brave processes and managed service are active, SSH remains active, dedicated profile mode is 700. Kodi used its existing bounded stop; browser emitted a Wayland/Vulkan warning. Projector presentation and playback remain unconfirmed.
+
+## 2026-09-04 — Spec 009 T008/T009 Root-Cause Isolation: GNOME Shell Bug, Not a Brave Flag Gap
+
+- Relaunched the managed browser twice with owner acceptance testing: GNOME's on-screen keyboard correctly appears for the native GTK keyring-unlock dialog but never for Brave's own web-content text fields, even after adding `--enable-wayland-ime --wayland-text-input-version=3` (T008) and `--force-renderer-accessibility` (T009).
+- Captured a `WAYLAND_DEBUG=1` protocol trace of a manual, unmanaged Brave instance (same flags) while the owner tapped a Zuzz text field. Brave correctly bound `zwp_text_input_manager_v3`, created a `zwp_text_input_v3` object, and sent the full expected handshake on focus: `enter()`, `enable()`, `set_content_type()`, `set_cursor_rectangle()`, `set_surrounding_text()`, `commit()`.
+- Conclusion: Brave/Chromium's Wayland text-input-v3 client implementation is working correctly and telling the compositor a text field is focused. The keyboard's failure to appear is a GNOME Shell/Mutter-side defect in reacting to that signal, not a missing or incorrect Brave launch flag. Further Brave flag changes are not expected to fix this.
+- Cross-checked a public report (Brave community forum, "onscreen keyboard not triggered on Ubuntu") describing the same symptom with no resolution posted before the thread auto-closed — consistent with an unresolved upstream issue rather than a local misconfiguration.
+- Also confirmed as background facts during diagnosis: session is native GNOME Wayland (not X11), `ibus-x11` bridge is running but no non-default input engine is selected (`xkb us` only), and no `wayland-info`-equivalent tool was available locally for deeper protocol inspection beyond the captured trace.
+- Operational note: the manual debug Brave instance's child process outlived an initial `pkill` pattern match (it targeted the `brave-browser` wrapper script, not the re-exec'd `/opt/brave.com/brave/brave` binary), causing the managed service's next start to silently hand off to the still-running instance and report itself inactive. Resolved by killing all processes matching the profile's `--user-data-dir`, clearing the stale `SingletonLock`, and cleanly restarting `brave-media.service`, which is confirmed active and normal.
+- `--force-renderer-accessibility` was left in `scripts/launch-zuzz.sh`'s `--run` launch command; it is harmless and does not regress anything, but did not resolve the keyboard gap.
+- Decision needed from the owner before continuing T008/T009: whether to attempt a standalone on-screen keyboard app (new dependency requiring approval) as a stopgap, or defer text entry without a physical keyboard to the already-planned Spec 010 controller-driven keyboard, closing T008/T009 as a documented upstream limitation.
+
+## 2026-09-04 — Spec 009 Firefox On-Screen-Keyboard Comparison Test
+
+- At the owner's suggestion, ran a manual, unmanaged `firefox --kiosk https://zuzz.tv` test (snap Firefox 154.0, already installed) in place of Brave, with `brave-media.service` stopped for the duration.
+- The owner confirmed the GNOME on-screen keyboard correctly appears and is usable in a Firefox text field on the same site, unlike Brave/Chromium under identical GNOME accessibility settings.
+- This narrows T008/T009's root cause: it is not a blanket GNOME Shell defect (Firefox proves the compositor-side trigger works), but a Brave/Chromium-specific incompatibility in how its Wayland text-input-v3 client behaves, despite the protocol trace looking superficially correct.
+- The diagnostic Firefox process was stopped after the test; no persistent Firefox launcher, profile, or service was created. `brave-media.service` was left stopped pending the owner's decision on whether to keep pursuing Brave or move Spec 009's browser choice to Firefox.
+
+## 2026-09-04 — Architectural Decision: Desktop-First Home, Kodi Retirement, and Phone-Based Input
+
+- The project owner decided to retire the Kodi-first media home in favor of booting to the ordinary GNOME desktop, on the stated basis that the appliance will never hold a local media library. Kodi's remaining value was as a launcher shell, which the desktop provides directly.
+- The owner also chose phone-based remote input (KDE Connect / GSConnect) over continuing to pursue on-screen-keyboard support, following the Spec 009 finding that GNOME's keyboard depends on application cooperation that Brave/Chromium does not provide.
+- Created `specs/0/0.015-desktop-first-home/spec.md`. It amends Spec 006 (automatic login is retained; only the Kodi-launch half of `media-home.service` retires), supersedes Spec 007 and most of Spec 012, reduces Spec 010, and simplifies Spec 011. Kodi stays installed and launchable so the decision remains reversible.
+- Created `specs/0/0.016-gsconnect-remote-input/spec.md` for phone-based keyboard and pointer input using Ubuntu's `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, confirmed available; not installed). No third-party package source is required.
+- Recorded rationale: the browser/Kodi stop-restore orchestration is the appliance's most failure-prone component and caused two visible faults during this session alone, in addition to the previously documented Kodi bounded-stop and HDMI-sink failures. The desktop-first change is subtractive, since Kodi already runs as a window inside the normal GNOME Wayland session rather than as a standalone session.
+- Recorded risks: GNOME is not a ten-foot interface and will need display scaling and large-text settings for projector distance; and the KDE Connect iOS client has historically lacked remote input, so the owner's phone platform must be confirmed before Spec 016 implementation.
+- The owner directed that Spec 015 be specified before Spec 016. No implementation of either feature has begun, and no roadmap status fields have been changed yet; those edits are tasks within Spec 015.
+- Spec 009's Firefox switch remains uncommitted on `feature/0.009-brave-zuzz-browser-streaming` at the time of this entry.
