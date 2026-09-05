@@ -1,5 +1,22 @@
 # Progress Log
 
+## 2026-09-05 — Spec 015 T014 Pre-PR Checks Clean
+
+- `bash -n` passes on all 14 repository scripts. `systemd-analyze --user verify` is clean for both `media-home.service` and `zuzz-media.service`, with the unrelated pre-existing `spice-vdagent` warning filtered. `desktop-file-validate` is clean for `zuzz.desktop`. `git diff --check` is clean.
+- Scanned all 27 files changed against `main` for private-key headers, likely secret assignments, and MAC addresses; no matches. Confirmed no browser profile, cookie, or credential file is tracked, satisfying the constitution's requirement that browser profiles and streaming credentials stay outside version control.
+- ShellCheck remains uninstalled, so no ShellCheck result is claimed.
+- The pull request is deliberately not opened yet. Spec 015 T012 (owner couch acceptance) is the last open item, and the owner has not yet judged whether 1.5 text scaling is correct at projector distance.
+
+## 2026-09-05 — Spec 015 T011 Passed: Desktop-First Boot Validated
+
+- The appliance rebooted at `2026-09-05 00:32:11`, changing from the pre-reboot boot time of `2026-09-04 22:15:53`.
+- **Every T011 acceptance criterion passed.** `media-home.service` is disabled and inactive, and has **no journal entries whatsoever for this boot**, which is the strongest available evidence that it never attempted to start rather than starting and failing. No `kodi.bin` process exists and no Firefox process exists, confirming nothing media-related starts automatically.
+- Automatic login survived unchanged: `gdm-autologin` opened dfish's session at `00:32:20`, nine seconds after boot, producing an active Wayland session on `seat0`/`tty2`. `/etc/gdm3/custom.conf` still carries `AutomaticLoginEnable=true` and `AutomaticLogin=dfish`. Spec 006's guarantee is intact.
+- Recovery paths intact: `ssh.service` enabled and active with this session reconnecting over it, and `/dev/tty1` through `/dev/tty6` present for physical-console recovery.
+- The couch display settings persisted across the reboot without reapplication: `text-scaling-factor` 1.5, `cursor-size` 48, and `favorite-apps` curated to Zuzz, Firefox, and Kodi. This confirms `gsettings` values are durable and the configuration script does not need to run at every boot.
+- A pre-existing, unrelated journal line was observed during autologin: `gkr-pam: couldn't unlock the login keyring`. This is the same GNOME keyring behaviour Spec 009 already handled through its keyring-unlock work and is not caused by this feature.
+- Spec 015 is now complete except for T012 (owner couch acceptance of DualSense desktop navigation and a judgement on whether 1.5 text scaling is right at projector distance) and T014 (pre-PR checks).
+
 ## 2026-09-05 — Spec 016 Unblocked: Android Confirmed; GSConnect vs KDE Connect Clarified
 
 - The owner confirmed the phone is **Android**, resolving the risk that could have invalidated Spec 016 before implementation. The KDE Connect Android client provides the remote keyboard and touchpad input the feature depends on.

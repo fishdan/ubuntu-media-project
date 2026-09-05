@@ -32,14 +32,22 @@ every browser exit.
 
 ## Phase 5 — Validation and acceptance
 
-- [ ] T011 Reboot the appliance and confirm the acceptance criteria that depend on boot: automatic login still works, the GNOME desktop is reached, no media application starts automatically, `media-home.service` stays disabled, and SSH plus local TTY recovery are intact.
+- [x] T011 Reboot the appliance and confirm the acceptance criteria that depend on boot: automatic login still works, the GNOME desktop is reached, no media application starts automatically, `media-home.service` stays disabled, and SSH plus local TTY recovery are intact.
+  Passed. Rebooted 2026-09-05 00:32:11. `media-home.service` has no journal entries at all for this boot,
+  so it never attempted to start; no Kodi or Firefox process exists; GDM autologin opened dfish's session
+  at 00:32:20 onto an active Wayland session on seat0/tty2; SSH enabled and active; tty1-6 present.
+  All three couch settings survived the reboot.
 - [ ] T012 Owner acceptance from the couch: the DualSense pointer mode navigates the desktop, launches the streaming browser, and returns to the desktop by closing it, with no keyboard or mouse.
 - [x] T013 Validate the documented revert path end to end: re-enable `media-home.service`, confirm Kodi-first startup returns without reinstalling or reconfiguring anything, then disable it again and confirm the desktop-first state is restored.
   Verified without a reboot: enabling started Kodi and `--revert` restored all three settings exactly;
   disabling stopped Kodi and `--apply` restored the couch settings. Confirmed the Kodi bounded-stop
   defect reappears on the way back (`media-home.service` lands in `failed`), which is why the documented
   procedure now includes `systemctl --user reset-failed`.
-- [ ] T014 Run the standard pre-PR checks (`bash -n` on all scripts, `systemd-analyze --user verify`, `git diff --check`, secret and MAC scans), update `progress.ai` and `handoff.ai`, and prepare the pull request.
+- [~] T014 Run the standard pre-PR checks (`bash -n` on all scripts, `systemd-analyze --user verify`, `git diff --check`, secret and MAC scans), update `progress.ai` and `handoff.ai`, and prepare the pull request.
+  Checks done and clean: `bash -n` on all 14 scripts, both systemd units verify clean, `desktop-file-validate`
+  clean, `git diff --check` clean, and private-key/secret/MAC scans across all 27 files changed against `main`
+  found nothing. No browser profile, cookie, or credential file is tracked. ShellCheck is not installed, so no
+  ShellCheck result is claimed. The pull request itself is held pending T012 owner acceptance.
 
 ## Explicitly not in this feature
 

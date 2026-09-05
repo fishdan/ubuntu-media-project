@@ -17,10 +17,10 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 3. The owner confirmed the move away from Kodi, which narrowed Spec 009's remaining acceptance and authorised Spec 015.
 4. Implemented Spec 015 phases 1-4 and validated the revert path in both directions.
 
-### Current appliance state
+### Current appliance state (after the reboot)
 
 - `media-home.service`: installed, **disabled**, inactive. Kodi is installed and launchable but no longer starts at login.
-- `zuzz-media.service`: **active**, Firefox kiosk on zuzz.tv.
+- `zuzz-media.service`: **inactive**. This is correct: nothing starts automatically any more. Launch Zuzz from the desktop, or with `systemctl --user start zuzz-media.service`.
 - Desktop settings applied for the couch: `text-scaling-factor` 1.5, `cursor-size` 48, favourites curated to Zuzz, Firefox, Kodi. Baseline captured at `~/.local/state/ubuntu-media-project/desktop-home.baseline`.
 - SSH active. GDM automatic login unchanged (`AutomaticLoginEnable=true`, `AutomaticLogin=dfish`).
 - `org.gnome.desktop.a11y.applications screen-keyboard-enabled` remains `true` from Spec 009 T007.
@@ -33,9 +33,9 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 ### Outstanding work
 
 **Spec 015 — needs the owner and the console:**
-- T011: reboot and confirm automatic login still works, the desktop is reached, no media application starts, `media-home.service` stays disabled, and SSH plus local TTY recovery are intact. **Not yet done — the appliance has not been rebooted since these changes.**
-- T012: owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse.
-- T014: pre-PR checks and PR preparation, after T011 and T012.
+- ~~T011: reboot validation.~~ **Passed 2026-09-05** — see above.
+- **T012 is the only open implementation task**: owner acceptance from the couch — DualSense pointer navigates the desktop, launches the browser, and returns to the desktop by closing it, with no keyboard or mouse. The owner should also judge whether `text-scaling-factor` 1.5 is right at projector distance.
+- T014: pre-PR checks are done and clean. The pull request itself is held until T012.
 
 **Spec 009 — needs the owner at the projector:**
 - T004-T006 and T011: projector/receiver audio, streaming login and playback, and close/relaunch account persistence. Projector presentation and on-screen-keyboard typing were already accepted on 2026-09-04. Kodi restoration was struck from scope.
@@ -51,36 +51,16 @@ Supersedes all earlier handoff entries. The durable history remains in `progress
 - The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left deliberately; delete only on the owner's instruction. Brave itself is untouched.
 - ShellCheck is still not installed, so no ShellCheck result is claimed anywhere in this project.
 
-### REBOOT IN PROGRESS — first thing to do on reconnect
+### Reboot completed — Spec 015 T011 PASSED
 
-The appliance was rebooted on 2026-09-05 to validate Spec 015 T011. This session
-runs on the appliance through VS Code Remote SSH, so it ended with the reboot.
-Pre-reboot state: boot time `2026-09-04 22:15:53`, `media-home.service`
-disabled/inactive, `zuzz-media.service` active, SSH enabled/active, GDM
-autologin on, `text-scaling-factor` 1.5, host at `192.168.1.204`.
-
-Run this and record the result in `progress.ai` as T011 evidence:
-
-```
-uptime -s                                             # must differ from 2026-09-04 22:15:53
-systemctl is-active ssh                               # active
-systemctl --user is-enabled media-home.service        # disabled
-systemctl --user is-active media-home.service         # inactive
-ps -eo cmd | grep -c '[k]odi.bin'                     # 0
-ps -eo cmd | grep -c '[f]irefox --no-remote -P zuzz'  # 0 (nothing auto-starts)
-loginctl list-sessions                                # a seat0 graphical session for dfish
-grep AutomaticLogin /etc/gdm3/custom.conf             # still true / dfish
-gsettings get org.gnome.desktop.interface text-scaling-factor   # 1.5
-```
-
-T011 passes if the desktop is reached with automatic login intact, nothing
-media-related started on its own, and SSH plus the local TTY still work. If
-Kodi starts anyway, `media-home.service` was re-enabled by something and that
-must be investigated before anything else.
+Rebooted `2026-09-05 00:32:11`. Every criterion passed: `media-home.service` has
+no journal entries at all for this boot (it never attempted to start), no Kodi or
+Firefox process exists, `gdm-autologin` opened dfish's session at 00:32:20 onto an
+active Wayland session on seat0/tty2, SSH is enabled and active, tty1-6 are
+present, and all three couch settings survived the reboot without reapplication.
 
 ### Recommended next actions
 
-1. Reboot the appliance and complete Spec 015 T011. This is the feature's central claim and is the one thing that cannot be inferred from the current running state.
-2. Get the owner in front of the projector for T012, and judge whether 1.5 text scaling is right.
+1. Get the owner in front of the projector for Spec 015 T012. This is the last open task in the feature. Launch Zuzz from the desktop with the DualSense, confirm closing it returns to the desktop, and judge whether 1.5 text scaling is right. Nothing starts automatically now, so the desktop is what appears at boot.
 3. ~~Answer the phone-platform question for Spec 016.~~ Resolved 2026-09-05: Android. Spec 016 is unblocked and uses GSConnect (the GNOME implementation of the KDE Connect protocol), not the Plasma `kdeconnect` package.
 4. Finish T014, then decide whether to PR Spec 009 and Spec 015 separately or merge 009 first.
