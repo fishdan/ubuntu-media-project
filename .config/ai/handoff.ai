@@ -108,6 +108,31 @@ If pairing survived, T010 passes. If not, document the reconnection procedure
 instead — the specification allows either, but it must be one or the other.
 Then T015: pre-PR checks, update progress and handoff, open the PR.
 
+### REBOOT ISSUED for Spec 011 T014 — verify on reconnect
+
+Rebooted to confirm the Steam arrangement survives a restart. Branch
+`feature/0.011-steam-big-picture`, 3 tasks open (T013, T014, T017).
+
+```
+uptime -s
+systemctl is-active ssh
+systemctl --user is-enabled media-home.service        # disabled
+gnome-extensions list --enabled | grep gsconnect      # still enabled
+scripts/dualsense-media-mode.sh status                # pointer back once controller wakes
+systemctl --user start steam-bigpicture.service       # Steam still launches
+scripts/dualsense-media-mode.sh status                # must flip to "off" - the hand-off
+systemctl --user stop steam-bigpicture.service
+scripts/dualsense-media-mode.sh status                # must return to "ON"
+```
+
+**T013 still needs settling.** The owner reported the PS button works from Steam,
+but the journal does not corroborate it: the last `return-home` invocation was
+23:48:46 reporting "Nothing to close", 27 seconds after Steam had already stopped.
+A likely explanation is that the controller had gone to sleep, so pressing PS woke
+it rather than emitting the mapped key. Re-test with Steam actually running and
+confirm the journal shows `Stopped steam-bigpicture.service` from `return-home`
+before marking it accepted.
+
 ### Recommended next actions
 
 1. Push both branches and open the pull requests, 009 first, then 015.
