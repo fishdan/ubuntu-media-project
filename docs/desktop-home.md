@@ -30,7 +30,10 @@ revert path.
 | Firefox | The normal Firefox launcher (separate from the media profile) |
 | Kodi | The normal Kodi launcher; still installed, just no longer the home |
 
-The dock favourites are curated to Zuzz, Firefox, and Kodi. Steam is added by
+The dock favourites are curated to Zuzz, Firefox, Brave, and Kodi. Brave is kept
+deliberately: Spec 016 has to prove that phone-based typing works in a Chromium
+browser, because Chromium's Wayland text-input behaviour is what defeated the
+on-screen keyboard in Spec 009. Steam is added by
 Spec 011; it is deliberately absent from the favourites until then, because a
 favourite pointing at a missing desktop file renders as a blank tile.
 
@@ -84,7 +87,7 @@ of everything it writes before writing it:
 | --- | --- | --- |
 | `org.gnome.desktop.interface text-scaling-factor` | `1.5` | `1.0` |
 | `org.gnome.desktop.interface cursor-size` | `48` | `24` |
-| `org.gnome.shell favorite-apps` | Zuzz, Firefox, Kodi | Ubuntu defaults |
+| `org.gnome.shell favorite-apps` | Zuzz, Firefox, Brave, Kodi | Ubuntu defaults |
 | `dash-to-dock dock-fixed` | `true` | `false` |
 | `dash-to-dock autohide` | `false` | `true` |
 | `dash-to-dock dash-max-icon-size` | `64` | `48` |
