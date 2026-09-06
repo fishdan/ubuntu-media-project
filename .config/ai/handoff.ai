@@ -85,6 +85,29 @@ bash scripts/configure-gsconnect.sh --harden
 `SFTP.automount`, `Notification.send-notifications` and `Contacts.contacts-source`
 all ship enabled, and plugin state is per-device so it cannot be pre-applied.
 
+### REBOOT ISSUED for Spec 016 T010 — verify these on reconnect
+
+Rebooted to confirm the GSConnect pairing survives a restart. Pre-reboot:
+extension enabled, port 1716 listening, device `<redacted-device-id>`
+(Galaxy Tab A11) paired, `discoverable` false, DualSense connected,
+`media-home.service` disabled. Branch `feature/0.016-gsconnect-remote-input`,
+2 tasks open (T010, T015).
+
+```
+uptime -s
+gnome-extensions list --enabled | grep gsconnect     # still enabled?
+ss -tuln | grep 1716                                 # daemon listening again?
+gsettings get org.gnome.Shell.Extensions.GSConnect.Device:\
+  /org/gnome/shell/extensions/gsconnect/device/<redacted-device-id>/ paired
+gsettings get org.gnome.Shell.Extensions.GSConnect discoverable   # must stay false
+bash scripts/configure-gsconnect.sh --status         # policy must survive
+bluetoothctl devices Connected                       # DualSense back?
+```
+
+If pairing survived, T010 passes. If not, document the reconnection procedure
+instead — the specification allows either, but it must be one or the other.
+Then T015: pre-PR checks, update progress and handoff, open the PR.
+
 ### Recommended next actions
 
 1. Push both branches and open the pull requests, 009 first, then 015.
