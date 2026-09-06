@@ -6,9 +6,10 @@
 # Ubuntu repository only. The Plasma `kdeconnect` package is deliberately not
 # used: it would pull Qt and KDE libraries onto a GNOME appliance for no benefit.
 #
-# This installs and enables the extension but deliberately does NOT pair a phone
-# and does NOT enable plugins. Run scripts/configure-gsconnect.sh afterwards to
-# apply the plugin policy, and pair only after that.
+# This installs and enables the extension but deliberately does NOT pair a phone.
+# GSConnect stores plugin state per device, so the policy in
+# scripts/configure-gsconnect.sh can only be applied once a device exists. Pair,
+# then run it immediately.
 
 set -euo pipefail
 
@@ -45,5 +46,9 @@ else
     printf '%s\n' 'Extension enabled.'
 fi
 
-printf '\n%s\n' 'Next: scripts/configure-gsconnect.sh --apply  (plugin policy)'
-printf '%s\n' 'Pair the phone only AFTER the plugin policy is applied.'
+printf '\n%s\n' 'Next: pair the phone, then IMMEDIATELY run:'
+printf '%s\n' '  scripts/configure-gsconnect.sh --apply    # restrict to remote input'
+printf '%s\n' '  scripts/configure-gsconnect.sh --harden   # stop advertising on the LAN'
+printf '%s\n' 'The policy cannot be applied before pairing: GSConnect stores plugin state'
+printf '%s\n' 'per device, and permissive defaults (file receive, SFTP automount,'
+printf '%s\n' 'notification forwarding) are live from the moment a device pairs.'

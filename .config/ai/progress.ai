@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 T003: Extension Enabled and Listening
+
+- Enabled `gsconnect@andyholmes.github.io` after the reboot made it visible. It reports `Enabled: Yes`, `State: ACTIVE`, version 71, with `service/daemon.js` running and listening on **TCP and UDP 1716 on all interfaces**.
+- With no host firewall, that port is reachable from anything on the LAN. This is the exposure already recorded in `plan.md`; it is acceptable only because pairing requires confirmation at both ends, and `configure-gsconnect.sh --harden` will stop GSConnect advertising once the phone is paired.
+- Corrected superseded instructions in `scripts/install-gsconnect.sh`. Both its header comment and its closing message still told the operator to apply the plugin policy *before* pairing, which the schema investigation proved impossible. Leaving that text would have actively misled whoever ran it next, so it now states the real sequence and names the permissive defaults that make promptness matter.
+- Ready for T005 pairing, which needs the owner's phone and the KDE Connect Android app on the same LAN.
+
+## 2026-09-05 — Reboot: DualSense Recovered; Login Pointer Service Validated Cold
+
+- Rebooted at `2026-09-05 22:25:29`. SSH recovered on the same address `192.168.1.204`, and the desktop-first state held: `media-home.service` still disabled and inactive, no Kodi process.
+- **The DualSense reconnected on its own.** It is connected over Bluetooth (`<redacted-bluetooth-address>`) and present as a physical input device at `event15`. Combined with the earlier evidence — `Host is down (112)`, no advertising during two btmon captures, and a ten-second light-bar flash before giving up — the flat-battery diagnosis is confirmed. Charging fixed it; nothing was wrong with the pairing, the bond, or the appliance's Bluetooth stack, all of which tested healthy throughout.
+- **This is also the first cold-boot validation of `dualsense-desktop-input.service`.** The service came up `active` and pointer injection is live, which means its `on-when-present` wait did its job: at boot the controller is not yet connected, because Bluetooth association takes several seconds, and the service waited for the device to appear rather than failing immediately. That path had only ever been exercised by hand before. The design decision to wait, and to exit cleanly rather than fail when no controller appears, is what made an unattended recovery possible here.
+- Worth noting for the record: nothing was done to fix the controller. The appliance recovered it without intervention once the hardware was charged, which is the behaviour an appliance should have.
+- Also confirmed: GSConnect is now **visible** to GNOME Shell after the session restart, as expected, and is not yet enabled. The Wayland constraint the installer warns about behaved exactly as documented.
+- Still outstanding and unchanged by the reboot: Wi-Fi remains rfkill soft-blocked, so Ethernet is the only path to the appliance; and the DualSense status false-positive fix is still unmerged in PR #10, which is why `status` on this branch reported the controller as live while it was disconnected before the reboot.
+
 ## 2026-09-05 — Spec 016: GSConnect Installed; Plan Corrected After Reading the Schema
 
 - T002/T003 installed `gnome-shell-extension-gsconnect` `71-1ubuntu1` from `resolute/universe`. The installer is idempotent; the second run reported already-installed. It correctly detected that a newly installed extension is invisible to a running Wayland GNOME session and stopped with instructions rather than failing oddly. The extension is **not yet enabled**; that needs a log out and back in.

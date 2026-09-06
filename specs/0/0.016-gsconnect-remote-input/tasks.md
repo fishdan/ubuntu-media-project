@@ -11,7 +11,9 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 
 - [x] T001 Record the pre-change baseline: GNOME Shell version, package availability and version, firewall state, listening ports, and appliance address. Confirm SSH, autologin, and the desktop are healthy first.
 - [x] T002 Write `scripts/install-gsconnect.sh`: idempotent, installs `gnome-shell-extension-gsconnect` from the Ubuntu repository only, no third-party source, and refuses to run as the wrong user. Verify by running it twice. Done: installed `71-1ubuntu1`; second run reported already-installed.
-- [ ] T003 Enable the extension and confirm it reports as enabled. On Wayland the shell cannot be restarted in place, so this needs a log out and back in, or a reboot; record which was used.
+- [x] T003 Enable the extension and confirm it reports as enabled. On Wayland the shell cannot be restarted in place, so this needs a log out and back in, or a reboot; record which was used.
+  Done via reboot at 2026-09-05 22:25:29. Extension reports `Enabled: Yes`, `State: ACTIVE`, version 71,
+  with the daemon running and listening on TCP and UDP 1716.
 
 ## Phase 2 — Lock down before pairing
 
