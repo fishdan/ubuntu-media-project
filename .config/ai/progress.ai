@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011: Big Picture, Sign-in and Games Accepted; Controller Restore Proven in Real Use
+
+- The owner reached Big Picture from the dock, signed in, installed games, and played several including **Thronefall**, which has full controller support, alongside RimWorld and FTL. T009, T011 and T012 accepted.
+- **First launch appeared unresponsive.** The click did work; Steam's first-run bootstrap downloads and extracts Valve's client for several minutes while showing no window. The unit was `active` and consuming CPU throughout. This affects first run only and is now recorded so it is not mistaken for a fault.
+- **The controller restore is proven in real use, not just in a synthetic test.** The journal shows RimWorld stopping at 23:47:59, then at 23:48:19 the unit's `ExecStopPost` running `dualsense-media-mode` and logging `DualSense desktop media mode: on`. The pointer returned automatically after a 24-minute session that peaked at 9.3 GB of system memory. This is the design decision to use `ExecStopPost` rather than a shell trap paying off in the real case.
+- **T013 is only partially verified and is not being claimed.** The owner exited Steam through its own menu rather than with the PS button, so `return-home` fired at 23:48:46 when Steam had already stopped 27 seconds earlier and correctly reported "nothing to close". The Steam unit-matching path in `return-home` has therefore not been exercised from the couch.
+- **Minor issue observed: the PS button repeats.** Six `return-home` invocations were logged within the same second, consistent with the key repeating while held. It is harmless because the script is idempotent and reports "nothing to close" on subsequent runs, but it is recorded rather than ignored.
+- Honest framing of the game result: Thronefall, FTL and RimWorld are all comparatively light titles. This confirms the appliance handles the class of game a GTX 1060 with 3 GB of VRAM suits, and is not evidence that a modern demanding title would run at projector resolution. None has been tested.
+
 ## 2026-09-06 — Spec 011: Steam Detects the DualSense; RimWorld Report Traced to Game-Level Config
 
 - The owner reached Big Picture from the dock and installed and started games, but reported that RimWorld showed "partial controller support" and then "no controller detected".

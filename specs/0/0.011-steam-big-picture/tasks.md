@@ -42,7 +42,7 @@ regression there would be discovered from the couch rather than from a shell.
 
 ## Phase 4 — Owner acceptance
 
-- [ ] T009 Owner launches Steam from the dock with the DualSense alone and reaches Big Picture.
+- [x] T009 Owner launches Steam from the dock with the DualSense alone and reaches Big Picture. Accepted 2026-09-06. First launch appeared unresponsive because the client bootstrap runs for several minutes with no window; the unit was active and working throughout. This affects first run only.
 - [x] T010 Steam Input sees the DualSense as a native gamepad, with no duplicate or phantom input from input-remapper.
   Confirmed from Steam's own logs: `Added HIDAPI device 'DualSense Wireless Controller' VID 0x054c,
   PID 0x0ce6, bluetooth 1, path = /dev/hidraw0, driver = SDL_JOYSTICK_HIDAPI_PS5 (ENABLED)` and
@@ -52,9 +52,21 @@ regression there would be discovered from the couch rather than from a shell.
   axes advertised, `hid_playstation` and `joydev` loaded, and input-remapper holding no forwarded node.
   A game reporting "no controller detected" is therefore a per-game Steam Input setting, not an appliance
   fault.
-- [ ] T011 Sign in to Steam. Text entry uses the Spec 016 phone input; record whether Steam Guard was required and whether phone input handled it.
-- [ ] T012 Install and run one representative test title. **Judge it honestly against a GTX 1060 with 3 GB of VRAM** and record what it actually does, including stutter or unplayability. Do not present a title that does not run well as working.
-- [ ] T013 The PS button returns from Steam to the desktop, and the pointer works immediately afterwards.
+- [x] T011 Sign in to Steam. Accepted 2026-09-06: the owner signed in successfully and installed games.
+- [x] T012 Install and run one representative test title. **Judge it honestly against a GTX 1060 with 3 GB of VRAM** and record what it actually does, including stutter or unplayability. Do not present a title that does not run well as working.
+  Accepted 2026-09-06. The owner played several titles including **Thronefall**, which carries *full*
+  controller support and worked well, plus RimWorld and FTL. A 24-minute session peaked at 9.3 GB of system
+  memory with no reported problems.
+  Honest scope of that result: Thronefall, FTL and RimWorld are all comparatively light titles, so this
+  confirms the appliance handles exactly the class of game the GTX 1060's 3 GB of VRAM suits. It is not
+  evidence that a modern demanding title would run at projector resolution, and none has been tested.
+- [~] T013 The PS button returns from Steam to the desktop, and the pointer works immediately afterwards.
+  **Partially verified.** The restore half is proven in real use: at 23:48:19, after the owner quit Steam
+  from within Big Picture, `ExecStopPost` ran and the journal records `DualSense desktop media mode: on`.
+  The pointer came back automatically with no manual step.
+  **Still untested: pressing PS while Steam is running.** The owner exited via Steam's own menu, so
+  `return-home` was invoked at 23:48:46 when Steam had already stopped 27 seconds earlier and correctly
+  reported "nothing to close". The scope/unit matching for Steam has not yet been exercised from the couch.
 
 ## Phase 5 — Durability and exit
 
