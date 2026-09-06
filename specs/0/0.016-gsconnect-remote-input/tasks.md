@@ -68,7 +68,13 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 - [x] T012 Write `docs/phone-input.md` covering install, the enabled-plugin policy with rationale, pairing, daily use, the known LAN exposure, and removal.
 - [x] T013 Record in `progress.ai` that no firewall is enabled, so no ports were opened, and note that GSConnect would need TCP/UDP `1716-1764` if one is ever added.
 - [x] T014 Record the GNOME 51 compatibility risk (`gnome-shell (<< 51~)`) against Spec 013, since a future release will make this package uninstallable.
-- [ ] T015 Run the standard pre-PR checks, update `progress.ai` and `handoff.ai`, and prepare the pull request.
+- [x] T015 Run the standard pre-PR checks, update `progress.ai` and `handoff.ai`, and prepare the pull request.
+  All checks clean: `bash -n` on 18 scripts, systemd units verify, preset JSON valid, `git diff --check`
+  clean, and no key or certificate material anywhere in the diff.
+  **The scan caught a real leak.** The DualSense Bluetooth address and the paired device's GSConnect
+  identifier had been written into `progress.ai` and `handoff.ai`, violating both the constitution and this
+  specification's own criteria, in a public repository. Neither was in `main` and the branch was unpushed,
+  so nothing was published; both were purged from all twelve branch commits before push.
 
 ## Explicitly not in this feature
 

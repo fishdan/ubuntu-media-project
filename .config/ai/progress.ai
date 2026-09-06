@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-05 — Secret-Hygiene Failure Caught by the Pre-PR Scan and Purged Before Push
+
+- The T015 pre-PR scan found **two identifiers I had written into tracked files in violation of rules this project states explicitly**: the DualSense's Bluetooth address in `progress.ai`, and the paired device's GSConnect identifier in both `progress.ai` and `handoff.ai`.
+- Both rules were already on the record and were being followed elsewhere. The constitution requires Bluetooth addresses stay out of version control, `docs/dualsense.md` says to "treat its Bluetooth address as session-local information and never copy it into Git", and Spec 016's own acceptance criteria require that "device identifiers, and any paired-device metadata remain outside version control". `scripts/dualsense-media-mode.sh` deliberately reads the address from BlueZ at runtime for exactly this reason. The scripts were right; the prose I wrote around them was not.
+- **The repository is public**, so publishing would have exposed the controller's hardware address and the paired device's identifier permanently.
+- Caught before any push. Neither string existed in `main` and the branch had never been pushed, so nothing was ever published.
+- Purged with `git filter-branch` across all twelve branch commits, replacing them with `<redacted-bluetooth-address>` and `<redacted-device-id>`. Commit count, messages and structure are unchanged; only the two strings differ. A safety ref `backup/0.016-before-redaction` was taken first and the rewrite verified with `git log -S` finding no remaining occurrence in any commit.
+- History rewriting is normally discouraged by the constitution, which is why it is recorded here with its justification: the commits were local and unpushed, no human work was altered or lost, and the alternative was permanently publishing identifiers to a public repository. Redacting only in a later commit would have left both strings in the published history.
+- **Process lesson worth keeping.** The pre-PR secret scan is not a formality; it caught a real leak that ordinary review would likely have missed, because the identifiers were buried in narrative prose rather than in code or configuration. Diagnostic output pasted into progress notes is exactly where this class of mistake happens, and it should be redacted at the moment of writing rather than trusted to a later scan.
+
 ## 2026-09-05 — Spec 016 T010 Passed: Pairing and Policy Survive a Reboot
 
 - Rebooted at `2026-09-05 22:58:14`. GSConnect came back with no intervention: extension enabled, daemon listening on TCP and UDP 1716, device still `paired: true`, the full fourteen-plugin `disabled-plugins` policy intact, and `discoverable` still `false`. The tablet reconnected on its own with an established session from `192.168.1.210`. T010 passes without needing the fallback reconnection procedure.
