@@ -16,6 +16,10 @@ readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/ubuntu-media-project"
 readonly state_path="$state_dir/dualsense-media-mode.active"
 readonly config_path="$config_root/config.json"
 readonly config_version='2.2.0'
+# Read from BlueZ rather than tracked in Git: the constitution keeps Bluetooth
+# addresses out of version control.
+bt_address=$(bluetoothctl devices Paired 2>/dev/null | awk -v d="$device" '$0 ~ d {print $2; exit}')
+readonly bt_address
 
 usage() {
     printf 'Usage: %s on|on-when-present [seconds]|off|status\n' "${0##*/}" >&2
@@ -39,9 +43,11 @@ ensure_config() {
 
 # input-remapper's own status is cached intent, and its generic "input-remapper
 # mouse"/"keyboard" uinput nodes persist once created. The per-device
-# "... forwarded" node is the one that exists only while this controller is
-# actually being injected, so it is the honest liveness signal.
+# "... forwarded" node is closer, but it also outlives the controller: it is
+# still present after the controller disconnects, which made this report a false
+# positive with no controller in the room. Require the physical device too.
 injection_is_live() {
+    controller_present || return 1
     grep -q "N: Name=\"input-remapper $device forwarded\"" /proc/bus/input/devices 2>/dev/null
 }
 
@@ -61,13 +67,19 @@ install_preset() {
 # available at the desktop rather than only inside the browser. This waits for
 # the controller to finish connecting over Bluetooth after login, and exits 0 if
 # it never appears, so a missing controller does not fail the login service.
+controller_present() {
+    local name
+    for name in /sys/class/input/event*/device/name; do
+        [[ -r $name ]] || continue
+        [[ $(<"$name") == "$device" ]] && return 0
+    done
+    return 1
+}
+
 wait_for_controller() {
-    local deadline=$((SECONDS + ${1:-60})) name
+    local deadline=$((SECONDS + ${1:-60}))
     while ((SECONDS < deadline)); do
-        for name in /sys/class/input/event*/device/name; do
-            [[ -r $name ]] || continue
-            [[ $(<"$name") == "$device" ]] && return 0
-        done
+        controller_present && return 0
         sleep 2
     done
     return 1
@@ -103,12 +115,14 @@ case ${1:-} in
     status)
         if injection_is_live; then
             printf '%s\n' 'DualSense desktop media mode: ON (live injection confirmed)'
-        elif [[ -e $state_path ]]; then
-            printf '%s\n' 'DualSense desktop media mode: REQUESTED BUT NOT INJECTING.' >&2
-            printf '%s\n' 'The controller is probably disconnected. Reconnect it and run: dualsense-media-mode.sh on' >&2
+        elif ! controller_present; then
+            printf '%s\n' 'DualSense controller: NOT CONNECTED.' >&2
+            printf '%s\n' 'Press the PS button to wake it. If that fails, charge it over USB, or re-pair:' >&2
+            printf '%s\n' '  bluetoothctl connect '"$bt_address" >&2
+            printf '%s\n' 'A controller recently used with a PS5 may have re-paired there and needs pairing again.' >&2
             exit 1
         else
-            printf '%s\n' 'DualSense desktop media mode: off'
+            printf '%s\n' 'DualSense desktop media mode: off (controller connected, not injecting)'
         fi
         ;;
     *) usage ;;
