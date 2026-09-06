@@ -49,7 +49,11 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 
 ## Phase 5 — Durability and exit
 
-- [ ] T010 Confirm pairing survives a reboot; if it does not, document the reconnection procedure.
+- [x] T010 Confirm pairing survives a reboot; if it does not, document the reconnection procedure.
+  **Passed.** Rebooted `2026-09-05 22:58:14`. The extension came back enabled, the daemon relisted on
+  TCP/UDP 1716, the device remained `paired: true`, the full fourteen-plugin `disabled-plugins` policy
+  survived intact, `discoverable` stayed `false`, and the tablet reconnected on its own
+  (`192.168.1.210:47386` established). No manual step was needed.
 - [x] T011 Document the removal path: unpair the phone, disable or remove the extension, delete `~/.config/gsconnect/`, and confirm SSH, automatic login, and the desktop are unaffected. Verify it, rather than only writing it down.
   Verifying it found the documented path was **wrong**. `gnome-extensions disable` does not stop GSConnect:
   the daemon is D-Bus activated via `org.gnome.Shell.Extensions.GSConnect.service`, parented to systemd

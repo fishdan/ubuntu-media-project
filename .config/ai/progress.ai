@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 T010 Passed: Pairing and Policy Survive a Reboot
+
+- Rebooted at `2026-09-05 22:58:14`. GSConnect came back with no intervention: extension enabled, daemon listening on TCP and UDP 1716, device still `paired: true`, the full fourteen-plugin `disabled-plugins` policy intact, and `discoverable` still `false`. The tablet reconnected on its own with an established session from `192.168.1.210`. T010 passes without needing the fallback reconnection procedure.
+- Notably the hardening survived too. `discoverable: false` persisting across a reboot matters, because a setting that silently reverted would quietly restore LAN advertising on a firewall-less appliance.
+- **The DualSense did not reconnect this time**, and the evidence shows the appliance handled it correctly rather than failing. The controller is genuinely absent from `/sys/class/input`, having gone to sleep through inactivity rather than through any fault. `dualsense-desktop-input.service` waited its full 60 seconds (`22:58:30` to `22:59:31`), found no controller, printed the recovery hint, and exited **cleanly** — the unit reports `Finished`, not failed. This is the `on-when-present` design behaving exactly as intended: a sleeping controller must not leave a failed unit behind at every boot.
+- Pressing the PS button should wake the controller, and because `config.json` records an autoload entry for it, input-remapper is expected to reapply the preset on reconnect without manual intervention. That specific path has not been observed yet and is not claimed.
+- Incidental confirmation of the PR #10 fix's value: on this branch, which still carries the old liveness check, `status` correctly reported "REQUESTED BUT NOT INJECTING" for this case. The old check's defect was the opposite situation — a stale `forwarded` node lingering after a disconnect produced a false "live" report. Both cases are handled by the corrected version awaiting merge.
+
 ## 2026-09-05 — Owner Decision: Brave with Bookmarks Replaces the Firefox Kiosk Launcher
 
 - The owner decided to retire the Firefox kiosk launch of Zuzz and use **Brave with bookmarks** for streaming instead, adding a bookmark per service and relying on each site's own fullscreen viewing mode. Firefox stays in the dock as a fallback. This follows from Spec 016 removing the constraint that forced Firefox in the first place, and from the owner running Bitwarden in Brave.
