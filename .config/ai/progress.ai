@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-09-05 — Brave Restored to the Dock for the Spec 016 Chromium Test
+
+- The owner noticed Brave was missing from the dock. It had been dropped when Spec 015 curated `favorite-apps` down to Zuzz, Firefox and Kodi; Brave was in the Ubuntu default set and was not deliberately excluded, merely not carried forward.
+- Restored it through `scripts/configure-desktop-home.sh` rather than by hand, keeping the change in version control as the documented practice requires.
+- The restoration is not cosmetic. Spec 016 T008 requires proving that phone-based typing works in a **Chromium-based** browser, because Chromium's Wayland text-input behaviour is exactly what defeated GNOME's on-screen keyboard in Spec 009 and forced the switch to Firefox. Without a Brave launcher in the dock that acceptance could not be performed from the couch, which is the only place it counts.
+- Verified all four favourites resolve to real desktop files, so none renders as a blank tile, and confirmed the rollback baseline still holds the original Ubuntu favourites list. Adding a value to the desired set does not disturb the captured prior value, which is the per-key capture behaviour working as intended.
+
 ## 2026-09-05 — Spec 016 T005/T006: Paired, Locked Down, and Verified
 
 - The owner paired their Android device and the policy was applied within seconds, as planned. Device id `<redacted-device-id>`, connected over `lan://192.168.1.210:1716` with an established TCP session to the appliance.
