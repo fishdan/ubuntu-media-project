@@ -1,6 +1,6 @@
 # Feature Specification: Phone-Based Remote Input (GSConnect)
 
-**Status**: Planned (unblocked 2026-09-05)
+**Status**: In progress
 
 > **Phone platform resolved on 2026-09-05: Android.** The risk that closed this specification before it
 > started is gone — the KDE Connect Android client provides the remote keyboard and touchpad input this

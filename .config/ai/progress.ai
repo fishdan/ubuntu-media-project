@@ -1,5 +1,20 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 Started: Plan, Tasks, and Environment Baseline
+
+- Branched `feature/0.016-gsconnect-remote-input` from `main` and wrote `plan.md` and `tasks.md` before touching the appliance. Spec status moved to In progress.
+- **T001 baseline captured, recorded rather than assumed as the specification requires:**
+  - GNOME Shell **50.1**. The package declares `gnome-shell (>= 46~), gnome-shell (<< 51~)`, so 50.1 is supported but only just; a future GNOME 51 will make this package uninstallable. Recorded as a maintenance risk for Spec 013.
+  - `gnome-shell-extension-gsconnect` **71-1ubuntu1** from `resolute/universe`, not installed. No third-party source needed.
+  - **No host firewall**: `ufw` reports `Status: inactive` and all iptables policies are `ACCEPT`. The specification's firewall criterion is met by recording this; no ports need opening. GSConnect would need TCP/UDP `1716-1764` if a firewall is ever added.
+  - Nothing listening on `1714-1719`, so no conflict with an existing KDE Connect install.
+  - Appliance at `192.168.1.204` on `enp3s0`.
+  - `gnome-shell-extension-gsconnect-browsers` exists but is deliberately not installed; it is link-sharing browser integration and out of scope.
+- **Sequencing decision recorded in the plan: the plugin policy is applied BEFORE pairing.** GSConnect enables a broad default plugin set, several plugins of which move data between phone and appliance. Pairing first and pruning later would open a window in which clipboard contents, notifications, and files sync to a living-room machine. Only `mousepad` is wanted; `clipboard`, `share`, `sms`, `telephony`, `notification`, `sftp`, `runcommand`, `mpris`, `systemvolume`, `battery`, `ping`, and `findmyphone` are disabled, each with a recorded rationale.
+- Noted as a known exposure rather than glossed over: with no firewall, GSConnect's listening port is reachable by anything on the LAN. This is acceptable only because pairing requires confirmation on both ends.
+- T002 wrote `scripts/install-gsconnect.sh`: idempotent, Ubuntu repository only, refuses to run as root, and handles the Wayland constraint that a newly installed extension is invisible to the running GNOME session until the user logs out and back in.
+- Not yet run. Installation, enabling, plugin policy, and pairing remain.
+
 ## 2026-09-05 — Specs 009 and 015 Fully Accepted
 
 - The owner confirmed the PS button returns to the desktop and that the Zuzz login is preserved across close and relaunch. Corroborated in the journal: `return-home invoked` at 09:55:30 followed immediately by `Stopped zuzz-media.service`, which is the compositor shortcut firing from the controller and stopping the browser unit.
