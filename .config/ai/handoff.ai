@@ -50,6 +50,64 @@ Supersedes all earlier handoff entries. The durable history is in `progress.ai`;
 - The appliance's DHCP address drifted from `192.168.1.203` to `192.168.1.204`; the router-side reservation remains an outstanding external action.
 - Turn pointer mode off before any Steam work (`dualsense-media-mode.sh off`) so Steam Input receives the native controller alone. That remains Spec 011's checkpoint.
 
+### REBOOT ISSUED 2026-09-05 — run these first on reconnect
+
+Rebooted to make the newly installed GSConnect extension visible to GNOME Shell;
+Wayland cannot restart the shell in place. This session runs on the appliance via
+VS Code Remote SSH and ended with the reboot.
+
+Pre-reboot state: boot `2026-09-05 00:32:11`, host `192.168.1.204` on `enp3s0`,
+SSH enabled/active, GSConnect `71-1ubuntu1` installed but not visible to the
+session, `media-home.service` disabled, DualSense paired but NOT connected
+(suspected flat battery, on charge), Wi-Fi still rfkill soft-blocked.
+
+```
+uptime -s                                   # must differ from 2026-09-05 00:32:11
+systemctl is-active ssh                     # active
+gnome-extensions list | grep gsconnect      # should now be VISIBLE
+gnome-extensions list --enabled | grep gsconnect   # probably not yet enabled
+systemctl --user is-enabled media-home.service     # disabled
+bluetoothctl devices Connected              # did the DualSense come back?
+rfkill list wifi                            # still soft blocked?
+```
+
+Then continue Spec 016:
+
+```
+bash scripts/install-gsconnect.sh           # now enables the extension
+bash scripts/configure-gsconnect.sh --status
+# pair the phone, then IMMEDIATELY:
+bash scripts/configure-gsconnect.sh --apply
+bash scripts/configure-gsconnect.sh --harden
+```
+
+**Do not pair before the policy script is ready to run.** `Share.receive-files`,
+`SFTP.automount`, `Notification.send-notifications` and `Contacts.contacts-source`
+all ship enabled, and plugin state is per-device so it cannot be pre-applied.
+
+### REBOOT ISSUED for Spec 016 T010 — verify these on reconnect
+
+Rebooted to confirm the GSConnect pairing survives a restart. Pre-reboot:
+extension enabled, port 1716 listening, device `<redacted-device-id>`
+(Galaxy Tab A11) paired, `discoverable` false, DualSense connected,
+`media-home.service` disabled. Branch `feature/0.016-gsconnect-remote-input`,
+2 tasks open (T010, T015).
+
+```
+uptime -s
+gnome-extensions list --enabled | grep gsconnect     # still enabled?
+ss -tuln | grep 1716                                 # daemon listening again?
+gsettings get org.gnome.Shell.Extensions.GSConnect.Device:\
+  /org/gnome/shell/extensions/gsconnect/device/<redacted-device-id>/ paired
+gsettings get org.gnome.Shell.Extensions.GSConnect discoverable   # must stay false
+bash scripts/configure-gsconnect.sh --status         # policy must survive
+bluetoothctl devices Connected                       # DualSense back?
+```
+
+If pairing survived, T010 passes. If not, document the reconnection procedure
+instead — the specification allows either, but it must be one or the other.
+Then T015: pre-PR checks, update progress and handoff, open the PR.
+
 ### Recommended next actions
 
 1. Push both branches and open the pull requests, 009 first, then 015.
