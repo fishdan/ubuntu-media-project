@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 T009 Accepted; Password Manager Raises a Browser Question
+
+- The owner confirmed close-and-relaunch persistence works. T009 is accepted, which retires the last of Spec 009's deferred acceptance — that had stalled purely because there was no way to type a password from the couch.
+- The owner also noted they run **Bitwarden in Brave**, which will remove most of the need to type passwords at all.
+- **This surfaces a decision worth making deliberately rather than by accident.** Bitwarden lives in Brave, but Zuzz runs in Firefox under `zuzz-media.service`. As configured, the password manager and the media browser are different browsers, so Bitwarden does not help for Zuzz logins.
+- The relevant context is that the Brave-to-Firefox switch in Spec 009 was **forced** by Chromium's Wayland text-input behaviour defeating GNOME's on-screen keyboard. Spec 016 removed that constraint entirely: remote input injects at the input layer, so the browser no longer has to cooperate with the compositor. The reason Firefox was chosen no longer exists.
+- Recorded as an open question for the owner rather than acted on. Moving Zuzz back to Brave would put streaming logins in the same browser as the password manager, but it is a real change with real work — the launcher, unit, profile handling and the snap-versus-deb profile-path difference that caused the original AppArmor failure — and it would need its own specification per the constitution. It should not be done as a side effect of this feature.
+- No change made. Firefox remains the configured Zuzz browser.
+
 ## 2026-09-05 — Spec 016 T007/T008 Accepted: Remote Input Works, Including in Chromium
 
 - The owner confirmed phone-based pointer and keyboard input works from the couch with no physical keyboard or mouse.

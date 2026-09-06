@@ -43,7 +43,9 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
   browser switch; typing into it from the tablet proves remote input bypasses that class of problem
   entirely, because events are injected at the input layer rather than requiring the application to
   cooperate with the compositor. This is the point of the feature — it proves input no longer depends on the browser cooperating with the compositor's on-screen-keyboard protocol, which is what defeated Spec 009.
-- [ ] T009 Enter a password into a streaming-service login field from the phone and confirm the session persists across a browser close and relaunch, completing the acceptance Spec 009 could not finish.
+- [x] T009 Enter a password into a streaming-service login field from the phone and confirm the session persists across a browser close and relaunch, completing the acceptance Spec 009 could not finish.
+  Accepted 2026-09-05. This also retires the last of Spec 009's deferred acceptance, which stalled purely
+  because there was no way to type a password from the couch.
 
 ## Phase 5 — Durability and exit
 
