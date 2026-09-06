@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016: GSConnect Installed; Plan Corrected After Reading the Schema
+
+- T002/T003 installed `gnome-shell-extension-gsconnect` `71-1ubuntu1` from `resolute/universe`. The installer is idempotent; the second run reported already-installed. It correctly detected that a newly installed extension is invisible to a running Wayland GNOME session and stopped with instructions rather than failing oddly. The extension is **not yet enabled**; that needs a log out and back in.
+- **The plan's central ordering claim was wrong and has been corrected.** It said the plugin policy would be applied before pairing. Reading the shipped schema showed that is impossible: GSConnect stores plugin state **per device** under `/org/gnome/shell/extensions/gsconnect/device/<id>/`, and no device exists until it is paired. There is no global plugin policy to pre-set.
+- **The first `configure-gsconnect.sh` was also wrong for a second reason and was rewritten.** It set an `enabled` key on the per-plugin schemas. Those schemas have no such key; the real control is the Device schema's `disabled-plugins` list. The original would have silently done nothing while reporting success — the same failure shape as the input-remapper and liveness-check defects found earlier today. Reading the schema rather than assuming the API is what caught it.
+- Recorded the permissive shipped defaults that make prompt policy application matter: `Share.receive-files`, `SFTP.automount`, `Notification.send-notifications` and `Contacts.contacts-source` are all `true` out of the box. `Clipboard` is the one good default, shipping `false` both directions.
+- The rewritten script disables every non-input plugin via `disabled-plugins`, additionally clears each risky plugin's own switches as defence in depth so that accidentally re-enabling one does not immediately start moving data, trims the device menu to `keyboard`, and adds `--harden` to turn off GSConnect's LAN discovery once pairing is done. Discovery hardening matters here specifically because the appliance runs no firewall.
+- **Dependency footprint recorded per the constitution's explicit-dependencies principle.** The install pulled in 39 packages including `folks`, `telepathy-glib`, `evolution-data-server` and `python3-nautilus` — contacts and telephony stacks present to serve the very plugins this feature disables. Three Evolution user services now run as a result (`addressbook-factory` 9 MiB, `calendar-factory` 9 MiB, `source-registry` 28 MiB; roughly 46 MiB total). All are `static`, D-Bus activated rather than enabled at boot, and none listens on the network. Not masked, because D-Bus-activated services may be requested by other desktop components; noted as available if the owner wants the memory back.
+- Next: enable the extension, which requires a session restart, then pair and immediately apply the policy.
+
 ## 2026-09-05 — Spec 016 Started: Plan, Tasks, and Environment Baseline
 
 - Branched `feature/0.016-gsconnect-remote-input` from `main` and wrote `plan.md` and `tasks.md` before touching the appliance. Spec status moved to In progress.

@@ -1,19 +1,22 @@
 # Tasks: Phone-Based Remote Input (GSConnect)
 
-Ordered per `plan.md`. **T004 must precede T005**: GSConnect enables a broad
-default plugin set, several plugins of which move data between the phone and the
-appliance. Pairing before pruning opens a window in which clipboard contents,
-notifications, and files sync to a living-room machine.
+Ordered per `plan.md`. **Note the correction recorded there**: the plugin policy
+cannot be applied before pairing, because GSConnect stores plugin state per
+device and no device exists until paired. T004 therefore writes and tests the
+policy script so it can be run within seconds of pairing in T005, and several
+permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
+`Notification.send-notifications`) make that promptness matter.
 
 ## Phase 1 — Install
 
-- [ ] T001 Record the pre-change baseline: GNOME Shell version, package availability and version, firewall state, listening ports, and appliance address. Confirm SSH, autologin, and the desktop are healthy first.
-- [ ] T002 Write `scripts/install-gsconnect.sh`: idempotent, installs `gnome-shell-extension-gsconnect` from the Ubuntu repository only, no third-party source, and refuses to run as the wrong user. Verify by running it twice.
+- [x] T001 Record the pre-change baseline: GNOME Shell version, package availability and version, firewall state, listening ports, and appliance address. Confirm SSH, autologin, and the desktop are healthy first.
+- [x] T002 Write `scripts/install-gsconnect.sh`: idempotent, installs `gnome-shell-extension-gsconnect` from the Ubuntu repository only, no third-party source, and refuses to run as the wrong user. Verify by running it twice. Done: installed `71-1ubuntu1`; second run reported already-installed.
 - [ ] T003 Enable the extension and confirm it reports as enabled. On Wayland the shell cannot be restarted in place, so this needs a log out and back in, or a reboot; record which was used.
 
 ## Phase 2 — Lock down before pairing
 
-- [ ] T004 Apply the plugin policy from `plan.md` **before any phone is paired**: enable `mousepad` only, and explicitly disable `clipboard`, `share`, `sms`, `telephony`, `notification`, `sftp`, `runcommand`, `mpris`, `systemvolume`, `battery`, `ping`, and `findmyphone`. Make this reproducible in a tracked script, not a one-off, and record the rationale for each in the docs.
+- [x] T004 Write and test `scripts/configure-gsconnect.sh`, the reproducible plugin policy: keep `mousepad`, disable everything else via the Device schema's `disabled-plugins` list, clear the permissive per-plugin switches as defence in depth, and provide `--harden` to stop LAN discovery after pairing.
+  A first version was wrong and was rewritten: it set an `enabled` key on the per-plugin schemas, which do not have one, so it would have silently done nothing. Verified both `--status` and `--apply` behave correctly with no device paired.
 
 ## Phase 3 — Pair
 

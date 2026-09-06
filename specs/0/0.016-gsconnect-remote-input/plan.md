@@ -8,7 +8,20 @@
 
 Install Ubuntu's `gnome-shell-extension-gsconnect`, enable it, pair the owner's Android phone through an explicit confirmation, reduce the enabled plugins to only what remote input needs, then validate typing in both Firefox and a Chromium-based browser.
 
-The ordering matters for one reason: **plugin reduction must happen before the phone is used for anything real.** GSConnect enables a broad default plugin set on pairing, several plugins of which move data between the phone and the appliance. Pairing first and pruning later means a window in which clipboard contents, notifications, and files sync to a machine that lives in a living room. Pruning first is the difference between a text-entry tool and an unplanned phone-sync appliance.
+**Correction, 2026-09-05.** This plan originally said the plugin policy would be applied *before* pairing. Inspecting the shipped schema showed that is not possible: GSConnect keeps plugin state **per device**, under `/org/gnome/shell/extensions/gsconnect/device/<id>/`, and no device exists until it is paired. There is no global plugin policy to pre-set.
+
+The mechanism is also not what was assumed. The per-plugin schemas have **no `enabled` key**; the real control is the Device schema's `disabled-plugins` list. A first version of `configure-gsconnect.sh` set a non-existent `enabled` key and would have silently done nothing.
+
+So the ordering becomes: pair, then apply the policy **immediately**, before the phone is used for anything else. The exposure window is real and worth stating plainly, because several shipped defaults are permissive:
+
+- `Share.receive-files = true` — inbound file transfer accepted out of the box
+- `SFTP.automount = true`
+- `Notification.send-notifications = true`
+- `Contacts.contacts-source = true`
+
+`Clipboard` is the one good default: both `receive-content` and `send-content` ship as `false`.
+
+The window is narrowed three ways: the policy script is written and tested before pairing begins so it can be run within seconds; the per-plugin switches above are explicitly cleared as well as the plugins being disabled, so accidentally re-enabling one does not immediately start moving data; and `--harden` turns off GSConnect's LAN discovery once pairing is complete, which is the cheapest available mitigation given the appliance has no firewall.
 
 ## Environment facts captured 2026-09-05
 
@@ -27,7 +40,7 @@ Only what remote input requires. Every plugin capable of moving data between the
 
 | Plugin | State | Rationale |
 | --- | --- | --- |
-| `mousepad` | **enabled** | This is the feature. Remote pointer and keyboard input. |
+| `mousepad` | **kept enabled** | This is the feature. Remote pointer and keyboard input. |
 | `clipboard` | disabled | Would sync clipboard both ways. A living-room machine should not receive the phone's clipboard, and streaming passwords typed on the appliance should not leave it. |
 | `share` | disabled | Inbound file transfer to the appliance. Out of scope. |
 | `sms`, `telephony`, `notification` | disabled | Mirrors personal messages onto a television. Out of scope and privacy-adverse. |
@@ -46,11 +59,20 @@ Only what remote input requires. Every plugin capable of moving data between the
 
 1. Install the package with an idempotent tracked script; do not enable anything yet.
 2. Enable the extension. On Wayland the GNOME Shell cannot be restarted in place, so this needs a log out and back in, or a reboot. Plan for it rather than being surprised by it.
-3. Apply the plugin policy **before** pairing.
-4. Pair the phone with owner confirmation.
-5. Validate pointer and typing from the couch, in Firefox and in a Chromium-based browser.
-6. Complete the Spec 009 login and persistence acceptance that stalled on text entry.
-7. Validate reboot persistence and the documented removal path.
+3. Write and test the plugin policy script so it is ready to run instantly.
+4. Pair the phone with owner confirmation, then run the policy **immediately** — see the correction above for why it cannot be applied in advance.
+5. Disable LAN discovery once pairing is done (`--harden`).
+6. Validate pointer and typing from the couch, in Firefox and in a Chromium-based browser.
+7. Complete the Spec 009 login and persistence acceptance that stalled on text entry.
+8. Validate reboot persistence and the documented removal path.
+
+## Dependency footprint
+
+Installing the extension pulled in **39 packages**, including `folks`, `telepathy-glib`, `evolution-data-server` (`edataserver`, `ebook-contacts`, `camel`) and `python3-nautilus` — contacts and telephony stacks present to support the SMS and contacts plugins this feature deliberately disables.
+
+Three Evolution user services are now running as a result: `evolution-addressbook-factory` (9 MiB), `evolution-calendar-factory` (9 MiB) and `evolution-source-registry` (28 MiB), about 46 MiB total. All three are `static`, D-Bus activated rather than enabled at boot, and none listens on the network.
+
+Recorded rather than waved through, because the constitution requires deliberate dependency decisions. This is a real cost on an appliance that has no use for contacts or calendaring, and it is the price of Ubuntu's packaging rather than anything this feature asked for. Masking them is possible if the owner wants the memory back, but is not done here because D-Bus-activated services may be requested by other desktop components.
 
 ## Risks
 
