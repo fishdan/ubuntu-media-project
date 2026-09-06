@@ -1,5 +1,15 @@
 # Progress Log
 
+## 2026-09-06 — Spec 015 Side Effect Found and Settled: Text Scaling Shrinks Web Pages
+
+- While watching Zuzz in Brave, the owner reported the page interface was too large and the video frame's "expand to full screen" toggle sat off the visible area, needing a scroll to reach. Normal Zuzz use puts that control within easy reach.
+- **Root cause is the Spec 015 display setting, not the browser or the site.** Browsers apply GNOME's `text-scaling-factor` to web content, not only to their own chrome. At 1.5 the 1920x1200 output presents to websites as roughly 1280x800 CSS pixels, so Zuzz laid itself out for a far smaller window and pushed the control below the fold. The video itself looked correct because once playback is fullscreen the page layout stops mattering.
+- This is a genuine side effect of the accepted Spec 015 decision to gain couch legibility through text scaling rather than display scaling. That decision remains right — display scaling would make the compositor render high and downscale, costing sharpness and GPU work on a machine that also runs games — but its effect on web layout was not anticipated.
+- **Settled at 80% page zoom, accepted by the owner.** The arithmetic is worth recording because the chosen value is deliberately not the obvious one: page zoom multiplies against text scaling, so 1.5 x 0.80 gives an effective 1.20 and a 1600x1000 viewport. A 67% zoom would fully cancel the scaling and restore the full 1920x1200 designed width, but would also hand back all the couch legibility. 80% keeps web text about 20% larger than native while giving sites enough width to lay out as intended.
+- Browsers remember zoom per site, so this is a one-time setting per streaming service rather than a recurring annoyance.
+- Documented in `docs/desktop-home.md` with the zoom/effective-scale table, since anyone reproducing this appliance will hit exactly this.
+- Recorded but deliberately not adopted: launching the browser with `--force-device-scale-factor=1` would make it ignore text scaling entirely and could be shipped as a tracked desktop entry, removing the per-site step. It also shrinks the browser's own tabs and menus, which are wanted large at projector distance. Flagged for Spec 017 to revisit if per-site zoom becomes tedious across many services.
+
 ## 2026-09-06 — Spec 011 T015/T016: Steam Documentation and Removal Path
 
 - Wrote `docs/steam.md` covering installation, the first-run bootstrap that looks broken and is not, the controller hand-off and why it is a systemd unit rather than a shell trap, launching and returning home, controller troubleshooting, honest hardware capability, storage, credentials and removal.

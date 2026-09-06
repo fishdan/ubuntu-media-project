@@ -111,6 +111,35 @@ If the desktop is still hard to read from the couch, raise
 `text-scaling-factor` in the script rather than by hand, so the change stays in
 version control.
 
+### Text scaling also shrinks web pages
+
+**Browsers apply `text-scaling-factor` to web content**, not just to their own
+menus. At 1.5 the 1920x1200 screen presents to websites as roughly 1280x800 CSS
+pixels, so pages lay themselves out for a much smaller window. Observed on
+2026-09-06: Zuzz pushed its video frame's fullscreen toggle below the fold, and
+it had to be scrolled to.
+
+The fix is page zoom, which multiplies against the text scaling:
+
+| Page zoom | Effective scale | Web viewport |
+| --- | --- | --- |
+| 100% | 1.50 | 1280x800 |
+| **80%** | **1.20** | **1600x1000** |
+| 67% | 1.00 | 1920x1200 |
+
+**80% is the accepted setting.** It does not fully cancel the text scaling, which
+is the point: web text stays about 20% larger than native for couch viewing,
+while the viewport is wide enough that sites lay out as intended. 67% would give
+pages their full designed width but hand back all the couch legibility.
+
+Browsers remember zoom per site, so this is set once per streaming service.
+
+An alternative is launching the browser with `--force-device-scale-factor=1`,
+which makes it ignore text scaling entirely and would be trackable as a desktop
+entry. It is not used here, because it also shrinks the browser's own tabs and
+menus, which are wanted large at projector distance. Revisit it in Spec 017 if
+per-site zoom becomes tedious across many services.
+
 ## Installing
 
 ```bash
