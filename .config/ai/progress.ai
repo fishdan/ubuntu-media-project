@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011 T008: Controller Hand-off Verified From a Shell
+
+- With the controller connected, the full hand-off cycle was observed rather than inferred. Before start: `ON (live injection confirmed)`. On `systemctl --user start steam-bigpicture.service`: `off (controller connected, not injecting)`, which is the state Steam Input needs. On stop: back to `ON (live injection confirmed)`, with the journal showing `ExecStopPost` reapplying the preset. The unit cgroup is torn down cleanly with no orphaned Steam processes.
+- This is the collision between Spec 008 and Spec 015 resolved: Steam gets the native controller, and the desktop gets its pointer back automatically, with no keyboard step for the owner.
+- Incidental confirmation: the controller had gone to sleep and reconnected on its own with injection already live, without anyone running `dualsense-media-mode on`. That is input-remapper's autoload entry — written into `config.json` during the Spec 016-era fix — working as intended on reconnect. It had not previously been observed and was explicitly not claimed at the time.
+- A reported "2 surviving Steam processes" was another self-matching grep, this time catching the search tool's own `ugrep` command line. That is the fourth such false reading in this project; process checks here should always exclude the checking command itself.
+- Deliberately did **not** let Steam complete its first-run bootstrap: the client download and sign-in are T003 and need the owner, including any Steam Guard code. Stopping the unit mid-bootstrap is safe, since Steam resumes its download on next launch.
+- Remaining for Spec 011 is owner-facing: first-run sign-in, Big Picture from the dock with the controller alone, Steam Input seeing a native gamepad, a test title judged honestly against a GTX 1060 with 3 GB VRAM, and the PS button returning to the desktop.
+
 ## 2026-09-06 — Spec 011 T006/T007: Steam Launcher and Automatic Controller Hand-off
 
 - Added `scripts/launch-steam.sh`, `config/systemd/user/steam-bigpicture.service` and a tracked desktop entry, extended `scripts/install-steam.sh` to deploy them idempotently, added Steam to `return-home.sh`'s unit list, and put it in the dock through `configure-desktop-home.sh` so the change stays in version control. All five favourites verified to resolve to real desktop files.

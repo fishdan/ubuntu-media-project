@@ -34,7 +34,11 @@ regression there would be discovered from the couch rather than from a shell.
 - [x] T007 Add a tracked desktop entry and put Steam in the dock through `configure-desktop-home.sh`, so the change stays in version control.
   Steam was also added to `return-home.sh`'s unit list. All five dock favourites verified to resolve to real
   desktop files.
-- [ ] T008 Confirm from a shell that launching Steam turns media mode off and exiting restores it, before asking the owner to test from the couch.
+- [x] T008 Confirm from a shell that launching Steam turns media mode off and exiting restores it, before asking the owner to test from the couch.
+  Verified with the controller connected. Before: `ON (live injection confirmed)`. On unit start:
+  `off (controller connected, not injecting)` — the hand-off. On unit stop: back to
+  `ON (live injection confirmed)`, with the journal showing `ExecStopPost` reapplying the preset. The unit
+  cgroup is torn down cleanly with no orphaned Steam processes.
 
 ## Phase 4 — Owner acceptance
 
