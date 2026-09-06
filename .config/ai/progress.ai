@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-05 — Owner Decision: Brave with Bookmarks Replaces the Firefox Kiosk Launcher
+
+- The owner decided to retire the Firefox kiosk launch of Zuzz and use **Brave with bookmarks** for streaming instead, adding a bookmark per service and relying on each site's own fullscreen viewing mode. Firefox stays in the dock as a fallback. This follows from Spec 016 removing the constraint that forced Firefox in the first place, and from the owner running Bitwarden in Brave.
+- The change is largely subtractive and consistent with the direction Spec 015 set: it removes the last piece of bespoke session orchestration, replacing a single-purpose managed browser session with an ordinary desktop application and bookmarks.
+- Artifacts it would retire or rework: `scripts/launch-zuzz.sh`, `config/systemd/user/zuzz-media.service`, `config/applications/zuzz.desktop`, `scripts/install-browser-media.sh`, and `docs/browser-media.md`.
+- **Blocking consequence identified before any work started: the PS button return-home would break.** `scripts/return-home.sh` stops `zuzz-media.service`. A browser launched from a dock entry is not a systemd service; it runs in a transient `app-gnome-brave-NNNN.scope` under `app.slice`. With no `zuzz-media.service` to stop, the PS button would silently do nothing and leave the browser on screen, regressing a Spec 015 acceptance criterion the owner has already tested and accepted.
+- `return-home.sh` therefore needs to close foreground application scopes rather than a fixed unit list. That is a real design change and is the main body of work in this switch, not an afterthought.
+- Recorded as an owner decision requiring its own specification per the constitution. Nothing has been implemented and Spec 016 is unaffected; the Firefox Zuzz launcher remains in place and working until the replacement is specified, built, and accepted.
+
 ## 2026-09-05 — Spec 016 T009 Accepted; Password Manager Raises a Browser Question
 
 - The owner confirmed close-and-relaunch persistence works. T009 is accepted, which retires the last of Spec 009's deferred acceptance — that had stalled purely because there was no way to type a password from the couch.
