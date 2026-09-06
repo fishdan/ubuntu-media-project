@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011 Started: Steam Specified Against the Real Machine
+
+- Branched `feature/0.011-steam-big-picture` from `main`. The existing `spec.md` was a single-paragraph stub, so it was rewritten with real acceptance criteria before planning, and `plan.md` and `tasks.md` were written.
+- **Environment facts captured first, so the specification reflects the actual hardware:**
+  - Steam is not installed. `steam-installer` `1:1.0.0.85~ds-2build1` is available from `resolute/multiverse`, which is already enabled, so no third-party APT source is needed.
+  - **`i386` multiarch is not enabled** and `steam-installer` depends on `steam-libs-i386`. Enabling it is a prerequisite and a system-wide change that widens the installed surface with a parallel 32-bit library stack.
+  - GPU is a **GTX 1060 with 3 GB VRAM**, driver `580.173.02`. The 3 GB is the binding constraint on realistic game capability, and acceptance will judge the test title honestly against it rather than claiming success for something that stutters.
+  - The session is Wayland, so Steam runs through XWayland.
+  - ~201 GB free of 233 GB, so storage is not a constraint.
+- **Identified the collision this feature has to resolve.** Spec 008 recorded that input-remapper's media mode must be *off* before Steam launches, or Steam Input sees remapped keyboard and mouse events instead of a gamepad. Spec 015 then made that mode *on by default at login*, because the desktop needs a pointer. Steam therefore always launches into exactly the wrong controller state, and asking the owner to run a command from the couch is not a fix, since it needs the keyboard this appliance exists to avoid.
+- The launcher will toggle media mode off on start and restore it on exit. Recorded plainly in the plan that this reintroduces a small amount of the stop/restore orchestration Spec 015 deleted, along with why it is acceptable: this is one launcher toggling one input mode it owns, with the desktop still underneath, rather than orchestration between two sessions competing for the screen. It must restore the mode even on abnormal exit, or a Steam crash would leave the desktop with no pointer.
+- **`return-home.sh` needs a general rework and it is sequenced first.** It stops fixed systemd units, but a desktop-launched application runs in a transient `app-gnome-*.scope`, so the PS button would stop nothing and leave Steam on screen, silently regressing an accepted Spec 015 criterion. The tasks require verifying the rework against the existing browser path before Steam relies on it. Spec 017 will need the same capability for dock-launched Brave, so the mechanism is to be general rather than Steam-specific.
+- **Recorded a security nuance rather than letting a tidy installer imply more than it delivers:** `steam-installer` is a bootstrap. The Ubuntu package provides a launcher and 32-bit libraries; the Steam client itself is downloaded from Valve and self-updates outside APT. "Installed from the Ubuntu repository" is true of the package, not of the software that ends up running.
+- Noted that Steam's first-run sign-in is interactive and may require a Steam Guard code, which is precisely the case the Spec 016 phone input was built for.
+- No implementation yet.
+
 ## 2026-09-05 — Secret-Hygiene Failure Caught by the Pre-PR Scan and Purged Before Push
 
 - The T015 pre-PR scan found **two identifiers I had written into tracked files in violation of rules this project states explicitly**: the DualSense's Bluetooth address in `progress.ai`, and the paired device's GSConnect identifier in both `progress.ai` and `handoff.ai`.
