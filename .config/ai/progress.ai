@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-05 — DualSense Will Not Connect After AV-Rack Move; Status False Positive Fixed
+
+- The owner moved the appliance to the AV rack and reported the controller would not connect. SSH and the desktop are unaffected; the appliance is now on Ethernet (`enp3s0`, `192.168.1.204`) with Wi-Fi down.
+- Diagnosis: Bluetooth is healthy — `bluetooth.service` active, `hci0` neither soft nor hard blocked, adapter powered, and the DualSense still **paired**. It is simply not connected. `bluetoothctl connect` fails with `br-connection-create-socket` and `bluetoothd` logs `control_connect_cb() connect ...: Host is down (112)`, meaning the controller is not responding. A 15-second scan did not see it advertising, so it is asleep, out of range, discharged, or has re-paired to a PS5.
+- **Found and fixed a false positive in `dualsense-media-mode.sh status` that I introduced earlier today.** The liveness check tested only for the `input-remapper DualSense Wireless Controller forwarded` node. That node **outlives the controller**: it was still present with no controller in the room, so `status` cheerfully reported "ON (live injection confirmed)" while the physical device was absent. This is the same class of defect as the original cached-intent report it replaced — a signal that looks authoritative but does not track reality.
+- The check now requires the physical controller device to be present **as well as** the forwarded node, and `status` distinguishes three states: injecting, controller connected but not injecting, and controller not connected. The last prints actionable recovery steps and exits non-zero.
+- The recovery hint prints the paired Bluetooth address read from BlueZ at runtime rather than tracked in Git, keeping Bluetooth addresses out of version control per the constitution.
+- **Separately flagged, not yet fixed:** `rfkill` reports `phy0: Wireless LAN  Soft blocked: yes`. The appliance is reachable only over Ethernet, so the Wi-Fi fallback the constitution requires is currently unavailable. Left for the owner to decide, since it may have been deliberate when the machine moved to the rack.
+
 ## 2026-09-05 — Specs 009 and 015 Fully Accepted
 
 - The owner confirmed the PS button returns to the desktop and that the Zuzz login is preserved across close and relaunch. Corroborated in the journal: `return-home invoked` at 09:55:30 followed immediately by `Stopped zuzz-media.service`, which is the compositor shortcut firing from the controller and stopping the browser unit.
