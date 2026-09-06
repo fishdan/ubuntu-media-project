@@ -25,6 +25,10 @@ every browser exit.
 - [x] T007 Apply projector-distance display settings (text scaling, cursor size) and curate `org.gnome.shell favorite-apps` to the streaming browser, Kodi as an ordinary application, and Kodi. No Steam placeholder was added: `steam.desktop` does not exist until Spec 011 installs it, and a favourite pointing at a missing desktop file renders as a blank tile. Verify `--revert` restores the exact baseline in `plan.md`.
   Owner confirmed on 2026-09-05 that the screen "looks great" at projector distance, accepting the 1.5
   text scaling and 64px dock icons.
+  **Amended 2026-09-06: text scaling reverted to 1.0.** The owner judged the projector sharp and legible
+  without it, and 1.5 was squeezing web page layout because browsers apply it to web content. Cursor size
+  and dock icons remain enlarged; they help at distance and do not affect how sites lay out. See
+  `docs/desktop-home.md`.
 - [x] T008 Confirm the Zuzz desktop entry is present in the desktop's application list and launches the browser from the desktop without a terminal.
 
 ## Phase 4 — Roadmap bookkeeping

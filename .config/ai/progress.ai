@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-09-06 — Spec 015 Amended: Text Scaling Reverted to 1.0 and Accepted
+
+- The owner questioned whether text scaling was needed at all. Set `text-scaling-factor` back to `1.0` through the tracked script and the owner confirmed the result is **sharp and legible**, and that Zuzz restored to 100% browser zoom now works correctly.
+- **This supersedes the 1.5 setting accepted on 2026-09-05 and the 80% browser zoom accepted earlier today.** Both are now obsolete and the documentation has been rewritten rather than left to mislead: `docs/desktop-home.md` previously recommended 80% page zoom, which at 1.0 text scaling would render pages 20% smaller than native.
+- Two reasons the simpler setting is better, recorded so the trial is not repeated blindly:
+  1. **A projector is already a ten-foot display.** The original concern that "GNOME is not a ten-foot interface" was reasoned from first principles in the Spec 015 plan but turned out not to bite at this screen size. The problem being solved was largely theoretical.
+  2. **Text scaling propagates into web content**, so it forced a compensating per-site browser zoom. At 1.0 no zoom is needed anywhere and every site lays out as its authors intended at a true 1920x1200.
+- **Cursor size 48 and dock icons 64 are retained.** They help at projector distance and, unlike text scaling, have no effect on web page layout. Keeping them is the part of the original idea that was actually right.
+- Net result is fewer moving parts: no global scaling, no per-site zoom to remember as streaming services are added, and no compounding interaction between two settings that multiply.
+- Recorded as an amendment to Spec 015's accepted T007 settings rather than a silent change, and the rollback baseline is unaffected since it captured the original `1.0` before any of this began.
+
 ## 2026-09-06 — Spec 015 Side Effect Found and Settled: Text Scaling Shrinks Web Pages
 
 - While watching Zuzz in Brave, the owner reported the page interface was too large and the video frame's "expand to full screen" toggle sat off the visible area, needing a scroll to reach. Normal Zuzz use puts that control within easy reach.
