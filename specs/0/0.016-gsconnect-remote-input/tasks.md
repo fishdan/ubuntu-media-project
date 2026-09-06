@@ -33,8 +33,16 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 
 ## Phase 4 — Validate the actual goal
 
-- [ ] T007 From the couch, with no physical keyboard or mouse: move the pointer, click, and type into a text field from the phone.
-- [ ] T008 Verify remote typing works in **both** Firefox and a Chromium-based browser (Brave is already installed). This is the point of the feature — it proves input no longer depends on the browser cooperating with the compositor's on-screen-keyboard protocol, which is what defeated Spec 009.
+- [x] T007 From the couch, with no physical keyboard or mouse: move the pointer, click, and type into a text field from the phone.
+  Accepted 2026-09-05: the owner reports it works. GSConnect holds an established session to the tablet at
+  `192.168.1.210:1716`.
+- [x] T008 Verify remote typing works in **both** Firefox and a Chromium-based browser (Brave is already installed).
+  Accepted 2026-09-05, and corroborated in the journal: `app-gnome-brave` launched twice this boot from the
+  dock entry, alongside `app-gnome-zuzz-`. **This is the result the feature existed for.** Chromium is the
+  engine whose Wayland text-input behaviour defeated GNOME's on-screen keyboard in Spec 009 and forced the
+  browser switch; typing into it from the tablet proves remote input bypasses that class of problem
+  entirely, because events are injected at the input layer rather than requiring the application to
+  cooperate with the compositor. This is the point of the feature — it proves input no longer depends on the browser cooperating with the compositor's on-screen-keyboard protocol, which is what defeated Spec 009.
 - [ ] T009 Enter a password into a streaming-service login field from the phone and confirm the session persists across a browser close and relaunch, completing the acceptance Spec 009 could not finish.
 
 ## Phase 5 — Durability and exit

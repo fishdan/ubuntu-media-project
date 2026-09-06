@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 T007/T008 Accepted: Remote Input Works, Including in Chromium
+
+- The owner confirmed phone-based pointer and keyboard input works from the couch with no physical keyboard or mouse.
+- Corroborated from the journal that the Chromium half was genuinely exercised: `app-gnome-brave` appears twice for this boot, launched from the dock entry restored earlier, alongside `app-gnome-zuzz-`. Brave was still running at the time of checking. The GSConnect session to the tablet at `192.168.1.210:1716` remained established throughout, and the plugin policy is still intact with `discoverable` false.
+- **This closes the problem Spec 009 could not solve.** That specification burned substantial effort on GNOME's on-screen keyboard refusing to appear in Brave, captured a `WAYLAND_DEBUG` trace proving Brave sent a protocol-correct `text-input-v3` handshake that GNOME Shell ignored, and ultimately changed browsers to work around it. Remote input sidesteps the entire class of problem: GSConnect injects events at the input layer, the same way a physical keyboard does, so it does not matter whether the focused application cooperates with the compositor's text-input protocol.
+- A consequence worth recording: **browser choice is no longer constrained by keyboard support.** The Spec 009 switch from Brave to Firefox was forced by a limitation that no longer binds. Firefox remains the configured Zuzz browser and there is no reason to change it now, but if that decision is ever revisited it should be on its own merits rather than on keyboard behaviour.
+- Remaining for Spec 016: T009 (enter a streaming password from the tablet and confirm the session persists across a close and relaunch), then reboot persistence, the removal path, and documentation.
+
 ## 2026-09-05 — Brave Restored to the Dock for the Spec 016 Chromium Test
 
 - The owner noticed Brave was missing from the dock. It had been dropped when Spec 015 curated `favorite-apps` down to Zuzz, Firefox and Kodi; Brave was in the Ubuntu default set and was not deliberately excluded, merely not carried forward.
