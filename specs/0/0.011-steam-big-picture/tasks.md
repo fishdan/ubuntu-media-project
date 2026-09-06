@@ -25,8 +25,15 @@ regression there would be discovered from the couch rather than from a shell.
 
 ## Phase 3 — Launch and controller hand-off
 
-- [ ] T006 Write `scripts/launch-steam.sh`: turn DualSense media mode **off**, launch Steam into Big Picture, and restore media mode when Steam exits — including on abnormal exit, so the desktop is never left without a pointer.
-- [ ] T007 Add a tracked desktop entry and put Steam in the dock through `configure-desktop-home.sh`, so the change stays in version control.
+- [x] T006 Write `scripts/launch-steam.sh`: turn DualSense media mode **off**, launch Steam into Big Picture, and restore media mode when Steam exits — including on abnormal exit, so the desktop is never left without a pointer.
+  Implemented as `steam-bigpicture.service` rather than a shell trap. A trap can be killed before it runs;
+  `ExecStopPost` is guaranteed even if Steam crashes, which is what prevents a crash leaving the desktop
+  with no pointer. Both hooks carry a leading `-` so a disconnected controller cannot block Steam starting
+  or leave the unit failed. Big Picture is opened via `steam://open/bigpicture` rather than a flag, since
+  the flag was renamed across Steam versions (`-bigpicture`, then `-gamepadui`) while the URL stayed stable.
+- [x] T007 Add a tracked desktop entry and put Steam in the dock through `configure-desktop-home.sh`, so the change stays in version control.
+  Steam was also added to `return-home.sh`'s unit list. All five dock favourites verified to resolve to real
+  desktop files.
 - [ ] T008 Confirm from a shell that launching Steam turns media mode off and exiting restores it, before asking the owner to test from the couch.
 
 ## Phase 4 — Owner acceptance

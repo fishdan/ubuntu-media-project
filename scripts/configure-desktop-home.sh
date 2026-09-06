@@ -34,7 +34,7 @@ readonly settings=(
     # phone-based typing works in a Chromium browser, since Chromium's Wayland
     # text-input behaviour is what defeated the on-screen keyboard in Spec 009.
     # Losing the launcher would make that acceptance untestable from the couch.
-    "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'firefox_firefox.desktop', 'brave-browser.desktop', 'kodi.desktop']"
+    "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'brave-browser.desktop', 'firefox_firefox.desktop', 'steam-bigpicture.desktop', 'kodi.desktop']"
     # The dock auto-hides by default, which means hunting for a screen edge with
     # a controller stick from across the room. Pin it open and enlarge the icons.
     "org.gnome.shell.extensions.dash-to-dock${sep}dock-fixed${sep}true"

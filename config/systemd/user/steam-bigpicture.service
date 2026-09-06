@@ -1,0 +1,17 @@
+[Unit]
+Description=Steam Big Picture
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=exec
+# The leading '-' matters on both: dualsense-media-mode exits non-zero when the
+# controller is not connected, and neither a missing controller nor a failed
+# restore should prevent Steam starting or leave the unit failed on exit.
+ExecStartPre=-%h/.local/bin/dualsense-media-mode off
+ExecStart=%h/.local/bin/launch-steam --run
+# Guaranteed to run even if Steam crashes, so the desktop is never left without
+# a pointer. Short wait: the controller is normally already connected here.
+ExecStopPost=-%h/.local/bin/dualsense-media-mode on-when-present 15
+TimeoutStopSec=30s
+KillMode=control-group

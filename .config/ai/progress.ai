@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011 T006/T007: Steam Launcher and Automatic Controller Hand-off
+
+- Added `scripts/launch-steam.sh`, `config/systemd/user/steam-bigpicture.service` and a tracked desktop entry, extended `scripts/install-steam.sh` to deploy them idempotently, added Steam to `return-home.sh`'s unit list, and put it in the dock through `configure-desktop-home.sh` so the change stays in version control. All five favourites verified to resolve to real desktop files.
+- **The controller hand-off is a systemd unit rather than a shell trap, deliberately.** A trap can be killed before it runs, which is exactly the case that matters here: if Steam crashes while media mode is off, a missed restore leaves the desktop with no pointer and no keyboard, on a machine whose whole design goal is to be usable without either. `ExecStopPost` is guaranteed to run regardless of how Steam exits.
+- Both hooks carry a leading `-` so their failure is non-fatal. `dualsense-media-mode` exits non-zero when the controller is not connected, and neither a missing controller at launch nor a failed restore on exit should prevent Steam starting or leave a failed unit behind.
+- Big Picture is opened with `steam://open/bigpicture` rather than a command-line flag. The flag has been renamed across Steam versions — `-bigpicture` and later `-gamepadui` — while the URL has stayed stable, so this avoids a launcher that breaks silently on a client update.
+- **T008 cannot be completed yet and is not being claimed.** Verifying that launching turns media mode off and exiting restores it requires the controller to be connected, and it is currently asleep. The unit and its hooks verify clean and are deployed, but the actual mode transition has not been observed.
+- Steam's client has not been bootstrapped either: `~/.steam` does not exist, so first run will still download Valve's client and require signing in. That is T003 and needs the owner, along with any Steam Guard code — which is precisely the case Spec 016's phone input was built for.
+
 ## 2026-09-06 — Spec 011 T001-T005: Steam Installed; return-home Handles Transient Scopes
 
 - T002 installed `steam-installer 1:1.0.0.85~ds-2build1` from Ubuntu `multiverse` via a tracked idempotent script that enables the `i386` architecture first. Footprint: **192 packages added, 186 of them i386**, giving the appliance a full parallel 32-bit library stack. Disk use was negligible at this stage; the client download comes on first run. Second run correctly reported already-installed. SSH, the desktop-first home and GSConnect were unaffected.

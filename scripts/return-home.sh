@@ -15,6 +15,7 @@ set -euo pipefail
 # application process, so stopping the unit stops the application.
 readonly -a units=(
     zuzz-media.service
+    steam-bigpicture.service
 )
 
 # Applications launched from a desktop entry. GNOME starts these in transient
