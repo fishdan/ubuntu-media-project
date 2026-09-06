@@ -71,8 +71,14 @@ regression there would be discovered from the couch rather than from a shell.
 ## Phase 5 — Durability and exit
 
 - [ ] T014 Confirm the arrangement survives a reboot: Steam still launches, media mode still restores, and the PS button still works.
-- [ ] T015 Document the removal path — uninstall Steam, revert `i386` — and verify SSH, automatic login, the desktop, and the DualSense are unaffected.
-- [ ] T016 Write `docs/steam.md` covering install, the controller hand-off, launching, the honest GPU capability note, the bootstrap and `i386` security notes, and removal.
+- [~] T015 Document the removal path — uninstall Steam, revert `i386` — and verify SSH, automatic login, the desktop, and the DualSense are unaffected.
+  Documented in `docs/steam.md`, including that `dpkg --remove-architecture i386` will refuse while any of
+  the 186 i386 packages remain, so `autoremove` must run first, and that the tracked dock favourites and
+  `return-home.sh` unit list must be updated too or the configuration would no longer match reality.
+  **Deliberately not executed**, because it would destroy a working installation and the owner's installed
+  games for a test whose outcome is not in doubt. Recorded as documented-but-unverified rather than
+  claimed.
+- [x] T016 Write `docs/steam.md` covering install, the controller hand-off, launching, the honest GPU capability note, the bootstrap and `i386` security notes, and removal.
 - [ ] T017 Confirm no Steam credentials, tokens, or library paths are tracked; run the standard pre-PR checks including the secret scan; update `progress.ai` and `handoff.ai`; open the pull request.
 
 ## Explicitly not in this feature

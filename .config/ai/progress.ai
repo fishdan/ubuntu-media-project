@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011 T015/T016: Steam Documentation and Removal Path
+
+- Wrote `docs/steam.md` covering installation, the first-run bootstrap that looks broken and is not, the controller hand-off and why it is a systemd unit rather than a shell trap, launching and returning home, controller troubleshooting, honest hardware capability, storage, credentials and removal.
+- The troubleshooting section is written from what was actually diagnosed today rather than generic advice: it gives the four platform checks that distinguish an appliance fault from a per-game setting, and calls out `/dev/uinput` specifically, because without write access Steam cannot synthesise the virtual gamepad that games not using the Steam Input API depend on, which presents exactly as "no controller detected".
+- Recorded the storage reality: Steam and a small library used about **9 GB**, 5 GB of it games, leaving 192 GB free of 233 GB.
+- Confirmed no Steam data is tracked. Only the project's own launcher, unit, desktop entry, scripts and spec files match "steam" in the repository. Noted in the docs that some filenames under `~/.steam` embed the controller's Bluetooth address, which the constitution keeps out of version control — a useful reminder given a leak of exactly that identifier was caught during Spec 016.
+- **T015 is documented but deliberately not executed**, and is recorded as such rather than claimed. Running it would destroy a working installation and the owner's installed games for a test whose outcome is not in doubt. Two details were verified statically and written down because they are easy to get wrong: `dpkg --remove-architecture i386` will refuse while any of the 186 i386 packages remain, so `autoremove` must run first; and removal must also update the tracked dock favourites in `configure-desktop-home.sh` and the unit list in `return-home.sh`, or the tracked configuration would no longer match the machine.
+- Remaining for Spec 011: the PS button pressed while Steam is actually running (T013), reboot durability (T014), and the pre-PR checks (T017).
+
 ## 2026-09-06 — Spec 011: Big Picture, Sign-in and Games Accepted; Controller Restore Proven in Real Use
 
 - The owner reached Big Picture from the dock, signed in, installed games, and played several including **Thronefall**, which has full controller support, alongside RimWorld and FTL. T009, T011 and T012 accepted.
