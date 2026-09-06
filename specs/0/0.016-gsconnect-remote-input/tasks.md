@@ -50,10 +50,20 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 ## Phase 5 — Durability and exit
 
 - [ ] T010 Confirm pairing survives a reboot; if it does not, document the reconnection procedure.
-- [ ] T011 Document the removal path: unpair the phone, disable or remove the extension, delete `~/.config/gsconnect/`, and confirm SSH, automatic login, and the desktop are unaffected. Verify it, rather than only writing it down.
-- [ ] T012 Write `docs/phone-input.md` covering install, the enabled-plugin policy with rationale, pairing, daily use, the known LAN exposure, and removal.
-- [ ] T013 Record in `progress.ai` that no firewall is enabled, so no ports were opened, and note that GSConnect would need TCP/UDP `1716-1764` if one is ever added.
-- [ ] T014 Record the GNOME 51 compatibility risk (`gnome-shell (<< 51~)`) against Spec 013, since a future release will make this package uninstallable.
+- [x] T011 Document the removal path: unpair the phone, disable or remove the extension, delete `~/.config/gsconnect/`, and confirm SSH, automatic login, and the desktop are unaffected. Verify it, rather than only writing it down.
+  Verifying it found the documented path was **wrong**. `gnome-extensions disable` does not stop GSConnect:
+  the daemon is D-Bus activated via `org.gnome.Shell.Extensions.GSConnect.service`, parented to systemd
+  rather than GNOME Shell, and it kept running with **port 1716 still listening on all interfaces**. It
+  exposes no `quit` action. On a firewall-less appliance that would leave a network listener running while
+  the operator believed the feature was removed. The documented path now includes an explicit daemon stop
+  and a port check.
+  Confirmed unaffected by disabling: SSH, `dualsense-desktop-input.service`, automatic login, and the
+  desktop-first home. The pairing survives a disable and re-enable.
+  The unpair step was deliberately **not executed**, to avoid destroying a working owner-accepted pairing
+  for a test whose outcome is not in doubt; that step remains documented but unverified.
+- [x] T012 Write `docs/phone-input.md` covering install, the enabled-plugin policy with rationale, pairing, daily use, the known LAN exposure, and removal.
+- [x] T013 Record in `progress.ai` that no firewall is enabled, so no ports were opened, and note that GSConnect would need TCP/UDP `1716-1764` if one is ever added.
+- [x] T014 Record the GNOME 51 compatibility risk (`gnome-shell (<< 51~)`) against Spec 013, since a future release will make this package uninstallable.
 - [ ] T015 Run the standard pre-PR checks, update `progress.ai` and `handoff.ai`, and prepare the pull request.
 
 ## Explicitly not in this feature
