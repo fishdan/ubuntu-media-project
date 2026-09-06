@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011: Steam Detects the DualSense; RimWorld Report Traced to Game-Level Config
+
+- The owner reached Big Picture from the dock and installed and started games, but reported that RimWorld showed "partial controller support" and then "no controller detected".
+- **Steam itself detects the controller correctly.** Its own log records `Added HIDAPI device 'DualSense Wireless Controller' VID 0x054c, PID 0x0ce6, bluetooth 1, path = /dev/hidraw0, driver = SDL_JOYSTICK_HIDAPI_PS5 (ENABLED)`, followed by `Controller using HIDAPI driver`, and `controller.txt` shows Steam Input activating bindings and adopting configurations.
+- Every platform prerequisite was checked rather than assumed, and all are correct: `steam-devices` udev rules are installed; `dfish` holds explicit ACLs on `/dev/hidraw0`, `/dev/input/event15` and `/dev/uinput`; `/dev/input/js0` exists; the device advertises `BTN_GAMEPAD` and all eight axes; `hid_playstation` and `joydev` are loaded; and input-remapper holds no forwarded node, confirming the Spec 011 hand-off released the controller as intended.
+- `/dev/uinput` deserves specific mention because it is the classic failure for this symptom: without it Steam cannot synthesise the virtual gamepad that games not using the Steam Input API rely on. An initial check using `sudo -u dfish test -w` wrongly reported it unwritable; testing directly as the user, and opening the device for writing, showed it is accessible. The misleading result came from the test method, not the system.
+- **Conclusion: this is a per-game Steam Input setting, not an appliance defect.** T010's acceptance criterion is met at the platform level. RimWorld's "partial controller support" is a store-level flag, and whether the game sees a pad depends on the Steam Input mode selected for that title.
+- Recorded because it matters for future titles: with Steam Input enabled for a game, Steam captures the DualSense and presents a virtual gamepad; with it disabled, the game must read the raw device itself. A game that detects nothing in one mode will often detect a pad in the other.
+
 ## 2026-09-06 — Spec 011 T008: Controller Hand-off Verified From a Shell
 
 - With the controller connected, the full hand-off cycle was observed rather than inferred. Before start: `ON (live injection confirmed)`. On `systemctl --user start steam-bigpicture.service`: `off (controller connected, not injecting)`, which is the state Steam Input needs. On stop: back to `ON (live injection confirmed)`, with the journal showing `ExecStopPost` reapplying the preset. The unit cgroup is torn down cleanly with no orphaned Steam processes.

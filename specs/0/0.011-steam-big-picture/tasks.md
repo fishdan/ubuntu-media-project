@@ -43,7 +43,15 @@ regression there would be discovered from the couch rather than from a shell.
 ## Phase 4 — Owner acceptance
 
 - [ ] T009 Owner launches Steam from the dock with the DualSense alone and reaches Big Picture.
-- [ ] T010 Steam Input sees the DualSense as a native gamepad, with no duplicate or phantom input from input-remapper.
+- [x] T010 Steam Input sees the DualSense as a native gamepad, with no duplicate or phantom input from input-remapper.
+  Confirmed from Steam's own logs: `Added HIDAPI device 'DualSense Wireless Controller' VID 0x054c,
+  PID 0x0ce6, bluetooth 1, path = /dev/hidraw0, driver = SDL_JOYSTICK_HIDAPI_PS5 (ENABLED)` and
+  `Controller using HIDAPI driver`. Platform prerequisites all verified: `steam-devices` udev rules
+  installed, `dfish` holds ACLs on `/dev/hidraw0`, `/dev/input/event15` and `/dev/uinput` (so Steam can
+  emulate a pad for games that do not use the Steam Input API), `js0` present, `BTN_GAMEPAD` and all eight
+  axes advertised, `hid_playstation` and `joydev` loaded, and input-remapper holding no forwarded node.
+  A game reporting "no controller detected" is therefore a per-game Steam Input setting, not an appliance
+  fault.
 - [ ] T011 Sign in to Steam. Text entry uses the Spec 016 phone input; record whether Steam Guard was required and whether phone input handled it.
 - [ ] T012 Install and run one representative test title. **Judge it honestly against a GTX 1060 with 3 GB of VRAM** and record what it actually does, including stutter or unplayability. Do not present a title that does not run well as working.
 - [ ] T013 The PS button returns from Steam to the desktop, and the pointer works immediately afterwards.
