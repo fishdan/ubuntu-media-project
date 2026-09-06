@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-09-05 — Spec 016 T005/T006: Paired, Locked Down, and Verified
+
+- The owner paired their Android device and the policy was applied within seconds, as planned. Device id `<redacted-device-id>`, connected over `lan://192.168.1.210:1716` with an established TCP session to the appliance.
+- **The paired device is a Galaxy Tab A11, reported by GSConnect as type `tablet`, not a phone.** Recorded rather than glossed over, since the specification and docs say "phone" throughout. It makes no functional difference — KDE Connect's remote input is identical — and a tablet is arguably a better typing surface. Worth confirming with the owner whether the phone should also be paired, or whether the tablet is the intended input device.
+- Plugin policy verified by reading the settings back rather than trusting the write: `disabled-plugins` contains all fourteen non-input plugins, and `mousepad` alone remains. The permissive defaults were individually confirmed cleared — `share.receive-files`, `sftp.automount`, `notification.send-notifications`, `clipboard.receive-content`, `clipboard.send-content` and `contacts.contacts-source` all read `false`.
+- `--harden` applied: `discoverable` is now `false`, so GSConnect no longer advertises on the LAN. With no host firewall this is the meaningful reduction in exposure; the port stays open for the paired device but the appliance stops announcing itself.
+- T006 secret check passed. `certificate.pem` and `private.pem` are in `~/.config/gsconnect/`, the private key at mode 600, outside version control. No `.pem` is tracked, the working tree is clean after pairing, and repository-wide scans found neither the device identifier nor any certificate material.
+- Ready for the owner acceptance tasks T007-T009: pointer and typing from the couch, typing verified in both Firefox and a Chromium browser, and the streaming login and persistence that Spec 009 could not finish.
+
 ## 2026-09-05 — Spec 016 T003: Extension Enabled and Listening
 
 - Enabled `gsconnect@andyholmes.github.io` after the reboot made it visible. It reports `Enabled: Yes`, `State: ACTIVE`, version 71, with `service/daemon.js` running and listening on **TCP and UDP 1716 on all interfaces**.

@@ -22,8 +22,14 @@ permissive shipped defaults (`Share.receive-files`, `SFTP.automount`,
 
 ## Phase 3 — Pair
 
-- [ ] T005 Pair the owner's Android phone through an explicit confirmation on both ends. Confirm no device is trusted implicitly and that an unpaired device cannot inject input.
-- [ ] T006 Confirm GSConnect's certificate, private key, and paired-device metadata under `~/.config/gsconnect/` are outside version control, and that `git status` is clean after pairing.
+- [x] T005 Pair the owner's Android phone through an explicit confirmation on both ends. Confirm no device is trusted implicitly and that an unpaired device cannot inject input.
+  Paired 2026-09-05. The device is a **Galaxy Tab A11 (type `tablet`)**, not a phone; functionally
+  identical for KDE Connect and arguably better for typing, but recorded because the specification says
+  "phone". Connected over `lan://192.168.1.210:1716`. Policy applied within seconds of pairing.
+- [x] T006 Confirm GSConnect's certificate, private key, and paired-device metadata under `~/.config/gsconnect/` are outside version control, and that `git status` is clean after pairing.
+  Verified: `certificate.pem` and `private.pem` live in `~/.config/gsconnect/` with the key at mode 600,
+  nothing `.pem` is tracked, the working tree is clean, and scans found neither the device id nor any
+  certificate material anywhere in the repository.
 
 ## Phase 4 — Validate the actual goal
 
