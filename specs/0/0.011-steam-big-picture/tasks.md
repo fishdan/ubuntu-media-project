@@ -6,14 +6,22 @@ regression there would be discovered from the couch rather than from a shell.
 
 ## Phase 1 — Install
 
-- [ ] T001 Record the pre-change baseline: Steam absent, `i386` not enabled, GPU and driver, free disk, session type, and that SSH and the desktop are healthy.
-- [ ] T002 Write `scripts/install-steam.sh`: idempotent, enables the `i386` architecture, installs `steam-installer` from Ubuntu `multiverse` only, no third-party APT source, and refuses to run as the wrong user. Verify by running it twice.
+- [x] T001 Record the pre-change baseline: Steam absent, `i386` not enabled, GPU and driver, free disk, session type, and that SSH and the desktop are healthy.
+- [x] T002 Write `scripts/install-steam.sh`: idempotent, enables the `i386` architecture, installs `steam-installer` from Ubuntu `multiverse` only, no third-party APT source, and refuses to run as the wrong user. Verify by running it twice. Done: `steam-installer 1:1.0.0.85~ds-2build1` installed, +192 packages of
+  which 186 are i386; second run reported already-installed.
 - [ ] T003 Complete Steam's first-run bootstrap, which downloads Valve's own client. Record what it pulls and note that the running client self-updates outside APT.
 
 ## Phase 2 — Return home must work first
 
-- [ ] T004 Rework `scripts/return-home.sh` to close transient `app-gnome-*.scope` units as well as the existing fixed unit list. Keep the mechanism general, since Spec 017 needs it for dock-launched Brave.
-- [ ] T005 **Verify the rework against the existing browser path before Steam uses it.** Start `zuzz-media.service`, confirm the PS button still stops it, and confirm a dock-launched application is also closed. A regression here would break an accepted Spec 015 criterion.
+- [x] T004 Rework `scripts/return-home.sh` to close transient `app-gnome-*.scope` units as well as the existing fixed unit list. Keep the mechanism general, since Spec 017 needs it for dock-launched Brave.
+  Scopes are systemd-escaped (`app-gnome-brave\x2dbrowser-6048.scope`), so matching uses `systemd-escape`
+  on an explicit application allowlist. An allowlist rather than "stop every app scope", because
+  `update-notifier` and `evolution-alarm-notify` are app scopes too. Brave also registers a second scope
+  under its Chromium identity, so that literal is matched as well or the browser survives.
+- [x] T005 **Verify the rework against the existing browser path before Steam uses it.** Start `zuzz-media.service`, confirm the PS button still stops it, and confirm a dock-launched application is also closed. A regression here would break an accepted Spec 015 criterion.
+  Verified both paths: dock-launched Brave was closed via both its scopes with background helper scopes and
+  `init.scope` untouched, and `zuzz-media.service` was still stopped via the unit path. The no-op case
+  reports correctly.
 
 ## Phase 3 — Launch and controller hand-off
 

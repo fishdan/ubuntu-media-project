@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-09-06 — Spec 011 T001-T005: Steam Installed; return-home Handles Transient Scopes
+
+- T002 installed `steam-installer 1:1.0.0.85~ds-2build1` from Ubuntu `multiverse` via a tracked idempotent script that enables the `i386` architecture first. Footprint: **192 packages added, 186 of them i386**, giving the appliance a full parallel 32-bit library stack. Disk use was negligible at this stage; the client download comes on first run. Second run correctly reported already-installed. SSH, the desktop-first home and GSConnect were unaffected.
+- **T004 reworked `scripts/return-home.sh` to close transient application scopes as well as managed units.** Three details mattered and were found by inspecting real scope names rather than assuming them:
+  - GNOME names these scopes with systemd escaping, for example `app-gnome-brave\x2dbrowser-6048.scope`, so matching uses `systemd-escape` on the application id rather than a naive string.
+  - The match is an **explicit allowlist**, not "stop every app scope". `update-notifier`, `evolution-alarm-notify` and the settings-daemon notifier all run as app scopes; a blanket sweep would have killed them.
+  - Brave registers a **second scope under its Chromium identity** (`app-org.chromium.Chromium-6055.scope`) in addition to its launcher scope. Stopping only the launcher scope would have left the browser running, which would have looked like an intermittent failure of the PS button.
+- **T005 verified both paths before Steam depends on either.** Dock-launched Brave was closed through both of its scopes with the background helper scopes and `init.scope` demonstrably untouched; `zuzz-media.service` was still stopped through the existing unit path with Firefox exiting; and the no-op case reports correctly. The journal records each invocation.
+- An apparent "3 surviving Brave processes" was a false alarm: the `ps | grep brave` pipeline matched its own shell command line. This is the third time today that a self-matching process pattern has produced a misleading reading, after the `pkill` that killed this session and the earlier Kodi case recorded in Spec 009.
+- Next: the Steam launcher with the automatic DualSense media-mode hand-off, which is the other substantive piece of this feature.
+
 ## 2026-09-06 — Spec 011 Started: Steam Specified Against the Real Machine
 
 - Branched `feature/0.011-steam-big-picture` from `main`. The existing `spec.md` was a single-paragraph stub, so it was rewritten with real acceptance criteria before planning, and `plan.md` and `tasks.md` were written.
