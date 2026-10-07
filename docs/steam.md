@@ -20,6 +20,22 @@ Two things a tidy installer can hide, so they are stated plainly:
 - **It enables `i386`.** Steam needs a parallel 32-bit library stack. The install
   added **192 packages, 186 of them i386**, widening the installed surface
   system-wide.
+
+  The 2026-10-07 security audit put a number on that. Three media-decode
+  libraries now carry a pending security update **once per architecture** --
+  `libavcodec62`, `libavutil60` and `libswresample6`, with the i386 copies at
+  `7:8.0.1-3ubuntu2`. They sit in Universe/Multiverse, so the only patch path is
+  Ubuntu Pro ESM-apps, and this appliance deliberately does not use Pro. They are
+  therefore accepted as unpatched.
+
+  The accepted risk is narrower than it sounds, and the reason is worth knowing
+  before anyone panics about it: Brave has **no system `libavcodec`/`libavformat`
+  linkage at all**, and Firefox is a confined snap with its own stack, so the
+  browser streaming that is this appliance's actual purpose never touches these
+  libraries. What links them is `kodi-bin`, `vlc-plugin-base` and
+  `gstreamer1.0-plugins-bad` -- and Kodi is retired, on a machine with no local
+  media library. Nothing removable: `apt-get -s autoremove` proposes nothing and
+  all are live dependencies.
 - **`steam-installer` is a bootstrap.** Ubuntu ships the launcher and libraries;
   the Steam client itself is downloaded from Valve on first run and self-updates
   outside APT. "Installed from the Ubuntu repository" describes the package, not
@@ -121,8 +137,17 @@ projector resolution**, and none has been tested.
 
 ## Storage
 
-Steam and a small library used about **9 GB** (5 GB of it games), leaving 192 GB
-free of 233 GB.
+Steam and a small library use about **8.6 GB**, measured at `~/.steam` on
+2026-10-07 with FTL, RimWorld and Thronefall installed alongside Proton
+Experimental and three SteamLinuxRuntime versions.
+
+**The earlier "leaving 192 GB free of 233 GB" figure is obsolete and was
+removed rather than left to mislead.** On 2026-10-07 the root filesystem was at
+**90% -- 23 GB free of 233 GB**. Steam is not the cause: `~/Downloads` held
+**161 GB** of unrelated files. Worth stating because 23 GB free is thin for a
+machine that installs games, and the next large title could fail to install for
+reasons that have nothing to do with Steam. Check `df -h /` before blaming the
+client.
 
 ## Credentials
 

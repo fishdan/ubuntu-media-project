@@ -9,7 +9,15 @@ regression there would be discovered from the couch rather than from a shell.
 - [x] T001 Record the pre-change baseline: Steam absent, `i386` not enabled, GPU and driver, free disk, session type, and that SSH and the desktop are healthy.
 - [x] T002 Write `scripts/install-steam.sh`: idempotent, enables the `i386` architecture, installs `steam-installer` from Ubuntu `multiverse` only, no third-party APT source, and refuses to run as the wrong user. Verify by running it twice. Done: `steam-installer 1:1.0.0.85~ds-2build1` installed, +192 packages of
   which 186 are i386; second run reported already-installed.
-- [ ] T003 Complete Steam's first-run bootstrap, which downloads Valve's own client. Record what it pulls and note that the running client self-updates outside APT.
+- [x] T003 Complete Steam's first-run bootstrap, which downloads Valve's own client. Record what it pulls and note that the running client self-updates outside APT.
+  Completed during the 2026-09-06 owner session, but never recorded; closed on 2026-10-07 from evidence on
+  disk. `~/.steam/debian-installation` exists and holds **8.6 GB**: Valve's client plus
+  `SteamLinuxRuntime`, `SteamLinuxRuntime_soldier`, `SteamLinuxRuntime_4`, `Proton - Experimental`,
+  `Steamworks Shared`, `Steam Controller Configs`, and the installed titles.
+  **The self-update claim is now demonstrated rather than asserted:** the APT package is still
+  `steam-installer 1:1.0.0.85~ds-2build1` while the running client reports `buildid=1788652215`. APT's
+  version is frozen at the bootstrap and says nothing about the code actually executing, which is exactly
+  why the distinction is documented in `docs/steam.md`.
 
 ## Phase 2 — Return home must work first
 
@@ -70,7 +78,19 @@ regression there would be discovered from the couch rather than from a shell.
 
 ## Phase 5 — Durability and exit
 
-- [ ] T014 Confirm the arrangement survives a reboot: Steam still launches, media mode still restores, and the PS button still works.
+- [~] T014 Confirm the arrangement survives a reboot: Steam still launches, media mode still restores, and the PS button still works.
+  **Verified after the 2026-09-29 reboot (7 days uptime at the time of checking).** SSH active;
+  `media-home.service` still `disabled`/`inactive`; GSConnect still enabled; `steam-bigpicture.service`
+  still present as `static`. Steam launched from the unit and reached Big Picture (`uimode=4`) with
+  `ActiveState=active`, `Result=success`; stop was clean in 16s with `Result=success`, no surviving
+  processes, and the cgroup accounted for 2.4G peak memory.
+  **Also proven: a missing controller cannot break the unit.** With the DualSense disconnected,
+  `ExecStartPre` logged `Device "DualSense Wireless Controller" is unknown or not an appropriate input
+  device` and `ExecStopPost` logged `No DualSense connected; leaving desktop media mode off`, yet the unit
+  neither failed nor blocked Steam — the leading `-` on both hooks doing its job. This was designed for in
+  T006 but had never been observed.
+  **Still untested: the media-mode hand-off itself across a reboot**, because the controller was asleep and
+  did not reconnect. The off-on transition requires it and is not being claimed from a disconnected run.
 - [~] T015 Document the removal path — uninstall Steam, revert `i386` — and verify SSH, automatic login, the desktop, and the DualSense are unaffected.
   Documented in `docs/steam.md`, including that `dpkg --remove-architecture i386` will refuse while any of
   the 186 i386 packages remain, so `autoremove` must run first, and that the tracked dock favourites and
@@ -79,7 +99,15 @@ regression there would be discovered from the couch rather than from a shell.
   games for a test whose outcome is not in doubt. Recorded as documented-but-unverified rather than
   claimed.
 - [x] T016 Write `docs/steam.md` covering install, the controller hand-off, launching, the honest GPU capability note, the bootstrap and `i386` security notes, and removal.
-- [ ] T017 Confirm no Steam credentials, tokens, or library paths are tracked; run the standard pre-PR checks including the secret scan; update `progress.ai` and `handoff.ai`; open the pull request.
+- [x] T017 Confirm no Steam credentials, tokens, or library paths are tracked; run the standard pre-PR checks including the secret scan; update `progress.ai` and `handoff.ai`; open the pull request.
+  All checks clean on 2026-10-07. Only the project's own eight Steam files are tracked — launcher, unit,
+  desktop entry, docs and spec artifacts; no `loginusers`, `ssfn`, token, `steamid`, or real
+  `steamapps` path appears anywhere. No private-key headers, no secret assignments, and **no
+  Bluetooth-address-shaped strings**, checked specifically because Spec 016 leaked one before and
+  `dualsense-media-mode.sh` prints the controller's address at runtime. All 26 tracked scripts pass
+  `bash -n`; `systemd-analyze --user verify` accepts all four units with only the pre-existing unrelated
+  `spice-vdagent` warning; `git diff --check` clean. `progress.ai` and `handoff.ai` updated, the latter
+  rewritten because it was a month stale and wrongly claimed nothing had been pushed.
 
 ## Explicitly not in this feature
 
