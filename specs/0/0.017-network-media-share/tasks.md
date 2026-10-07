@@ -44,11 +44,21 @@ failed boot in the living room.
 
 ## Phase 4 — Owner acceptance
 
-- [ ] T011 Owner browses the share in GNOME Files at the fixed path and it behaves like an ordinary
+- [x] T011 Owner browses the share in GNOME Files at the fixed path and it behaves like an ordinary
   folder.
-- [ ] T012 Owner plays a video full screen from the share with correct audio through the projector
+  **Accepted 2026-10-07** implicitly with T012 -- the owner reached and played the clip from the
+  share, which required getting into the folder. The four shortcuts added in T018 are what made
+  that possible without a keyboard.
+- [x] T012 Owner plays a video full screen from the share with correct audio through the projector
   and receiver. Judge playback honestly, including any stutter over the network, and record whether
   the link was Ethernet or Wi-Fi.
+  **Accepted 2026-10-07.** The owner played `_test-pattern-1080p.mp4` from the share and reported it
+  "worked great". The link was wired Ethernet (`enp3s0` at 1000 Mb/s); Wi-Fi was down throughout, so
+  nothing here speaks to Wi-Fi playback.
+  Honest scope of that result: the test clip is a 30-second synthetic 1080p H.264 pattern with a
+  440 Hz tone, about 20 MB. It proves the path end to end -- mount, decode, projector, receiver --
+  but it is not a demanding bitrate and says nothing about sustained playback of a large x265 file.
+  The 1080p x265 library moved in on 2026-10-07 is the real test of that.
 
 ## Phase 5 — Document and close
 

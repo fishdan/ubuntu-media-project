@@ -23,7 +23,11 @@ this file is current state only.
   server unreachable, which could not be done from a remote session that would
   have ended before the result could be seen. The dependency structure was
   inspected and supports the design, but that is an argument, not evidence.
-- **T011/T012 need the owner in the living room**: browse the share in Files, then
+- **T011/T012 ACCEPTED 2026-10-07** -- the owner played the test clip and it
+  "worked great", over wired Ethernet. But that was a 20 MB synthetic 1080p clip.
+  **No episode from the real 1080p x265 library has been played yet**, which is a
+  much heavier decode on a GTX 1060 with 3 GB VRAM. That is the next check.
+- ~~T011/T012 need the owner in the living room~~: browse the share in Files, then
   play a video full screen with audio through the projector and receiver. A test
   clip is already in place at `/media_remote/_test-pattern-1080p.mp4` (30s, 1080p,
   440 Hz tone) so nothing has to be found first.
@@ -80,8 +84,10 @@ the list, so it does not pre-empt the choice.
   that exposure was "close to unreachable" no longer holds, since VLC, Kodi and the
   GStreamer thumbnailer now decode files from the share. If the share ever holds
   untrusted files, reconsider Pro.
-- **Appliance disk is at 90%, 23 GB free**, caused by **161 GB in `~/Downloads`**.
-  Not Steam. The network share sidesteps this rather than worsening it.
+- ~~Appliance disk at 90%~~ **RESOLVED 2026-10-07.** The 161 GB `BattleStarGalactica`
+  folder in `~/Downloads` was moved to `nathan:/data/media` after full checksum
+  verification, and that folder *was* the problem. Root filesystem went from 90%
+  full / 24 GB free to **17% / 184 GB free**. `~/Downloads` is now empty.
 - Watch for stray `iptables` DROP rules before blaming NFS: a leftover rule on
   2049 imitated a dead server convincingly during development and cost a long
   diagnosis. `sudo iptables -S OUTPUT | grep 2049` should return nothing.
