@@ -1,5 +1,22 @@
 # Progress Log
 
+## 2026-10-07 — Spec 017 T011/T012 Accepted; 161 GB Library Moved to nathan
+
+- **T012 accepted.** The owner played `_test-pattern-1080p.mp4` from the share and reported it "worked great". Wired Ethernet throughout (`enp3s0` at 1000 Mb/s); Wi-Fi was down, so nothing here speaks to Wi-Fi playback. **T011 accepted** implicitly, since reaching the clip required getting into the folder — the four shortcuts from T018 are what made that possible without a keyboard.
+- Honest scope of that acceptance, recorded so it is not over-read: the clip is a 30-second synthetic 1080p H.264 pattern of about 20 MB. It proves the whole path — mount, decode, projector, receiver — but is not a demanding bitrate and says nothing about sustaining a large x265 file.
+- **Moved the owner's `BattleStarGalactica` library from `~/Downloads` on the appliance to `nathan:/data/media`: 172 `.mkv` files, 12 directories, 160.4 GiB** across four seasons plus Featurettes and Specials. 1080p x265.
+- **The copy went over SSH, not through `/media_remote`, because the share is read-only from the appliance.** That is the Spec 017 design working rather than an obstacle: nothing in the living room can write to the library, so additions are made on `nathan`.
+- Sustained **115.82 MB/s** over 1487 seconds (~25 minutes), which matches the 115 MB/s read measured during implementation and effectively saturates the gigabit link in both directions.
+- **The move was split into copy-then-verify, with deletion held as a separate reviewed step.** 161 GB of ripped media is not something to delete on the strength of an exit code. Four independent checks ran before anything was removed:
+  1. File count and exact byte total compared: 172 files and 172,243,376,226 bytes on both sides, matching exactly.
+  2. A full `rsync -nac` checksum comparison of every file, which returned nothing — no file differed.
+  3. An independent `md5sum` of the largest file (5.34 GB, `S04E19-E20 - Daybreak`) computed three ways — locally, on `nathan` over SSH, and read back through the read-only NFS mount — all `b62de776bf2e0eac9e7a564476a9e8f0`. The third path matters because it proves the bytes are correct *as the appliance will actually read them*, not merely as they sit on the server's disk.
+  4. Visibility and read-only status through the mount confirmed.
+- Only then was the source deleted. The script was written to abort with the source untouched on any failure.
+- **This resolved the appliance's most pressing practical risk as a side effect, because the folder *was* the risk.** The root filesystem went from **90% full with 24 GB free to 17% with 184 GB free**. Every prior entry that flagged "161 GB in `~/Downloads`" is now settled, and `~/Downloads` is empty. `nathan:/data` sits at 162 GB used of 1.8 TB, 1.6 TB free.
+- The library is now browsable and playable from the couch through the same four shortcuts, and is read-only from the appliance — verified again after the move by a failed `touch`.
+- **Not yet done and worth stating plainly: no episode from this library has been played.** T012 was accepted on the synthetic clip. A 1080p x265 Blu-ray rip at several GB per episode is a materially heavier decode than a 20 MB test pattern, and this appliance is a GTX 1060 with 3 GB of VRAM. Sustained playback of the real library is untested, and is the obvious next thing for the owner to check.
+
 ## 2026-10-07 — Spec 017 T018: the share had no clickable entry point
 
 - The owner asked whether there was now a clickable folder on the desktop. There was not, and that is a gap in the implementation rather than a misunderstanding of the request. The mount satisfied the specification's criterion that the folder "can be browsed in GNOME Files like any ordinary folder" while being, in practice, reachable only by typing a path into Files with `Ctrl+L` — on an appliance whose entire purpose is to work without a keyboard.
