@@ -85,7 +85,7 @@ of everything it writes before writing it:
 
 | Setting | Appliance value | Prior value |
 | --- | --- | --- |
-| `org.gnome.desktop.interface text-scaling-factor` | `1.5` | `1.0` |
+| `org.gnome.desktop.interface text-scaling-factor` | `1.0` (unchanged) | `1.0` |
 | `org.gnome.desktop.interface cursor-size` | `48` | `24` |
 | `org.gnome.shell favorite-apps` | Zuzz, Firefox, Brave, Kodi | Ubuntu defaults |
 | `dash-to-dock dock-fixed` | `true` | `false` |
@@ -107,20 +107,42 @@ overwritten by a later `--apply`, so it always describes the appliance as it was
 before this feature first touched it. `--revert` restores those values and
 removes the file.
 
-If the desktop is still hard to read from the couch, raise
-`text-scaling-factor` in the script rather than by hand, so the change stays in
-version control.
+### Text scaling was tried and rejected
 
-## Installing
+`text-scaling-factor` was set to 1.5 on 2026-09-05 to make the desktop legible at
+projector distance, and accepted at the time. It was **reverted to 1.0 on
+2026-09-06** after the owner judged the projector sharp and legible without it.
 
-```bash
-scripts/install-desktop-home.sh
-```
+Two reasons it is not used:
 
-Idempotent and safe to re-run. It links the helper scripts into `~/.local/bin`,
-installs and enables `dualsense-desktop-input.service`, and applies the display
-settings. It never enables `media-home.service`, so re-running it will not undo
-the Kodi retirement.
+1. **A projector is already a ten-foot display.** The original worry — that GNOME
+   is not a ten-foot interface — turned out not to bite at this screen size. The
+   problem it solved was largely theoretical.
+2. **Browsers apply text scaling to web content**, not only to their own menus. At
+   1.5 the 1920x1200 output presented to websites as roughly 1280x800 CSS pixels,
+   so pages laid themselves out for a much smaller window. In practice Zuzz pushed
+   its video frame's fullscreen toggle off the visible area.
+
+That second effect forced a compensating page zoom in the browser, and the two
+settings multiply:
+
+| Text scaling | Page zoom | Effective | Web viewport |
+| --- | --- | --- | --- |
+| 1.5 | 100% | 1.50 | 1280x800 (layout breaks) |
+| 1.5 | 80% | 1.20 | 1600x1000 (the interim fix) |
+| **1.0** | **100%** | **1.00** | **1920x1200 (current, as designed)** |
+
+At 1.0 no browser zoom is needed at all, and every site lays out as its authors
+intended. If you had set a page zoom while text scaling was 1.5, reset it to 100%
+or pages will render smaller than native.
+
+**Cursor size and dock icons stay enlarged.** They help at projector distance and,
+unlike text scaling, have no effect on web page layout.
+
+If the desktop ever does need to be larger, change it in
+`scripts/configure-desktop-home.sh` rather than by hand so it stays in version
+control — and re-read this section first, because the browser consequence will
+come back with it.
 
 ## Reverting to the Kodi-first home
 

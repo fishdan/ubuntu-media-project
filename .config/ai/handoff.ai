@@ -1,115 +1,77 @@
 # Handoff
 
-## 2026-09-05 — Specs 009 and 015 complete and accepted; ready to push and PR
+## 2026-10-07 — Spec 011 pushed and under PR; two controller tasks backlogged
 
-Supersedes all earlier handoff entries. The durable history is in `progress.ai`; this file is current state only.
+Supersedes all earlier handoff entries. The durable history is in `progress.ai`;
+this file is current state only.
 
 ### Branch and repository state
 
-- Branch: `feature/0.015-desktop-first-home`, 15 commits ahead of `main`. Working tree clean.
-- Those 15 commits are 3 for Spec 009 and 12 for Spec 015. `feature/0.015-desktop-first-home` is stacked on `feature/0.009-brave-zuzz-browser-streaming`.
-- **Nothing has been pushed and no pull request exists.** Push and PR 009 first, then 015 stacks cleanly as its own commits.
-- Specs 003-008 are already merged into `main`.
+- Branch: `feature/0.011-steam-big-picture`, 11 commits ahead of `main`, 0 behind.
+  `main` is an ancestor, so no rebase is needed and the PR merges cleanly.
+- **The previous handoff was a month stale and wrongly claimed nothing had been
+  pushed.** Specs 009, 015 and 016 were in fact merged as PRs #7 through #11.
+  `main` is at the PR #10 merge. Do not trust an old handoff over `git`.
+- Specs 003-009 and 015-016 are merged. Spec 011 is the only feature in flight.
 
 ### Status
 
-- **Spec 009 (Firefox/Zuzz streaming): Complete, pending PR.** No unchecked tasks. Owner accepted projector presentation, on-screen-keyboard text entry, streaming login, flawless AV through the projector and receiver, and login persistence across close and relaunch.
-- **Spec 015 (desktop-first home): Complete, pending PR.** No unchecked tasks. Owner accepted the couch test in full: pointer via stick and native touchpad, launching Zuzz from the dock, and the PS button returning to the desktop, all with no keyboard or mouse.
-- **Spec 016 (GSConnect phone input): unblocked, not started.** Has only `spec.md`; needs `plan.md` and `tasks.md` on its own branch. The phone is Android. The desktop side is `gnome-shell-extension-gsconnect` (`71-1ubuntu1`, available, not installed) — not the Plasma `kdeconnect` package.
+- **Spec 011 (Steam Big Picture): 13 tasks done, 3 partial, PR open.** Installed,
+  launching from the dock into Big Picture, signed in, games played and accepted.
+- **T013 and T014 are backlogged by owner decision, not forgotten.** Both need a
+  physically present person with a woken DualSense:
+  - **T013** — press the PS button *while Steam is actually running*. Never done;
+    the owner has only ever exited through Steam's own menu, so `return-home`'s
+    Steam unit-matching path has still never been exercised from the couch.
+  - **T014** — the media-mode off/on hand-off across a reboot. Everything else in
+    T014 is verified; only the controller transition is outstanding.
+- **T015** stays documented-but-unexecuted on purpose: running it would destroy a
+  working installation and the owner's games to test an outcome not in doubt.
 
 ### Current appliance state
 
-- Boots to the GNOME desktop with automatic login. Nothing media-related starts automatically.
-- `media-home.service`: installed, **disabled**, inactive. Kodi installed and launchable, so the retirement is reversible.
-- `zuzz-media.service`: static, inactive unless launched. Launch from the dock or `systemctl --user start zuzz-media.service`.
-- `dualsense-desktop-input.service`: enabled, active. Pointer mode live-verified via the `... forwarded` device node.
-- Return home: **PS button** emits `KEY_F14` (keysym `XF86Launch5`); a GNOME custom shortcut runs `scripts/return-home.sh`, which stops the fullscreen-application units.
-- Display: `text-scaling-factor` 1.5, `cursor-size` 48, dock pinned open with 64px icons, favourites Zuzz/Firefox/Kodi.
-- SSH active; tty1-6 available; GDM autologin unchanged.
-
-### Install and revert
-
-- Install or refresh: `scripts/install-desktop-home.sh` (idempotent; never enables `media-home.service`).
-- Revert to Kodi-first: `systemctl --user enable --now media-home.service`, `systemctl --user reset-failed media-home.service`, `scripts/configure-desktop-home.sh --revert`. Validated in both directions.
-- Full detail in `docs/desktop-home.md`.
-
-### Defects found and fixed this session
-
-1. `media-home.service` failed on every stop (Kodi child outliving the kill timeout) — made unreachable by deleting every code path that stops it.
-2. `zuzz-media.service` failed on every clean stop — `--restore` propagated `input-remapper-control`'s non-zero exit when the controller was absent; now best-effort.
-3. **input-remapper had never actually injected.** The CLI printed success while the daemon rejected every request because `config.json` was missing and no client had called `set_config_dir`. Never caught because Spec 008 validated native joystick input in Kodi, a different path.
-4. Pointer mode was tied to the browser lifecycle, so the desktop home was unnavigable — a circular dependency introduced by Spec 015 and fixed with a login service.
-5. No controller-only exit from kiosk mode existed. Alt+F4 via an L2+R2 chord failed; the PS button on `KEY_F13` opened Settings because xkb maps `FK13` to `XF86Tools` and GNOME matches on keysym. Fixed with `KEY_F14`/`XF86Launch5`.
-6. `configure-desktop-home.sh` captured its rollback baseline per file rather than per key, so settings added later would have been unrevertable.
+- Up since **2026-09-29 19:16:42**. Boots to the GNOME desktop with automatic login.
+- `media-home.service`: installed, **disabled**, inactive. Kodi still installed, so
+  the Spec 015 retirement remains reversible.
+- `steam-bigpicture.service`: `static`, inactive unless launched. Verified post-reboot
+  to start, reach Big Picture (`uimode=4`), and stop cleanly in 16s with no orphans.
+- **The DualSense is disconnected and did not wake on its own.** `dualsense-media-mode.sh
+  status` reports NOT CONNECTED. Likely a flat battery; charge over USB. Note the
+  script prints the controller's Bluetooth address at runtime -- never paste that into
+  a tracked file, a commit, or a PR.
+- GSConnect enabled. SSH active. Return home: PS button -> `KEY_F14` -> `scripts/return-home.sh`.
+- Display settings now: `text-scaling-factor` **1.0** (the 1.5 setting and the 80%
+  browser zoom are both superseded), `cursor-size` 48, dock icons 64.
 
 ### Known issues and loose ends
 
-- ShellCheck is not installed, so no ShellCheck result is claimed anywhere in this project.
-- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media` (123 MB). Left deliberately; delete only on the owner's instruction. Brave itself is untouched.
-- `~/.config/input-remapper-2/config.json` is generated at runtime and intentionally untracked.
-- The appliance's DHCP address drifted from `192.168.1.203` to `192.168.1.204`; the router-side reservation remains an outstanding external action.
-- Turn pointer mode off before any Steam work (`dualsense-media-mode.sh off`) so Steam Input receives the native controller alone. That remains Spec 011's checkpoint.
-
-### REBOOT ISSUED 2026-09-05 — run these first on reconnect
-
-Rebooted to make the newly installed GSConnect extension visible to GNOME Shell;
-Wayland cannot restart the shell in place. This session runs on the appliance via
-VS Code Remote SSH and ended with the reboot.
-
-Pre-reboot state: boot `2026-09-05 00:32:11`, host `192.168.1.204` on `enp3s0`,
-SSH enabled/active, GSConnect `71-1ubuntu1` installed but not visible to the
-session, `media-home.service` disabled, DualSense paired but NOT connected
-(suspected flat battery, on charge), Wi-Fi still rfkill soft-blocked.
-
-```
-uptime -s                                   # must differ from 2026-09-05 00:32:11
-systemctl is-active ssh                     # active
-gnome-extensions list | grep gsconnect      # should now be VISIBLE
-gnome-extensions list --enabled | grep gsconnect   # probably not yet enabled
-systemctl --user is-enabled media-home.service     # disabled
-bluetoothctl devices Connected              # did the DualSense come back?
-rfkill list wifi                            # still soft blocked?
-```
-
-Then continue Spec 016:
-
-```
-bash scripts/install-gsconnect.sh           # now enables the extension
-bash scripts/configure-gsconnect.sh --status
-# pair the phone, then IMMEDIATELY:
-bash scripts/configure-gsconnect.sh --apply
-bash scripts/configure-gsconnect.sh --harden
-```
-
-**Do not pair before the policy script is ready to run.** `Share.receive-files`,
-`SFTP.automount`, `Notification.send-notifications` and `Contacts.contacts-source`
-all ship enabled, and plugin state is per-device so it cannot be pre-applied.
-
-### REBOOT ISSUED for Spec 016 T010 — verify these on reconnect
-
-Rebooted to confirm the GSConnect pairing survives a restart. Pre-reboot:
-extension enabled, port 1716 listening, device `<redacted-device-id>`
-(Galaxy Tab A11) paired, `discoverable` false, DualSense connected,
-`media-home.service` disabled. Branch `feature/0.016-gsconnect-remote-input`,
-2 tasks open (T010, T015).
-
-```
-uptime -s
-gnome-extensions list --enabled | grep gsconnect     # still enabled?
-ss -tuln | grep 1716                                 # daemon listening again?
-gsettings get org.gnome.Shell.Extensions.GSConnect.Device:\
-  /org/gnome/shell/extensions/gsconnect/device/<redacted-device-id>/ paired
-gsettings get org.gnome.Shell.Extensions.GSConnect discoverable   # must stay false
-bash scripts/configure-gsconnect.sh --status         # policy must survive
-bluetoothctl devices Connected                       # DualSense back?
-```
-
-If pairing survived, T010 passes. If not, document the reconnection procedure
-instead — the specification allows either, but it must be one or the other.
-Then T015: pre-PR checks, update progress and handoff, open the PR.
+- **Disk is at 90%, 23 GB free of 233 GB.** Cause is `~/Downloads` at **161 GB**,
+  not Steam (8.6 GB). Nothing was deleted; it is the owner's data. A large game
+  install could now fail for reasons that look like a Steam fault and are not.
+- **20 Universe/Multiverse security updates are accepted as unpatched.** The owner
+  has decided against Ubuntu Pro, which was the only patch path. Do not re-propose
+  it each month. Real exposure is narrow: Brave has no system `libavcodec` linkage
+  and Firefox is a confined snap, so the browser path never touches them.
+- Five `-updates` packages pending (`openssh` x3, `libmp3lame0` x2), all non-security,
+  deliberately not installed. The installed OpenSSH already has the recent CVE fixes.
+- `glx: failed to create dri3 screen` and `failed to load driver: nvidia-drm` on every
+  Steam start. Benign in practice -- games ran fine -- but not proven harmless.
+- `pactl: not found` in Steam's journal is cosmetic; `pipewire-pulse` is running and
+  game audio is unaffected. `pulseaudio-utils` is intentionally not installed.
+- ShellCheck is still not installed, so no ShellCheck result is claimed anywhere.
+- Tailscale is installed on the appliance but appears in no specification and in no
+  progress entry -- an undocumented remote-access path worth specifying or removing.
+- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media`.
+  Left deliberately; delete only on the owner's instruction.
+- The appliance's DHCP address has drifted before; the router-side reservation is
+  still an outstanding external action.
 
 ### Recommended next actions
 
-1. Push both branches and open the pull requests, 009 first, then 015.
-2. After merge, start Spec 016 on its own branch: write `plan.md` and `tasks.md`, then install GSConnect and pair the Android phone. This closes the appliance's last major usability gap, text entry without a physical keyboard.
-3. Spec 011 (Steam) is the remaining roadmap feature, now simplified to launch-from and exit-to the desktop, and it should extend `scripts/return-home.sh`'s `units` array.
+1. Merge the Spec 011 PR once reviewed.
+2. When someone is physically at the appliance with a charged controller, close
+   T013 and T014 -- they are two short checks, not a work item.
+3. Decide on `~/Downloads`; 23 GB free is the appliance's most pressing practical risk.
+4. Then Spec 012 (`home-launcher-return-home`) or Spec 013
+   (`boot-recovery-reproducibility-polish`), both of which have only `spec.md` and
+   need `plan.md` and `tasks.md`.

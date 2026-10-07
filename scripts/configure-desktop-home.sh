@@ -28,13 +28,18 @@ readonly keybinding_key='XF86Launch5'
 # No Steam entry: steam.desktop does not exist until Spec 011 installs it, and a
 # favourite pointing at a missing desktop file renders as a blank tile.
 readonly settings=(
-    "org.gnome.desktop.interface${sep}text-scaling-factor${sep}1.5"
+    # Trialled at 1.5 and accepted on 2026-09-05, then reverted to 1.0 on
+    # 2026-09-06: the owner found the projector legible without it, and 1.5 was
+    # squeezing web page layout (browsers apply this to web content, not just
+    # their own chrome). Cursor and dock icons stay enlarged - those help at
+    # projector distance without affecting how sites lay themselves out.
+    "org.gnome.desktop.interface${sep}text-scaling-factor${sep}1.0"
     "org.gnome.desktop.interface${sep}cursor-size${sep}48"
     # Brave is kept in the dock deliberately. Spec 016 requires proving that
     # phone-based typing works in a Chromium browser, since Chromium's Wayland
     # text-input behaviour is what defeated the on-screen keyboard in Spec 009.
     # Losing the launcher would make that acceptance untestable from the couch.
-    "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'firefox_firefox.desktop', 'brave-browser.desktop', 'kodi.desktop']"
+    "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'brave-browser.desktop', 'firefox_firefox.desktop', 'steam-bigpicture.desktop', 'kodi.desktop']"
     # The dock auto-hides by default, which means hunting for a screen edge with
     # a controller stick from across the room. Pin it open and enlarge the icons.
     "org.gnome.shell.extensions.dash-to-dock${sep}dock-fixed${sep}true"

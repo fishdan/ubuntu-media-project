@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Steam Big Picture
+Comment=Launch Steam in Big Picture with the controller handed to Steam Input
+Exec=systemctl --user start steam-bigpicture.service
+Icon=steam
+Terminal=false
+Categories=Game;
