@@ -1,0 +1,24 @@
+# Read-only network media from nathan (192.168.1.163:/data/media).
+#
+# Deliberately has NO [Install] section. This unit is never enabled and nothing
+# mounts at boot; media_remote.automount triggers it on first access. That is the
+# whole point: a media server that is powered off must be an empty folder, not a
+# stalled boot. See docs/network-media.md.
+[Unit]
+Description=Read-only network media from nathan
+Documentation=https://github.com/fishdan/ubuntu-media-project/blob/main/docs/network-media.md
+
+[Mount]
+What=192.168.1.163:/data/media
+Where=/media_remote
+Type=nfs
+# ro        - the appliance auto-logs in with no password; nothing in the living
+#             room may alter the library. Enforced server-side too.
+# soft      - on a read-only mount there are no writes to corrupt, so the usual
+#             reason to prefer 'hard' does not apply. With 'hard', a server that
+#             vanishes mid-playback leaves the player in uninterruptible I/O and
+#             the PS button cannot close it. 'soft' turns that into a reportable
+#             error. timeo is deciseconds: 5s x 3 retries ~= 15s to fail.
+# _netdev   - marks this as network-backed for ordering sanity.
+Options=ro,soft,timeo=50,retrans=3,nfsvers=4.2,_netdev
+TimeoutSec=20

@@ -1,0 +1,18 @@
+# Trigger for media_remote.mount. THIS is the unit that gets enabled.
+#
+# Nothing is mounted at boot, so no boot or login unit can ever wait on the media
+# server. The kernel mounts on first access to /media_remote and unmounts after
+# an idle period. This also makes recovery automatic: once the server returns,
+# the next access mounts it again with no command and no reboot.
+[Unit]
+Description=Automount read-only network media from nathan
+Documentation=https://github.com/fishdan/ubuntu-media-project/blob/main/docs/network-media.md
+
+[Automount]
+Where=/media_remote
+# Generous on purpose: a short idle timeout could unmount under a paused player,
+# and an idle mounted NFS share costs nothing.
+TimeoutIdleSec=1800
+
+[Install]
+WantedBy=multi-user.target

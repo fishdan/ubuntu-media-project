@@ -15,7 +15,12 @@
 
 ## Owner decisions captured 2026-10-07
 
-- **Server:** a Linux machine the owner controls.
+- **Server:** `nathan` at **192.168.1.163**, Ubuntu 26.04.1 LTS, a Linux machine the owner controls.
+  **`bubuntu` (192.168.1.10) was evaluated first and rejected on capacity.** The owner recalled a
+  terabyte-class disk; `bubuntu` has two disks as remembered, one spinning and one SSD, but the
+  spinning one is a 160 GB `WDC WD1600JS` with 139 GB free, not a terabyte. The 1.8 TB disk is on
+  `nathan`, mounted at `/data` with **1.7 TB free**. `nathan` is the better host on every axis: far
+  more space, the same Ubuntu release as the appliance, and `/data` already mounted `noatime`.
 - **Protocol:** NFS. No credentials to store, best throughput, and it is what Spec 007 scoped
   before deferring. SMB is explicitly not used, which keeps a credentials file out of the picture
   entirely and so out of any conflict with the constitution's no-secrets rule.
@@ -32,17 +37,20 @@
   share sidesteps this rather than worsening it, which is a secondary benefit of this feature.
 - Session is GNOME Wayland with automatic login for `dfish`.
 
-## Required inputs, not yet supplied
+## Required inputs — supplied 2026-10-07
 
-These block implementation and must be collected before any mount is configured, exactly as
-Spec 007 required:
-
-1. The server's **hostname or LAN address**, and whether it has a DHCP reservation. The appliance's
-   own address has drifted before, so a server address that drifts would present as the library
-   vanishing.
-2. The **export path** on the server.
-3. The **local mount point** on the appliance.
-4. Whether the server's NFS export already exists or must also be configured.
+1. **Server:** `nathan`, `192.168.1.163`. **No DHCP reservation is known to exist**, and this is
+   recorded as a live fragility rather than glossed: the appliance's own address has drifted twice
+   in this project, and a server address that drifts would present to the owner as the media
+   library vanishing. The mount hardcodes the address.
+2. **Export path:** `/data/media`, a new subdirectory of the existing 1.8 TB `/data` mount. A
+   subdirectory rather than `/data` itself, so `lost+found` and the pre-existing `projects`
+   directory stay out of the share and the disk remains free for other uses.
+3. **Local mount point:** `/media_remote`, as the owner specified.
+4. **The export did not exist.** Neither candidate server had `nfs-kernel-server` installed and
+   neither had an `/etc/exports`. Server-side configuration was therefore required, which the
+   original Out of Scope section excluded — **the owner asked for it explicitly on 2026-10-07**, so
+   it is now in scope and tracked in `scripts/configure-media-server.sh`.
 
 ## Acceptance Criteria
 
@@ -87,8 +95,11 @@ being run, so:
 
 - Writing to the share, or any download-to-share workflow.
 - SMB/CIFS, sshfs, or any protocol other than NFS.
-- Configuring the Linux server's exports, unless the owner asks — the server is a separate machine
-  and this repository configures the appliance.
+- ~~Configuring the Linux server's exports~~ — **brought into scope on 2026-10-07 at the owner's
+  request**, since neither candidate server had NFS installed. Handled by the one deliberately
+  server-side script in this repository, `scripts/configure-media-server.sh`, which carries a
+  header saying so. Still out of scope: anything else about `nathan`, which runs n8n, Caddy,
+  Cloudflare Tunnel, MariaDB, PostgreSQL, Docker and NoMachine that this project does not describe.
 - A media library database, scraping, or metadata. This is a folder of files.
 - Restoring the retired Kodi-first home. Kodi may *play* from the share; it is not becoming the
   home again.

@@ -1,5 +1,15 @@
 # Feature Specification: Desktop-First Home and Kodi Retirement
 
+> **Amended 2026-10-07 by Spec 017.** This specification's statement that "NFS and network media
+> were never implemented and are not reintroduced" is **no longer true.** The owner reintroduced
+> network media on 2026-10-07; `nathan`'s `/data/media` is now exported read-only over NFS and
+> mounted at `/media_remote`. See `specs/0/0.017-network-media-share/`.
+>
+> The reasoning here still largely holds and is not being disowned: the appliance holds no local
+> media library, and Kodi remains retired. The media lives on another machine and is only read
+> over the LAN. What changed is that video now decodes locally again, which has a security
+> consequence recorded in Spec 017 and in `docs/network-media.md`.
+
 **Status**: Complete (pending PR)
 
 Replace the Kodi-first media home with the ordinary GNOME desktop as the appliance's home experience. The project owner has confirmed there will never be a local media library, which removes Kodi's primary value and leaves it acting only as a launcher shell. Booting to the desktop and launching streaming or gaming applications directly deletes the session stop/restore orchestration that has been the most failure-prone part of the appliance.
