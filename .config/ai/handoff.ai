@@ -1,77 +1,101 @@
 # Handoff
 
-## 2026-10-07 — Spec 011 pushed and under PR; two controller tasks backlogged
+## 2026-10-07 — Spec 017 network media share live; T008 reboot test is the top priority
 
 Supersedes all earlier handoff entries. The durable history is in `progress.ai`;
 this file is current state only.
 
 ### Branch and repository state
 
-- Branch: `feature/0.011-steam-big-picture`, 11 commits ahead of `main`, 0 behind.
-  `main` is an ancestor, so no rebase is needed and the PR merges cleanly.
-- **The previous handoff was a month stale and wrongly claimed nothing had been
-  pushed.** Specs 009, 015 and 016 were in fact merged as PRs #7 through #11.
-  `main` is at the PR #10 merge. Do not trust an old handoff over `git`.
-- Specs 003-009 and 015-016 are merged. Spec 011 is the only feature in flight.
+- Branch: `feature/0.017-network-media-share`. `main` is at the PR #12 merge.
+- Spec 011 (Steam) merged as PR #12. Specs 003-009, 011, 015 and 016 are all merged.
+  All merged feature branches were pruned locally and on the remote on 2026-10-07.
+- **Do not trust an old handoff over `git`.** The previous one was a month stale and
+  wrongly claimed nothing had been pushed.
 
 ### Status
 
-- **Spec 011 (Steam Big Picture): 13 tasks done, 3 partial, PR open.** Installed,
-  launching from the dock into Big Picture, signed in, games played and accepted.
-- **T013 and T014 are backlogged by owner decision, not forgotten.** Both need a
-  physically present person with a woken DualSense:
-  - **T013** — press the PS button *while Steam is actually running*. Never done;
-    the owner has only ever exited through Steam's own menu, so `return-home`'s
-    Steam unit-matching path has still never been exercised from the couch.
-  - **T014** — the media-mode off/on hand-off across a reboot. Everything else in
-    T014 is verified; only the controller transition is outstanding.
-- **T015** stays documented-but-unexecuted on purpose: running it would destroy a
-  working installation and the owner's games to test an outcome not in doubt.
+- **Spec 017 (network media share): implemented and working; owner acceptance outstanding.**
+  11 of 17 tasks done. `/media_remote` is live, read-only, serving `nathan:/data/media`.
+- **T008 is the top priority and is NOT done.** It confirms that an unreachable
+  media server cannot block boot or graphical login -- the constitutional
+  requirement this whole design exists to satisfy. It needs a reboot with the
+  server unreachable, which could not be done from a remote session that would
+  have ended before the result could be seen. The dependency structure was
+  inspected and supports the design, but that is an argument, not evidence.
+- **T011/T012 need the owner in the living room**: browse the share in Files, then
+  play a video full screen with audio through the projector and receiver. A test
+  clip is already in place at `/media_remote/_test-pattern-1080p.mp4` (30s, 1080p,
+  440 Hz tone) so nothing has to be found first.
+- **T010** (server vanishing mid-playback) also needs the display.
+- **Spec 011 T013/T014 remain backlogged** by owner decision, both needing a woken
+  DualSense and someone at the appliance.
 
 ### Current appliance state
 
-- Up since **2026-09-29 19:16:42**. Boots to the GNOME desktop with automatic login.
-- `media-home.service`: installed, **disabled**, inactive. Kodi still installed, so
-  the Spec 015 retirement remains reversible.
-- `steam-bigpicture.service`: `static`, inactive unless launched. Verified post-reboot
-  to start, reach Big Picture (`uimode=4`), and stop cleanly in 16s with no orphans.
-- **The DualSense is disconnected and did not wake on its own.** `dualsense-media-mode.sh
-  status` reports NOT CONNECTED. Likely a flat battery; charge over USB. Note the
-  script prints the controller's Bluetooth address at runtime -- never paste that into
-  a tracked file, a commit, or a PR.
-- GSConnect enabled. SSH active. Return home: PS button -> `KEY_F14` -> `scripts/return-home.sh`.
-- Display settings now: `text-scaling-factor` **1.0** (the 1.5 setting and the 80%
-  browser zoom are both superseded), `cursor-size` 48, dock icons 64.
+- Up since 2026-09-29. Boots to the GNOME desktop with automatic login.
+- `/media_remote` is reachable from the couch four ways -- Files sidebar bookmark,
+  desktop icon, dock favourite, Activities search -- all running `nautilus
+  /media_remote`. Clicking any of them is also the reconnect path, since touching
+  the path triggers the automount.
+- `/media_remote`: `media_remote.automount` enabled and active; `media_remote.mount`
+  is `static` and **must never be enabled** -- that would reintroduce a boot
+  dependency on the media server. The install script aborts if it ever is.
+- Read 115 MB/s cold over wired gigabit; read-only verified by a failed write.
+- `media-home.service` disabled/inactive. Kodi installed, retired, launchable.
+- `steam-bigpicture.service` static. GSConnect enabled. SSH active.
+- **The DualSense is disconnected** and did not wake; likely a flat battery.
+  `dualsense-media-mode.sh status` prints the controller's Bluetooth address at
+  runtime -- never paste that into a tracked file, a commit, or a PR.
+
+### Media server
+
+- `nathan`, `192.168.1.163`, Ubuntu 26.04.1. SSH as `dfish` with passwordless sudo.
+- Exports `/data/media` read-only to `192.168.1.0/24`. 1.8 TB disk, 1.7 TB free.
+- Add media there, on `nathan`. The appliance can read but never write.
+- `bubuntu` (192.168.1.10) was evaluated and rejected: its spinning disk is 160 GB,
+  not the terabyte it was thought to be. Nothing was changed on `bubuntu`.
+
+### Open decision for the owner
+
+**The tracked dock favourites do not match the machine.**
+`scripts/configure-desktop-home.sh` sets five (`zuzz`, `brave-browser`,
+`firefox_firefox`, `steam-bigpicture`, `kodi`); the live dock had three --
+`zuzz` and `firefox_firefox` had been removed by hand, though all five desktop
+files still resolve. Re-running that script would restore them. Either re-add
+them to the dock or update the script; until then the tracked configuration is
+knowingly out of step. Spec 017 appends its own favourite rather than setting
+the list, so it does not pre-empt the choice.
 
 ### Known issues and loose ends
 
-- **Disk is at 90%, 23 GB free of 233 GB.** Cause is `~/Downloads` at **161 GB**,
-  not Steam (8.6 GB). Nothing was deleted; it is the owner's data. A large game
-  install could now fail for reasons that look like a Steam fault and are not.
-- **20 Universe/Multiverse security updates are accepted as unpatched.** The owner
-  has decided against Ubuntu Pro, which was the only patch path. Do not re-propose
-  it each month. Real exposure is narrow: Brave has no system `libavcodec` linkage
-  and Firefox is a confined snap, so the browser path never touches them.
-- Five `-updates` packages pending (`openssh` x3, `libmp3lame0` x2), all non-security,
-  deliberately not installed. The installed OpenSSH already has the recent CVE fixes.
-- `glx: failed to create dri3 screen` and `failed to load driver: nvidia-drm` on every
-  Steam start. Benign in practice -- games ran fine -- but not proven harmless.
-- `pactl: not found` in Steam's journal is cosmetic; `pipewire-pulse` is running and
-  game audio is unaffected. `pulseaudio-utils` is intentionally not installed.
+- **`nathan` has no DHCP reservation** and its address is hardcoded in the mount
+  unit. A drift would present as the media library vanishing. Router-side
+  reservation recommended -- external action.
+- **`nathan` runs Caddy and Cloudflare Tunnel**, so part of it is internet-published.
+  The NFS export is LAN-only; keep `/data/media` out of any tunnel config.
+- **The security audit was amended on 2026-10-07** because this feature re-enters the
+  unpatched decode path. 20 Universe/Multiverse media libraries stay unpatched; Pro
+  remains declined and should not be re-proposed monthly. But the earlier conclusion
+  that exposure was "close to unreachable" no longer holds, since VLC, Kodi and the
+  GStreamer thumbnailer now decode files from the share. If the share ever holds
+  untrusted files, reconsider Pro.
+- **Appliance disk is at 90%, 23 GB free**, caused by **161 GB in `~/Downloads`**.
+  Not Steam. The network share sidesteps this rather than worsening it.
+- Watch for stray `iptables` DROP rules before blaming NFS: a leftover rule on
+  2049 imitated a dead server convincingly during development and cost a long
+  diagnosis. `sudo iptables -S OUTPUT | grep 2049` should return nothing.
+- `soft` does not bound the *initial* NFS mount attempt; `TimeoutSec=20` on the
+  mount unit does. A dead server blocks first access for up to 20s, then fails.
+- Five `-updates` packages pending (`openssh` x3, `libmp3lame0` x2), all non-security.
 - ShellCheck is still not installed, so no ShellCheck result is claimed anywhere.
-- Tailscale is installed on the appliance but appears in no specification and in no
-  progress entry -- an undocumented remote-access path worth specifying or removing.
-- The old Brave media profile remains at `~/.local/share/ubuntu-media-project/brave-media`.
-  Left deliberately; delete only on the owner's instruction.
-- The appliance's DHCP address has drifted before; the router-side reservation is
-  still an outstanding external action.
+- Tailscale is on both machines but appears in no specification.
 
 ### Recommended next actions
 
-1. Merge the Spec 011 PR once reviewed.
-2. When someone is physically at the appliance with a charged controller, close
-   T013 and T014 -- they are two short checks, not a work item.
-3. Decide on `~/Downloads`; 23 GB free is the appliance's most pressing practical risk.
-4. Then Spec 012 (`home-launcher-return-home`) or Spec 013
-   (`boot-recovery-reproducibility-polish`), both of which have only `spec.md` and
-   need `plan.md` and `tasks.md`.
+1. **T008**: reboot the appliance with `nathan` unreachable (or NFS blocked) and
+   confirm the desktop and SSH come up normally. Then T009 properly, by powering
+   the server down and back up.
+2. Owner acceptance T011/T012 from the couch, using the test clip.
+3. Open/merge the Spec 017 PR, then add real media to `nathan:/data/media`.
+4. Decide on `~/Downloads`, and on a DHCP reservation for `nathan`.
