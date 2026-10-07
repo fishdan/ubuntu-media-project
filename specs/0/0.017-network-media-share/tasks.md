@@ -55,10 +55,16 @@ failed boot in the living room.
   **Accepted 2026-10-07.** The owner played `_test-pattern-1080p.mp4` from the share and reported it
   "worked great". The link was wired Ethernet (`enp3s0` at 1000 Mb/s); Wi-Fi was down throughout, so
   nothing here speaks to Wi-Fi playback.
-  Honest scope of that result: the test clip is a 30-second synthetic 1080p H.264 pattern with a
-  440 Hz tone, about 20 MB. It proves the path end to end -- mount, decode, projector, receiver --
-  but it is not a demanding bitrate and says nothing about sustained playback of a large x265 file.
-  The 1080p x265 library moved in on 2026-10-07 is the real test of that.
+  **Confirmed again on the real library, which is the result that actually matters.** The initial
+  acceptance was on a 30-second synthetic 1080p H.264 clip of about 20 MB -- enough to prove the
+  path end to end but not a demanding bitrate, and it said nothing about sustaining a large x265
+  file on a GTX 1060 with 3 GB of VRAM. That gap was flagged rather than glossed.
+  The owner has since watched episodes from the moved 1080p x265 library and reported they "play
+  fine -- no problem". Corroborated from the client and server counters rather than taken on
+  trust: **5.73 GB read over NFS across 21,875 READ operations with zero timeouts, zero
+  retransmissions and zero errors**, and `nathan` reporting 5.78 GB served. The `soft`/`timeo`
+  safety net never had to engage, so the wired gigabit path is comfortably ahead of the demand.
+  Sustained x265 playback from the share is therefore proven, not assumed.
 
 ## Phase 5 — Document and close
 
