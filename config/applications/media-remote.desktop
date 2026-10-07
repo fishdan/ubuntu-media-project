@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Media
+Comment=Read-only network media from nathan
+# Opens the mount point in GNOME Files. Touching the path is what triggers the
+# automount, so clicking this is also what brings the share up after the server
+# has been away -- there is no separate "reconnect" step.
+Exec=nautilus /media_remote
+Icon=folder-remote
+Terminal=false
+Categories=AudioVideo;Video;
+StartupNotify=true

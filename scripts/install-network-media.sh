@@ -38,6 +38,18 @@ revert() {
   for u in "$AUTO_UNIT" "$MOUNT_UNIT"; do
     [ -e "$UNIT_DST/$u" ] && { sudo rm -f "$UNIT_DST/$u"; log "   removed $u"; }
   done
+  # Shortcuts, so a revert does not leave launchers pointing at a dead path.
+  rm -f "$HOME/.local/share/applications/media-remote.desktop" "$HOME/Desktop/media-remote.desktop"
+  if [ -f "$HOME/.config/gtk-3.0/bookmarks" ]; then
+    grep -v "^file:///media_remote" "$HOME/.config/gtk-3.0/bookmarks" > "$HOME/.config/gtk-3.0/bookmarks.tmp" 2>/dev/null || true
+    mv "$HOME/.config/gtk-3.0/bookmarks.tmp" "$HOME/.config/gtk-3.0/bookmarks"
+  fi
+  if command -v gsettings >/dev/null; then
+    cur="$(gsettings get org.gnome.shell favorite-apps 2>/dev/null || echo "@as []")"
+    new="$(printf '%s' "$cur" | sed "s/, *'media-remote.desktop'//; s/'media-remote.desktop', *//; s/\['media-remote.desktop'\]/@as []/")"
+    gsettings set org.gnome.shell favorite-apps "$new" 2>/dev/null || true
+  fi
+  log "   removed shortcuts (bookmark, desktop icon, dock favourite)"
   sudo systemctl daemon-reload
   # Leave the empty directory and nfs-common in place; removing the package could
   # affect anything else using NFS, and an empty directory is harmless.
@@ -100,7 +112,67 @@ if systemctl is-enabled "$MOUNT_UNIT" 2>/dev/null | grep -q enabled; then
   die "$MOUNT_UNIT is enabled. It must NOT be: that would reintroduce a boot-time dependency on the media server."
 fi
 
-log "== 5. verify =="
+log "== 5. shortcuts =="
+# Without these the share is only reachable by typing a path into Files, which on
+# an appliance meant to run without a keyboard makes it effectively unreachable.
+DESKTOP_SRC="$REPO_ROOT/config/applications/media-remote.desktop"
+APP_DIR="$HOME/.local/share/applications"
+DESKTOP_DIR="$HOME/Desktop"
+BOOKMARKS="$HOME/.config/gtk-3.0/bookmarks"
+
+[ -f "$DESKTOP_SRC" ] || die "Missing tracked desktop entry: $DESKTOP_SRC"
+mkdir -p "$APP_DIR"
+if cmp -s "$DESKTOP_SRC" "$APP_DIR/media-remote.desktop"; then
+  log "   application entry unchanged"
+else
+  install -m 0644 "$DESKTOP_SRC" "$APP_DIR/media-remote.desktop"
+  log "   application entry deployed"
+fi
+
+# Files sidebar bookmark. Worth the most of the three: it also appears in every
+# open/save dialog, not just in Files.
+mkdir -p "$(dirname "$BOOKMARKS")"
+touch "$BOOKMARKS"
+if grep -qxF "file:///media_remote Media" "$BOOKMARKS"; then
+  log "   sidebar bookmark already present"
+else
+  # Drop any stale variant first so re-runs cannot accumulate duplicates.
+  grep -v "^file:///media_remote" "$BOOKMARKS" > "$BOOKMARKS.tmp" 2>/dev/null || true
+  mv "$BOOKMARKS.tmp" "$BOOKMARKS"
+  printf 'file:///media_remote Media\n' >> "$BOOKMARKS"
+  log "   sidebar bookmark added"
+fi
+
+# Desktop icon. The ding@rastersoft.com extension renders these, and GNOME will
+# refuse to launch a desktop entry it does not consider trusted, so set that too.
+if [ -d "$DESKTOP_DIR" ]; then
+  if cmp -s "$DESKTOP_SRC" "$DESKTOP_DIR/media-remote.desktop"; then
+    log "   desktop icon unchanged"
+  else
+    install -m 0755 "$DESKTOP_SRC" "$DESKTOP_DIR/media-remote.desktop"
+    log "   desktop icon deployed"
+  fi
+  # GNOME refuses to launch a desktop entry it does not consider trusted.
+  gio set "$DESKTOP_DIR/media-remote.desktop" metadata::trusted true 2>/dev/null || \
+    log "   (could not set trusted metadata; may need a right-click Allow Launching)"
+else
+  log "   no ~/Desktop; skipping desktop icon"
+fi
+
+# Dock favourite. Appended to whatever is actually there rather than replacing the
+# list, so this cannot quietly undo a favourite the owner removed by hand.
+if command -v gsettings >/dev/null; then
+  current="$(gsettings get org.gnome.shell favorite-apps 2>/dev/null || echo "@as []")"
+  if printf '%s' "$current" | grep -q "media-remote.desktop"; then
+    log "   dock favourite already present"
+  else
+    updated="$(printf '%s' "$current" | sed "s/]$/, 'media-remote.desktop']/; s/^@as \[\]$/['media-remote.desktop']/")"
+    gsettings set org.gnome.shell favorite-apps "$updated" 2>/dev/null && \
+      log "   dock favourite added" || log "   (could not set dock favourite)"
+  fi
+fi
+
+log "== 6. verify =="
 log "   automount : $(systemctl is-active "$AUTO_UNIT")"
 log "   mounted now: $(findmnt -rn "$MOUNT_POINT" >/dev/null 2>&1 && echo yes || echo 'no (correct - mounts on access)')"
 log "Done. Browse $MOUNT_POINT to trigger the mount."

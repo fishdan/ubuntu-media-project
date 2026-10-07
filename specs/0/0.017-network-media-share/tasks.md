@@ -69,6 +69,35 @@ failed boot in the living room.
   tracked scripts, `systemd-analyze verify` on all units, `git diff --check`; update `progress.ai`
   and `handoff.ai`; open the pull request.
 
+## Added 2026-10-07 after owner review
+
+- [x] T018 **Make the share reachable without a keyboard.** The mount satisfied the
+  specification's "browsable in Files" criterion while being practically unreachable from the
+  couch, which the owner caught. Added a tracked `media-remote.desktop` and deployed it four ways
+  from the installer: a Files sidebar bookmark (also visible in every open/save dialog), a desktop
+  icon, a dock favourite, and an Activities search entry. All run `nautilus /media_remote`, and
+  since touching the path triggers the automount, clicking any of them is also the reconnect path.
+  The desktop icon gets `metadata::trusted true`, without which GNOME shows it as inert.
+  Idempotent: re-runs report "unchanged" and cannot duplicate the bookmark. The revert removes all
+  four and was verified to restore the dock and bookmarks exactly as they were.
+  `desktop-file-validate` passes with no warnings.
+  **The dock favourite is appended, never set as a list**, so it cannot undo a favourite the owner
+  removed by hand -- see the drift finding below.
+
+## Finding: tracked dock favourites no longer match the machine
+
+`scripts/configure-desktop-home.sh` sets five favourites outright
+(`zuzz`, `brave-browser`, `firefox_firefox`, `steam-bigpicture`, `kodi`), but the live dock held
+only three -- `brave-browser`, `steam-bigpicture`, `kodi`.
+
+**All five desktop files exist and resolve**, so this was not GNOME dropping a broken entry. The
+two were removed deliberately, by hand, and the tracked script was never updated. Re-running that
+script would restore them.
+
+Not resolved here, because it is the owner's call which side is right: re-add `zuzz` and
+`firefox` to the dock, or update the tracked script to match the machine. Flagged rather than
+silently decided, and the new media favourite was appended so neither choice is pre-empted.
+
 ## Explicitly not in this feature
 
 - Writing to the share, or downloading into it.

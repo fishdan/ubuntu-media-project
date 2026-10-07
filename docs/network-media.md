@@ -30,6 +30,33 @@ adds one read-only export for `192.168.1.0/24`. It keeps a recovery copy at
 `/etc/exports.before-media-appliance` and refuses to proceed if `/data/media` is already exported
 with different options.
 
+## Getting to it without a keyboard
+
+A mount alone is not reachable from the couch -- it would mean typing a path into
+Files. Four shortcuts are deployed by the installer and tracked in
+`config/applications/media-remote.desktop`:
+
+| Where | What |
+|---|---|
+| **Files sidebar** | A "Media" bookmark. The most useful of the four: it also appears in every open/save dialog, not only in Files. |
+| **Desktop** | A "Media" icon, rendered by the `ding@rastersoft.com` extension. |
+| **Dock** | A "Media" favourite. |
+| **Activities search** | Searchable as "Media". |
+
+All four run `nautilus /media_remote`. Because touching the path is what triggers
+the automount, **clicking any of them is also what brings the share back after the
+server has been away** -- there is no separate reconnect step.
+
+The desktop icon carries `metadata::trusted true`, without which GNOME refuses to
+launch a desktop entry and shows it as inert. If it ever appears dead, right-click
+it and choose Allow Launching.
+
+**The dock favourite is appended to whatever is already there, never set as a whole
+list.** That matters: `configure-desktop-home.sh` from Spec 015 sets five
+favourites outright, and the live dock had only three because `zuzz.desktop` and
+`firefox_firefox.desktop` were removed by hand. Replacing the list would have
+silently undone that choice. See the note in that script.
+
 ## Why automount and not `/etc/fstab`
 
 **Because an unavailable media server must never block boot or graphical login.** The appliance

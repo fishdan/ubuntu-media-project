@@ -35,6 +35,11 @@ readonly settings=(
     # projector distance without affecting how sites lay themselves out.
     "org.gnome.desktop.interface${sep}text-scaling-factor${sep}1.0"
     "org.gnome.desktop.interface${sep}cursor-size${sep}48"
+    # NOTE 2026-10-07 (Spec 017): the live dock held only brave/steam/kodi -- 'zuzz'
+    # and 'firefox_firefox' had been removed by hand, though both desktop files still
+    # resolve. This line would restore them on the next run. Unresolved pending the
+    # owner's decision; Spec 017 appends its own favourite rather than setting the
+    # whole list so it cannot pre-empt that choice.
     # Brave is kept in the dock deliberately. Spec 016 requires proving that
     # phone-based typing works in a Chromium browser, since Chromium's Wayland
     # text-input behaviour is what defeated the on-screen keyboard in Spec 009.

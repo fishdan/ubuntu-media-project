@@ -34,6 +34,10 @@ this file is current state only.
 ### Current appliance state
 
 - Up since 2026-09-29. Boots to the GNOME desktop with automatic login.
+- `/media_remote` is reachable from the couch four ways -- Files sidebar bookmark,
+  desktop icon, dock favourite, Activities search -- all running `nautilus
+  /media_remote`. Clicking any of them is also the reconnect path, since touching
+  the path triggers the automount.
 - `/media_remote`: `media_remote.automount` enabled and active; `media_remote.mount`
   is `static` and **must never be enabled** -- that would reintroduce a boot
   dependency on the media server. The install script aborts if it ever is.
@@ -51,6 +55,17 @@ this file is current state only.
 - Add media there, on `nathan`. The appliance can read but never write.
 - `bubuntu` (192.168.1.10) was evaluated and rejected: its spinning disk is 160 GB,
   not the terabyte it was thought to be. Nothing was changed on `bubuntu`.
+
+### Open decision for the owner
+
+**The tracked dock favourites do not match the machine.**
+`scripts/configure-desktop-home.sh` sets five (`zuzz`, `brave-browser`,
+`firefox_firefox`, `steam-bigpicture`, `kodi`); the live dock had three --
+`zuzz` and `firefox_firefox` had been removed by hand, though all five desktop
+files still resolve. Re-running that script would restore them. Either re-add
+them to the dock or update the script; until then the tracked configuration is
+knowingly out of step. Spec 017 appends its own favourite rather than setting
+the list, so it does not pre-empt the choice.
 
 ### Known issues and loose ends
 
