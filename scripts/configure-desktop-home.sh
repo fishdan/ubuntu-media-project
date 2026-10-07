@@ -35,16 +35,29 @@ readonly settings=(
     # projector distance without affecting how sites lay themselves out.
     "org.gnome.desktop.interface${sep}text-scaling-factor${sep}1.0"
     "org.gnome.desktop.interface${sep}cursor-size${sep}48"
-    # NOTE 2026-10-07 (Spec 017): the live dock held only brave/steam/kodi -- 'zuzz'
-    # and 'firefox_firefox' had been removed by hand, though both desktop files still
-    # resolve. This line would restore them on the next run. Unresolved pending the
-    # owner's decision; Spec 017 appends its own favourite rather than setting the
-    # whole list so it cannot pre-empt that choice.
-    # Brave is kept in the dock deliberately. Spec 016 requires proving that
-    # phone-based typing works in a Chromium browser, since Chromium's Wayland
-    # text-input behaviour is what defeated the on-screen keyboard in Spec 009.
-    # Losing the launcher would make that acceptance untestable from the couch.
-    "org.gnome.shell${sep}favorite-apps${sep}['zuzz.desktop', 'brave-browser.desktop', 'firefox_firefox.desktop', 'steam-bigpicture.desktop', 'kodi.desktop']"
+    # Dock contents, reconciled to the machine on 2026-10-07 at the owner's
+    # direction: "I don't think we need those firefox things anymore".
+    #
+    # 'zuzz.desktop' and 'firefox_firefox.desktop' were dropped. They had already
+    # been removed from the live dock by hand some time after Spec 015, and this
+    # line was silently out of step -- it would have restored them on the next run.
+    # Both launchers still exist and resolve; only the dock pinning is gone, so
+    # either is still reachable from Activities. Nothing was uninstalled.
+    #
+    # Consequence worth knowing before re-reading Spec 015: its accepted T-task
+    # recorded "launched Zuzz from the dock". That acceptance stands as history,
+    # but it is no longer reproducible from the dock alone.
+    #
+    # Brave is kept deliberately. Spec 016 requires proving that phone-based typing
+    # works in a Chromium browser, since Chromium's Wayland text-input behaviour is
+    # what defeated the on-screen keyboard in Spec 009. Losing the launcher would
+    # make that acceptance untestable from the couch.
+    #
+    # 'media-remote.desktop' (Spec 017) is listed here so this script describes the
+    # whole intended dock rather than a stale subset -- the same precedent Spec 011
+    # set with 'steam-bigpicture.desktop'. The Spec 017 installer also appends it,
+    # idempotently, so neither script fights the other.
+    "org.gnome.shell${sep}favorite-apps${sep}['brave-browser.desktop', 'steam-bigpicture.desktop', 'kodi.desktop', 'media-remote.desktop']"
     # The dock auto-hides by default, which means hunting for a screen edge with
     # a controller stick from across the room. Pin it open and enlarge the icons.
     "org.gnome.shell.extensions.dash-to-dock${sep}dock-fixed${sep}true"

@@ -1,5 +1,16 @@
 # Progress Log
 
+## 2026-10-07 — Dock Favourites Reconciled to the Machine
+
+- Closed the drift found during Spec 017 T018. `scripts/configure-desktop-home.sh` declared five dock favourites while the live dock held three; `zuzz.desktop` and `firefox_firefox.desktop` had been removed by hand some time after Spec 015 and the script was never updated, so **the next `--apply` would have silently restored them**.
+- The owner's decision on 2026-10-07: "I don't think we need those firefox things anymore -- the desktop looks great." The tracked list is now reconciled **to the machine** rather than the machine to the script: `['brave-browser.desktop', 'steam-bigpicture.desktop', 'kodi.desktop', 'media-remote.desktop']`.
+- **Nothing was uninstalled and no launcher was deleted.** Only the dock pinning changed. `zuzz.desktop` and the Firefox snap's desktop entry both still exist and resolve, so either is still reachable from Activities. That distinction matters because Spec 009 exists entirely to make Zuzz work, and this is a dock-tidying decision, not a reversal of it.
+- `media-remote.desktop` was added to the same list so the script describes the whole intended dock rather than a stale subset — the precedent Spec 011 set when it put `steam-bigpicture.desktop` there. Spec 017's own installer also appends it idempotently, so the two scripts do not fight.
+- All four favourites were verified to resolve to real desktop files before committing, because the script's own comment warns that a favourite pointing at a missing desktop file renders as a blank tile. `--status` then reported every tracked setting matching its desired value, so `--apply` was deliberately **not** run: there was nothing to change, and running it would have been a no-op that only risked disturbing state.
+- **The rollback is unaffected, which was checked rather than assumed.** The baseline at `~/.local/state/ubuntu-media-project/desktop-home.baseline` exists and still holds the pre-Spec-015 `favorite-apps` value. Capture is per key and keeps the first value seen, so editing the script's *desired* value cannot overwrite the recorded original; `--revert` still restores the true pre-appliance dock.
+- Recorded as an amendment to Spec 015 as well, since its accepted task recorded "launched Zuzz from the dock". That acceptance stands as history but is no longer reproducible from the dock alone, and saying so is cheaper than letting a future reader conclude the dock regressed.
+- Deliberately **not** done: removing the Firefox snap, deleting `zuzz.desktop`, or retiring Spec 009. The owner's remark was about dock clutter; reading it as "uninstall Firefox" would be inventing scope.
+
 ## 2026-10-07 — Spec 017 T011/T012 Accepted; 161 GB Library Moved to nathan
 
 - **T012 accepted.** The owner played `_test-pattern-1080p.mp4` from the share and reported it "worked great". Wired Ethernet throughout (`enp3s0` at 1000 Mb/s); Wi-Fi was down, so nothing here speaks to Wi-Fi playback. **T011 accepted** implicitly, since reaching the clip required getting into the folder — the four shortcuts from T018 are what made that possible without a keyboard.

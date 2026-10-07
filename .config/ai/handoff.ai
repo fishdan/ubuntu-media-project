@@ -61,16 +61,15 @@ this file is current state only.
 - `bubuntu` (192.168.1.10) was evaluated and rejected: its spinning disk is 160 GB,
   not the terabyte it was thought to be. Nothing was changed on `bubuntu`.
 
-### Open decision for the owner
+### Resolved 2026-10-07: dock favourites
 
-**The tracked dock favourites do not match the machine.**
-`scripts/configure-desktop-home.sh` sets five (`zuzz`, `brave-browser`,
-`firefox_firefox`, `steam-bigpicture`, `kodi`); the live dock had three --
-`zuzz` and `firefox_firefox` had been removed by hand, though all five desktop
-files still resolve. Re-running that script would restore them. Either re-add
-them to the dock or update the script; until then the tracked configuration is
-knowingly out of step. Spec 017 appends its own favourite rather than setting
-the list, so it does not pre-empt the choice.
+The tracked/live drift is closed. `configure-desktop-home.sh` now declares
+`['brave-browser.desktop', 'steam-bigpicture.desktop', 'kodi.desktop',
+'media-remote.desktop']`, matching the machine exactly. The owner confirmed
+`zuzz` and `firefox_firefox` are not wanted in the dock. **Nothing was
+uninstalled** -- both launchers still exist and are reachable from Activities.
+The Spec 015 rollback baseline is unaffected; it still holds the pre-appliance
+value, so `--revert` works as before.
 
 ### Known issues and loose ends
 

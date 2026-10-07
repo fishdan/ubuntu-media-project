@@ -9,6 +9,14 @@
 > media library, and Kodi remains retired. The media lives on another machine and is only read
 > over the LAN. What changed is that video now decodes locally again, which has a security
 > consequence recorded in Spec 017 and in `docs/network-media.md`.
+>
+> **Also amended 2026-10-07:** the dock no longer pins `zuzz.desktop` or
+> `firefox_firefox.desktop`. The owner removed them by hand after this specification
+> was accepted and confirmed on 2026-10-07 that they are not wanted
+> ("I don't think we need those firefox things anymore"). This specification's
+> accepted task recording "launched Zuzz from the dock" stands as history, but is no
+> longer reproducible from the dock alone. Both launchers still exist and are
+> reachable from Activities; nothing was uninstalled.
 
 **Status**: Complete (pending PR)
 
