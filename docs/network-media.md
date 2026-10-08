@@ -13,6 +13,25 @@ Browse it in GNOME Files or open files in VLC like any local folder.
 
 Add media **on `nathan`**, in `/data/media`. The appliance can read but never write.
 
+## BSG playlist
+
+Open **Battlestar Galactica.xspf** on the desktop. It opens in VLC; VLC's **Next** control
+advances to the next video. The playlist contains all 172 BSG MKV files currently on the share.
+It follows the owner's watch order: miniseries; Seasons 1–2 through episode 17; Razor minisodes
+and Razor; the rest of Season 2; Resistance; Season 3 and Season 4 through episode 11; Face of
+the Enemy; Season 4 episodes 12–15; The Plan; the rest of Season 4; and Blood & Chrome.
+The Lowdown and the non-narrative featurettes follow at the end.
+
+After adding or removing BSG videos, rebuild the desktop playlist on the appliance:
+
+```bash
+python3 scripts/build-bsg-playlist.py
+```
+
+The script reads the mounted share and updates the playlist only when its contents change. It
+does not write to the read-only share. The playlist uses absolute `/media_remote` paths, so it
+works from the desktop while the share is mounted and can trigger the automount when opened.
+
 ## Install
 
 Two scripts, because two machines are involved.

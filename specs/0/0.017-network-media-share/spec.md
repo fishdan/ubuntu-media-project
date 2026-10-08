@@ -67,6 +67,10 @@
    documented revert.
 6. Read-only is enforced and verified by an actual failed write attempt, not by inspecting options.
 7. SSH, automatic login, the desktop, GSConnect and the DualSense are unaffected.
+8. The owner can open one desktop playlist in VLC and use Next to advance through every BSG
+   video on the mounted share. Narrative videos follow the owner's 2026-10-08 watch order,
+   including the optional minisodes and webisodes; non-narrative featurettes follow at the end.
+   Rebuilding the playlist after library changes is documented and idempotent.
 
 ## Security consequence that must be recorded, not glossed
 
