@@ -7,6 +7,9 @@
 - Moved the uncommitted BSG playlist, Spec 017 task, recovery evidence, and tech debt updates
   from the merged dock branch to `feature/0.017-bsg-playlist` based on that `origin/main`. The
   existing desktop XSPF remains in place; no media or appliance setting changed.
+- Committed the playlist work as `99d4576`, pushed the branch, and opened draft PR #17:
+  https://github.com/fishdan/ubuntu-media-project/pull/17. It remains draft pending owner
+  confirmation of VLC Next from the couch.
 
 ## 2026-10-08 — Spec 017 T008 Deferred as Tech Debt
 
