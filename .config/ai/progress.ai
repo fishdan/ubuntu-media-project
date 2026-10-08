@@ -1,5 +1,53 @@
 # Progress Log
 
+## 2026-10-08 — PRs #15 and #16 Merged; Playlist Work Moved to Its Own Branch
+
+- Confirmed PR #15 (sustained x265 playback evidence) and PR #16 (dock favourites) merged into
+  `main` on 2026-10-08. Fetched `origin/main` at merge commit `6e29dc2`.
+- Moved the uncommitted BSG playlist, Spec 017 task, recovery evidence, and tech debt updates
+  from the merged dock branch to `feature/0.017-bsg-playlist` based on that `origin/main`. The
+  existing desktop XSPF remains in place; no media or appliance setting changed.
+- Committed the playlist work as `99d4576`, pushed the branch, and opened draft PR #17:
+  https://github.com/fishdan/ubuntu-media-project/pull/17. It remains draft pending owner
+  confirmation of VLC Next from the couch.
+
+## 2026-10-08 — Spec 017 T008 Deferred as Tech Debt
+
+- The owner does not have time for the unavailable-server reboot test now and explicitly asked to
+  record it as tech debt. T008 remains unchecked. The completed `nathan` reboot and T009 recovery
+  check do not prove that `orpheus` boots to the desktop with SSH while `nathan` is unavailable.
+- The task list now states the deferral and corrects its former claim that T008 must precede owner
+  acceptance; playback was already accepted before the boot test. The outstanding test is to make
+  `nathan` unavailable, reboot `orpheus`, and verify automatic login, SSH, and no share-induced
+  boot wait. T010 remains a separate open failure test.
+
+## 2026-10-08 — Spec 017 T009 Server Reboot Recovery
+
+- The owner rebooted `nathan`. Its new boot time is **17:30:19** on 2026-10-08; `nfs-server`
+  is active afterward. `orpheus` remained on its 2026-09-29 boot throughout.
+- The first ping at 17:30:44 found `nathan` back online, so the outage window was not observed
+  directly. The read-only NFS share was mounted after the reboot; `stat` of the miniseries file
+  and a 1 MiB read succeeded. No manual mount command or appliance reboot was performed.
+- This closes T009's post-return access check. T008 remains open because the appliance was not
+  rebooted while the server was unavailable. T010's mid-playback failure behavior remains open.
+
+## 2026-10-08 — Spec 017 T019 BSG VLC Playlist
+
+- The owner supplied the watch order and asked for one VLC playlist whose Next control advances
+  through the BSG library. Added T019 and an acceptance criterion to Spec 017 before implementing.
+- Added `scripts/build-bsg-playlist.py`, using only Python's standard library. It reads all MKV
+  files under `/media_remote/BattleStarGalactica`, orders narrative content as the owner specified,
+  and places The Lowdown and featurettes afterward. It writes an XSPF playlist atomically to
+  `~/Desktop/Battlestar Galactica.xspf` and leaves an identical file untouched on re-run.
+- Generated the desktop playlist with **172 unique tracks**. Parsed the XML, confirmed every URI
+  resolves to a readable file, and spot-checked each watch-order boundary. A second generator run
+  reported `Unchanged`; `gio` reports `application/xspf+xml` with `vlc.desktop` as default.
+  `python3 -m py_compile` and `git diff --check` passed. No live VLC playback test was run.
+- The owner reported "I did the reboot -- gtg." At the time of this session, `orpheus` still
+  reports its last boot as **2026-09-29 19:16:42**. SSH, display manager, and automount are active,
+  and the mount unit is static. This does not establish Spec 017 T008's required reboot with
+  `nathan` unreachable, so T008 remains open pending evidence or clarification.
+
 ## 2026-10-07 — Dock Favourites Reconciled to the Machine
 
 - Closed the drift found during Spec 017 T018. `scripts/configure-desktop-home.sh` declared five dock favourites while the live dock held three; `zuzz.desktop` and `firefox_firefox.desktop` had been removed by hand some time after Spec 015 and the script was never updated, so **the next `--apply` would have silently restored them**.

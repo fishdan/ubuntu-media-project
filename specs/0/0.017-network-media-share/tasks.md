@@ -4,9 +4,9 @@ Ordered per `plan.md`. **T002 blocks everything after it**: no mount may be conf
 server, export and local path are explicitly supplied, which is the constraint Spec 007 set and
 then never got to use.
 
-**T008 must precede owner acceptance.** The failure mode has to be proven from a shell before the
-owner is asked to rely on the share from the couch, or a dead server would be discovered as a
-failed boot in the living room.
+**T008 was planned before owner acceptance.** The owner accepted playback before this reboot
+test could be run and deferred it as tech debt on 2026-10-08. It remains open; the mount-unit
+dependency inspection is not a substitute for a boot test.
 
 ## Phase 1 — Baseline and inputs
 
@@ -36,8 +36,15 @@ failed boot in the living room.
 - [ ] T008 **With the server unreachable, reboot the appliance.** The desktop must still come up
   with automatic login and SSH must still be available. Record boot time and that no unit waited
   on the share. This is the constitutional requirement and the single most important check here.
-- [ ] T009 Confirm self-recovery: with the appliance still running, bring the server back and
+  **Deferred by owner 2026-10-08 as tech debt.** `nathan` was rebooted and T009 passed, but
+  `orpheus` was not rebooted. Do not mark T008 complete without the unavailable-server boot test.
+- [x] T009 Confirm self-recovery: with the appliance still running, bring the server back and
   confirm the folder works again on next access with **no manual command and no reboot**.
+  **Completed 2026-10-08:** `nathan` rebooted at 17:30:19 while `orpheus` stayed up.
+  The existing NFS share remained mounted and a post-reboot `stat` plus 1 MiB read from the
+  miniseries succeeded. No manual mount or appliance reboot was performed. The short outage
+  itself was missed by the first ping, so this proves post-reboot access rather than measuring
+  the exact failure interval.
 - [ ] T010 Confirm a server that disappears *mid-playback* surfaces an error the player can report
   rather than an unkillable process, and that the PS button still returns home afterwards. This is
   what the `soft` option was chosen for and it should be tested rather than assumed.
@@ -99,6 +106,17 @@ failed boot in the living room.
   `desktop-file-validate` passes with no warnings.
   **The dock favourite is appended, never set as a list**, so it cannot undo a favourite the owner
   removed by hand -- see the drift finding below.
+
+## Added 2026-10-08 after owner request
+
+- [x] T019 Create a desktop VLC playlist containing all BSG videos. Follow the owner's watch order:
+  miniseries, Seasons 1–2 through episode 17, Razor minisodes, Razor, the rest of Season 2,
+  Resistance, Season 3 and Season 4 through episode 11, Face of the Enemy, Season 4 episodes
+  12–15, The Plan, the rest of Season 4, and Blood & Chrome. Put The Lowdown and featurettes
+  afterward. Make generation repeatable when the library changes. Validate track count, file
+  paths, ordering, and VLC file association.
+  **Completed 2026-10-08:** 172 unique readable files in the XSPF playlist. A second run reported
+  unchanged; `gio` identifies the file as `application/xspf+xml` with `vlc.desktop` as default.
 
 ## Finding: tracked dock favourites no longer match the machine
 
@@ -170,9 +188,8 @@ seconds and then fails — a correction to what `plan.md` assumed.
   verified. **Not claimed.** The dependency structure was inspected instead and supports the
   design: `media_remote.mount` is `static` with nothing but the automount referencing it, and the
   automount's activation is server-independent. That is an argument, not evidence.
-- **T009 (self-recovery)** — partially shown. Access succeeded immediately once the stray firewall
-  rule was removed, with no manual mount command, which is the recovery path working. Not the
-  intended test of powering the server down and back up.
+- **T009 (self-recovery)** — the initial partial result below was superseded by the 2026-10-08
+  `nathan` reboot and successful post-reboot read documented beside the task above.
 - **T010 (server disappears mid-playback)** — not run; needs playback on the display.
 - **T011/T012 (owner acceptance)** — need the owner in the living room. A test clip,
   `_test-pattern-1080p.mp4`, is in place so playback and audio can be checked immediately.
