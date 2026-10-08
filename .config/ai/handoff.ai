@@ -23,10 +23,11 @@ this file is current state only.
   server unreachable, which could not be done from a remote session that would
   have ended before the result could be seen. The dependency structure was
   inspected and supports the design, but that is an argument, not evidence.
-- **T011/T012 ACCEPTED 2026-10-07** -- the owner played the test clip and it
-  "worked great", over wired Ethernet. But that was a 20 MB synthetic 1080p clip.
-  **No episode from the real 1080p x265 library has been played yet**, which is a
-  much heavier decode on a GTX 1060 with 3 GB VRAM. That is the next check.
+- **T011/T012 ACCEPTED 2026-10-07**, and since confirmed on the real library:
+  the owner has watched 1080p x265 episodes from the share and they play fine.
+  Measured 5.73 GB read over NFS, 21,875 READ ops, **zero timeouts and zero
+  retransmissions**. Sustained x265 playback is proven, not assumed -- the earlier
+  caveat about the GTX 1060 is closed.
 - ~~T011/T012 need the owner in the living room~~: browse the share in Files, then
   play a video full screen with audio through the projector and receiver. A test
   clip is already in place at `/media_remote/_test-pattern-1080p.mp4` (30s, 1080p,
