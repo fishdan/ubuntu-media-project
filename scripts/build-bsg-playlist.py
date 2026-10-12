@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 
 DEFAULT_SOURCE = Path("/media_remote/BattleStarGalactica")
-DEFAULT_OUTPUT = Path.home() / "Desktop" / "Battlestar Galactica.xspf"
+DEFAULT_OUTPUT = Path.home() / ".local/share/ubuntu-media-project/Battlestar Galactica.xspf"
 EPISODE = re.compile(r"S(\d{2})E(\d{2})", re.IGNORECASE)
 XSPF = "http://xspf.org/ns/0/"
 ET.register_namespace("", XSPF)
@@ -84,8 +84,7 @@ def main():
 
     if not args.source.is_dir():
         parser.error(f"Media folder is unavailable: {args.source}")
-    if not args.output.parent.is_dir():
-        parser.error(f"Output folder is unavailable: {args.output.parent}")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
 
     data, count = build_playlist(args.source)
     if args.output.exists() and args.output.read_bytes() == data:

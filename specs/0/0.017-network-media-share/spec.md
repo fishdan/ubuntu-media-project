@@ -1,7 +1,7 @@
 # Feature Specification: Network Media Share
 
-**Status:** specified, not started
-**Branch:** `feature/0.017-network-media-share`
+**Status:** implemented; T008 and T010 acceptance checks remain open
+**Original branch:** `feature/0.017-network-media-share`
 
 > **This reintroduces network media, which Spec 015 explicitly retired.** Spec 015 states that
 > "NFS and network media were never implemented and are not reintroduced," on the stated basis
@@ -71,6 +71,9 @@
    video on the mounted share. Narrative videos follow the owner's 2026-10-08 watch order,
    including the optional minisodes and webisodes; non-narrative featurettes follow at the end.
    Rebuilding the playlist after library changes is documented and idempotent.
+9. Reopening BSG from the desktop resumes the last episode at its saved playback position.
+   VLC's Next control continues through the watch order. Playback state is local to the
+   appliance and survives VLC exit and reboot; it is not written to the read-only share.
 
 ## Security consequence that must be recorded, not glossed
 
