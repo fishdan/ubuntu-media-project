@@ -21,6 +21,8 @@
   following track. Local state, playlist ordering, and completed-episode selection checks passed.
 - Couch-side acceptance of the new desktop launcher remains for the owner. T008's unavailable-
   server boot test remains deferred by the owner's 2026-10-08 decision; T010 remains open.
+- Committed as `128de61`, pushed `feature/0.017-bsg-resume`, and opened draft PR #18 pending
+  couch-side acceptance: https://github.com/fishdan/ubuntu-media-project/pull/18.
 
 ## 2026-10-08 — PRs #15 and #16 Merged; Playlist Work Moved to Its Own Branch
 

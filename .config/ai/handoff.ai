@@ -5,6 +5,8 @@
 - Current branch: `feature/0.017-bsg-resume` (check Git for live state). Spec 017 T020 is
   implemented: the desktop **Battlestar Galactica** shortcut opens VLC at the saved episode
   and position; a user service tracks BSG playback through MPRIS.
+- Draft PR #18 is open pending owner acceptance:
+  https://github.com/fishdan/ubuntu-media-project/pull/18.
 - Installed files: `~/.local/bin/ubuntu-media-project/bsg-resume`,
   `~/.config/systemd/user/bsg-playback-tracker.service`, desktop and application launchers,
   and the full XSPF under `~/.local/share/ubuntu-media-project/`. The tracker is active and
