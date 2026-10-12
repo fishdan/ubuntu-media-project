@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-12 — BSG resume accepted; PR #18 ready for review
+
+- On `feature/0.017-bsg-resume`, the owner confirmed from the couch that the desktop shortcut
+  resumes playback and VLC Next works. Spec 017 T020 is complete.
+- PR #18 can leave draft and proceed through review/merge:
+  https://github.com/fishdan/ubuntu-media-project/pull/18.
+- T008's unavailable-server appliance reboot remains deferred by owner decision. T010's
+  mid-playback server-loss test remains open.
+
 ## 2026-10-12 — BSG resume launcher installed; couch check pending
 
 - Current branch: `feature/0.017-bsg-resume` (check Git for live state). Spec 017 T020 is

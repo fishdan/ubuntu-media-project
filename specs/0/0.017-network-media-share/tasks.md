@@ -120,15 +120,15 @@ dependency inspection is not a substitute for a boot test.
 
 ## Added 2026-10-12 after owner request
 
-- [ ] T020 Save the current BSG episode and playback position locally, and provide a desktop
+- [x] T020 Save the current BSG episode and playback position locally, and provide a desktop
   launcher that resumes there with VLC Next advancing through the remaining watch order.
   Make the tracker and launcher reproducible, idempotent to install, and safe when the share is
   unavailable. Validate saved position, track changes, playlist order, and a live VLC resume.
   **Implemented 2026-10-12:** the tracker captured the currently open BSG episode and position;
   a separate VLC session verified a saved start time and automatic Next. An isolated MPRIS
   playback test verified pause position and transition to the following track. The desktop
-  launcher and user service are installed and active. Couch-side launcher acceptance remains
-  for the owner.
+  launcher and user service are installed and active. **Accepted from the couch 2026-10-12:**
+  the owner reported that the shortcut resumed playback and VLC Next worked.
 
 ## Finding: tracked dock favourites no longer match the machine
 

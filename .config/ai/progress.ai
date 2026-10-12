@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-10-12 — Spec 017 T020 Accepted From the Couch
+
+- The owner reported “it worked” in response to the requested projector check of both resume
+  and VLC Next. Marked T020 complete. The playlist now has owner acceptance for reopening at
+  the saved episode and position and advancing to the next episode.
+- Draft PR #18 is ready for review after this acceptance. T008 remains deferred by the owner's
+  2026-10-08 decision, and T010 remains open; neither is implied by the playlist check.
+
 ## 2026-10-12 — Spec 017 T020 BSG Playlist Resume Implemented
 
 - The owner asked for the desktop BSG playlist to reopen at the last episode and playback

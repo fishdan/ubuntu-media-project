@@ -1,6 +1,6 @@
 # Feature Specification: Network Media Share
 
-**Status:** implemented; T008, T010, and T020 acceptance checks remain open
+**Status:** implemented; T008 and T010 acceptance checks remain open
 **Original branch:** `feature/0.017-network-media-share`
 
 > **This reintroduces network media, which Spec 015 explicitly retired.** Spec 015 states that
