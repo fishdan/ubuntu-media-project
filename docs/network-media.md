@@ -15,12 +15,37 @@ Add media **on `nathan`**, in `/data/media`. The appliance can read but never wr
 
 ## BSG playlist
 
-Open **Battlestar Galactica.xspf** on the desktop. It opens in VLC; VLC's **Next** control
-advances to the next video. The playlist contains all 172 BSG MKV files currently on the share.
+Open **Battlestar Galactica** on the desktop. It opens VLC at the last BSG episode and saved
+playback position; VLC's **Next** control advances to the next video. The playlist contains all
+172 BSG MKV files currently on the share. The position is saved on the appliance about every
+10 seconds and when VLC is paused or closed. If VLC is already playing BSG, the shortcut brings
+that window forward.
 It follows the owner's watch order: miniseries; Seasons 1–2 through episode 17; Razor minisodes
 and Razor; the rest of Season 2; Resistance; Season 3 and Season 4 through episode 11; Face of
 the Enemy; Season 4 episodes 12–15; The Plan; the rest of Season 4; and Blood & Chrome.
 The Lowdown and the non-narrative featurettes follow at the end.
+
+The desktop shortcut and playback tracker are installed with:
+
+```bash
+bash scripts/install-bsg-resume.sh
+```
+
+The tracker is a systemd user service. Its state file is
+`~/.local/state/ubuntu-media-project/bsg-playback.json`. The full playlist lives at
+`~/.local/share/ubuntu-media-project/Battlestar Galactica.xspf`; the launcher creates a
+temporary playlist from the saved episode onward. Earlier episodes are still in the full
+playlist, but are omitted from that temporary VLC queue. To inspect or restart progress:
+
+```bash
+~/.local/bin/ubuntu-media-project/bsg-resume status
+~/.local/bin/ubuntu-media-project/bsg-resume reset
+```
+
+`reset` removes the saved point, so the next launch starts with the miniseries. Close VLC
+before resetting, since the running tracker will otherwise save the current episode again.
+The state file and temporary playlist are local; the NFS share remains read-only. If the
+saved video is removed during a library rebuild, the launcher starts from the first track.
 
 After adding or removing BSG videos, rebuild the desktop playlist on the appliance:
 
@@ -28,9 +53,9 @@ After adding or removing BSG videos, rebuild the desktop playlist on the applian
 python3 scripts/build-bsg-playlist.py
 ```
 
-The script reads the mounted share and updates the playlist only when its contents change. It
-does not write to the read-only share. The playlist uses absolute `/media_remote` paths, so it
-works from the desktop while the share is mounted and can trigger the automount when opened.
+The script reads the mounted share and updates the full playlist only when its contents change.
+It does not write to the read-only share. The playlist uses absolute `/media_remote` paths, so
+the desktop launcher can trigger the automount when opened.
 
 ## Install
 

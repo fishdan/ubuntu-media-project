@@ -1,5 +1,24 @@
 # Handoff
 
+## 2026-10-12 — BSG resume launcher installed; couch check pending
+
+- Current branch: `feature/0.017-bsg-resume` (check Git for live state). Spec 017 T020 is
+  implemented: the desktop **Battlestar Galactica** shortcut opens VLC at the saved episode
+  and position; a user service tracks BSG playback through MPRIS.
+- Installed files: `~/.local/bin/ubuntu-media-project/bsg-resume`,
+  `~/.config/systemd/user/bsg-playback-tracker.service`, desktop and application launchers,
+  and the full XSPF under `~/.local/share/ubuntu-media-project/`. The tracker is active and
+  captured the running S02E08 episode. The prior generated desktop XSPF was removed after
+  identical-content verification; its contents remain in the canonical XSPF.
+- Validation: isolated VLC start-time and Next, isolated MPRIS pause/track-switch test,
+  local state and order checks, syntax and unit checks. The owner's projector/controller
+  check of the new shortcut is still outstanding. Existing VLC playback was not interrupted.
+- Files modified: Spec 017 spec/plan/tasks, `scripts/build-bsg-playlist.py`,
+  `scripts/bsg-resume.py`, `scripts/install-bsg-resume.sh`, the user unit,
+  `docs/network-media.md`, progress and this handoff.
+- Next: owner closes VLC, opens the new desktop shortcut, and confirms it resumes near the
+  prior position and that Next advances. T008 remains deferred; T010 is still open.
+
 ## 2026-10-08 — BSG playlist branch; T008 deferred as tech debt
 
 - Current branch: `feature/0.017-bsg-playlist`, based on `origin/main` after PRs #15 and #16

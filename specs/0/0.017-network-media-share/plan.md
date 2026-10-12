@@ -72,3 +72,13 @@ attempted write that must fail — not a reading of the options.
 Everything in the specification's Out of Scope section, and in particular: this plan does not
 configure the server. If the owner wants the export created too, that is a separate decision and
 a separate task list, because it changes a machine this repository does not describe.
+
+## 2026-10-12 amendment: resume the BSG playlist
+
+The watch-order XSPF remains the canonical list, now stored under the user's local share
+directory. A systemd user service polls VLC's local MPRIS interface while a BSG track plays and
+saves its URI and position atomically under the user's local state directory. No media or state
+is written to NFS. The desktop launcher creates a temporary XSPF beginning at that URI, with
+VLC's per-track `start-time` option, then launches VLC. Later tracks stay in watch order for Next.
+Keeping the full source list separate lets a rebuild add files without erasing playback state.
+If a saved file disappears, the launcher safely begins at the first available track.

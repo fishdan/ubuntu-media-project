@@ -1,0 +1,11 @@
+[Unit]
+Description=Track Battlestar Galactica playback in VLC
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/ubuntu-media-project/bsg-resume watch
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

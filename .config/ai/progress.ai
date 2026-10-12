@@ -1,5 +1,27 @@
 # Progress Log
 
+## 2026-10-12 — Spec 017 T020 BSG Playlist Resume Implemented
+
+- The owner asked for the desktop BSG playlist to reopen at the last episode and playback
+  position. Added acceptance criterion 9 and T020 before implementation on
+  `feature/0.017-bsg-resume`.
+- Added `scripts/bsg-resume.py`: a VLC MPRIS tracker saves episode URI and seconds atomically to
+  `~/.local/state/ubuntu-media-project/bsg-playback.json`. The launcher builds a temporary XSPF
+  from the saved episode onward, with VLC's per-track `start-time`, so Next keeps the remaining
+  watch order. State stays on the appliance; the NFS share remains read-only.
+- Added an idempotent installer and systemd user unit. The canonical 172-track playlist moved
+  from the desktop to `~/.local/share/ubuntu-media-project/`; the generated desktop XSPF was
+  removed only after byte-for-byte comparison. The new desktop launcher is marked trusted.
+  The installer completed, the tracker is enabled and active, and the running VLC session was
+  left undisturbed. The tracker captured S02E08 at 20:28 (track 23 of 172).
+- Validation: Python compilation, Bash syntax, systemd unit verification, desktop-entry
+  validation, and `git diff --check` passed. An isolated VLC session proved `start-time=4`
+  resumed a track at about four seconds and then advanced to the next track without carrying
+  the offset forward. An isolated MPRIS playback test saved a paused position and then the
+  following track. Local state, playlist ordering, and completed-episode selection checks passed.
+- Couch-side acceptance of the new desktop launcher remains for the owner. T008's unavailable-
+  server boot test remains deferred by the owner's 2026-10-08 decision; T010 remains open.
+
 ## 2026-10-08 — PRs #15 and #16 Merged; Playlist Work Moved to Its Own Branch
 
 - Confirmed PR #15 (sustained x265 playback evidence) and PR #16 (dock favourites) merged into
