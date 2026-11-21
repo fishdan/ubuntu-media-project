@@ -3,7 +3,7 @@
 ## 2026-11-21 — Post-Reboot Check and Merged PR #18
 
 - The owner reported that the appliance rebooted and works well. The current `orpheus` boot began at 14:14:57 local time; SSH and GDM are active, a `seat0` desktop session is present, `media_remote.automount` is active, and `media_remote.mount` remains static. No share mount was requested during this boot according to the mount-unit journal. This confirms ordinary reboot health and preserves the remote recovery path.
-- Whether `nathan` was unreachable during that reboot has not been established, so Spec 017 T008 remains open under the owner's existing deferral. T010's mid-playback server-loss test also remains open.
+- The owner confirmed `nathan` was available during that reboot. Spec 017 T008 therefore remains open under the owner's existing deferral; the unavailable-server boot behavior was not tested. T010's mid-playback server-loss test also remains open.
 - GitHub PR #18 merged on 2026-10-12 as `f00279b`, already incorporating the accepted BSG resume feature. Local `main` was fast-forwarded to that commit before preparing the monthly audit record on a fresh documentation branch.
 
 ## 2026-11-21 — Monthly Vulnerability Audit
