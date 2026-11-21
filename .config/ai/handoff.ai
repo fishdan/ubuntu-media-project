@@ -1,5 +1,11 @@
 # Handoff
 
+## 2026-11-21 — BSG Resume Merged; Network Failure Tests Still Open
+
+- PR #18 merged into `main` on 2026-10-12. The BSG resume shortcut had already been accepted from the couch; Spec 017 T020 is complete.
+- The owner reports an ordinary appliance reboot works. On the 2026-11-21 boot, SSH, GDM, the desktop session, and the media automount are active; the mount unit is still static. The server-unreachable condition during boot has not been confirmed, so T008 remains deferred and unchecked. T010 remains open for a mid-playback server-loss test.
+- The monthly security audit is recorded in `progress.ai`: zero standard security updates and 21 Ubuntu Pro ESM-apps updates under the owner's existing decision to decline Pro.
+
 ## 2026-10-12 — BSG resume accepted; PR #18 ready for review
 
 - On `feature/0.017-bsg-resume`, the owner confirmed from the couch that the desktop shortcut
