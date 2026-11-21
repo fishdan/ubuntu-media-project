@@ -1,5 +1,19 @@
 # Progress Log
 
+## 2026-11-21 — Post-Reboot Check and Merged PR #18
+
+- The owner reported that the appliance rebooted and works well. The current `orpheus` boot began at 14:14:57 local time; SSH and GDM are active, a `seat0` desktop session is present, `media_remote.automount` is active, and `media_remote.mount` remains static. No share mount was requested during this boot according to the mount-unit journal. This confirms ordinary reboot health and preserves the remote recovery path.
+- The owner confirmed `nathan` was available during that reboot. Spec 017 T008 therefore remains open under the owner's existing deferral; the unavailable-server boot behavior was not tested. T010's mid-playback server-loss test also remains open.
+- GitHub PR #18 merged on 2026-10-12 as `f00279b`, already incorporating the accepted BSG resume feature. Local `main` was fast-forwarded to that commit before preparing the monthly audit record on a fresh documentation branch.
+
+## 2026-11-21 — Monthly Vulnerability Audit
+
+- Ran the overdue monthly audit on `orpheus` after `sudo -n apt-get update` refreshed Ubuntu and vendor package indexes. The stack remains Ubuntu 26.04 APT packages, Bash scripts, two Python scripts (including the APT-managed `python3-dbus` dependency), systemd units, and desktop launchers; there is no application dependency manifest for npm, Java, or another package-manager scanner.
+- `pro security-status --format json` reports **zero standard Ubuntu security updates**, zero ESM-infra updates, and **21 ESM-apps updates** with Ubuntu Pro unattached. The October audit reported 20; `gstreamer1.0-plugins-ugly` is the additional pending package. Media opened through VLC/Kodi or browsed in Files can enter the affected system decoder path, as recorded in the October audit amendment. The owner's decision not to use Ubuntu Pro remains in force, so these ESM-only fixes cannot be applied through the authorized package channels.
+- `apt list --upgradable` shows three packages from `resolute-updates`: `fwupd`, `libfwupd3`, and `ubuntu-drivers-common`. None is reported as an outstanding standard security update by `pro security-status`. No package, firmware, driver, or appliance configuration was changed in this audit; there is no newly available standard-channel critical/high security fix to apply. `unattended-upgrades` remains enabled and active, and SSH is active.
+- A tracked-file scan found zero private-key headers, credential assignments, or MAC-address-shaped strings. `git diff --check` passed. Commands: `sudo -n apt-get update`, `pro security-status --format json`, `apt list --upgradable`, `apt-cache policy fwupd libfwupd3 ubuntu-drivers-common`, `systemctl is-enabled/is-active unattended-upgrades`, `systemctl is-active ssh`, tracked-file pattern scan, and `git diff --check`.
+- Next monthly audit due by **2026-12-21**. Recheck standard security coverage and ESM-apps count; reconsider the accepted Pro decision only if the owner changes it or the media source trust boundary changes.
+
 ## 2026-10-12 — Spec 017 T020 Accepted From the Couch
 
 - The owner reported “it worked” in response to the requested projector check of both resume
