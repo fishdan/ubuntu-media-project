@@ -27,8 +27,19 @@ readonly repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 readonly bin_dir="$HOME/.local/bin"
 readonly unit_dir="$HOME/.config/systemd/user"
 readonly app_dir="$HOME/.local/share/applications"
+readonly desktop_dir="$HOME/Desktop"
 
 deploy_launcher() {
+    [[ -d $desktop_dir ]] || { printf 'Missing GNOME Desktop directory: %s\n' "$desktop_dir" >&2; exit 1; }
+    local desktop_target="$desktop_dir/steam-bigpicture.desktop"
+    if [[ -L $desktop_target || ( -e $desktop_target && ! -f $desktop_target ) ]]; then
+        printf 'Refusing to replace non-regular desktop shortcut: %s\n' "$desktop_target" >&2
+        exit 1
+    fi
+    if [[ -f $desktop_target ]] && ! cmp -s "$repo/config/applications/steam-bigpicture.desktop" "$desktop_target"; then
+        printf 'Refusing to replace modified desktop shortcut: %s\n' "$desktop_target" >&2
+        exit 1
+    fi
     install -d -m 0755 "$bin_dir" "$unit_dir" "$app_dir"
     local target="$bin_dir/launch-steam"
     if [[ -e $target && ! -L $target ]]; then
@@ -38,8 +49,14 @@ deploy_launcher() {
     ln -sfn -- "$repo/scripts/launch-steam.sh" "$target"
     install -m 0644 "$repo/config/systemd/user/steam-bigpicture.service" "$unit_dir/steam-bigpicture.service"
     install -m 0644 "$repo/config/applications/steam-bigpicture.desktop" "$app_dir/steam-bigpicture.desktop"
+    if [[ ! -f $desktop_target ]]; then
+        install -m 0755 "$repo/config/applications/steam-bigpicture.desktop" "$desktop_target"
+    else
+        chmod 0755 "$desktop_target"
+    fi
+    gio set "$desktop_target" metadata::trusted true
     systemctl --user daemon-reload
-    printf '%s\n' 'Deployed launch-steam, steam-bigpicture.service and its desktop entry.'
+    printf '%s\n' 'Deployed launch-steam, steam-bigpicture.service, app entry and trusted desktop shortcut.'
 }
 
 if dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'ok installed'; then

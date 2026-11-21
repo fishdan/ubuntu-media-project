@@ -29,6 +29,7 @@ Recorded before planning, so the specification reflects the real machine:
 - Steam is installed from the Ubuntu repository through an idempotent, tracked script. No third-party APT source is added. The `i386` architecture requirement is applied reproducibly and recorded.
 - It is recorded honestly that the Ubuntu package is a bootstrap: the Steam client it installs updates itself from Valve at runtime, so the software actually executing is not wholly Ubuntu-managed. The security implication is stated rather than implied.
 - Steam launches from the desktop into Big Picture without a keyboard or mouse, using a tracked launcher and desktop entry.
+- The Steam Big Picture shortcut is visible as a trusted icon on the GNOME desktop as well as in the dock, and the installer restores it on a repeat run.
 - **DualSense media mode is turned off automatically when Steam launches, and restored when Steam exits.** Requiring the owner to remember a manual step from the couch is not acceptable.
 - Steam Input sees the DualSense as a native gamepad, with no duplicate or phantom input from input-remapper.
 - The PS button returns to the desktop from Steam, via a reworked `return-home.sh` that closes transient application scopes rather than only fixed units. This must not regress the existing browser behaviour.

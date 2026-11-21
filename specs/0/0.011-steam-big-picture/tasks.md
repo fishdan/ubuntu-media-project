@@ -115,3 +115,8 @@ regression there would be discovered from the couch rather than from a shell.
 - Proton or anti-cheat troubleshooting for specific titles.
 - Steam Link, remote play, or streaming from another machine.
 - GPU tuning of any kind.
+
+## Added 2026-11-21 after owner request
+
+- [x] T018 Deploy the existing tracked Steam Big Picture launcher to `~/Desktop` through the idempotent Steam installer. Mark it executable and trusted, and refuse to overwrite a locally modified desktop shortcut. Validate the installed file and trust state without interrupting the running desktop. Completed 2026-11-21: two installer runs succeeded without reinstalling Steam; the desktop entry matches the tracked source, is mode 755, passes `desktop-file-validate`, and has `metadata::trusted: true`.
+- [x] T019 Owner opens the desktop icon from the couch and confirms Steam reaches Big Picture with the DualSense controller. Accepted 2026-11-21: the owner reported “Yes, it works” after the controller reconnected; `steam-bigpicture.service` was active and the privacy-safe controller report showed native joystick input.

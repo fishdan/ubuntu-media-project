@@ -60,3 +60,7 @@ Enabling `i386` also widens the installed surface with a parallel 32-bit library
 ## Out of scope
 
 As stated in `spec.md`: a large game library, Proton or anti-cheat troubleshooting, Steam Link and remote play, GPU tuning, and Steam Input profile design.
+
+## 2026-11-21 amendment: desktop shortcut
+
+The owner requested the Steam shortcut on the visible desktop. Deploy the existing tracked Big Picture desktop entry to `~/Desktop` from `install-steam.sh`, make it executable, and mark it trusted in GNOME. Preserve a locally modified shortcut rather than overwrite it. Validate the deployed entry and trust flag; the owner confirms it opens Big Picture from the couch.

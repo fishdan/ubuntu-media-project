@@ -77,6 +77,15 @@ to 60 seconds for the controller to finish connecting over Bluetooth and exiting
 cleanly if it never appears. The browser no longer turns the mode on or off; if
 it did, closing the browser would leave the desktop with no pointer.
 
+For an already paired controller, press **PS once** to wake and reconnect it.
+If it was still asleep when the 60-second login wait ended, connect it and run
+`scripts/dualsense-media-mode.sh on` over SSH if the pointer does not respond.
+Check with `scripts/dualsense-media-mode.sh status`; its disconnected message
+contains the controller's private Bluetooth address, so do not copy that output
+into Git or a public issue. If the controller was paired with a PS5 again, hold
+**Create + PS** until its light flashes rapidly and pair it again in Ubuntu's
+Bluetooth settings. A USB cable can provide temporary input and charge it.
+
 Turn it off before launching Steam so Steam Input receives the native controller
 alone. That remains Spec 011's checkpoint.
 
