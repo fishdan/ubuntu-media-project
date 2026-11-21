@@ -7,6 +7,7 @@
 - Ran the installer twice on `orpheus`; both runs used the already-installed `steam-installer` and did not reinstall packages. The desktop entry matches the tracked source, has mode 755 and `metadata::trusted: true`, and passes `desktop-file-validate`. `bash -n` and `git diff --check` passed. The live Steam session was not started or interrupted.
 - Privacy-safe controller report found one paired DualSense but no connected controller, joystick node, or loaded `hid_playstation` module. The login pointer service is enabled and finished its 60-second wait after the 2026-11-21 reboot with no controller present; the input-remapper system daemon is active. T019 remains for owner acceptance from the couch after pressing PS to reconnect, and media mode may need `scripts/dualsense-media-mode.sh on` if no pointer appears.
 - Committed as `dc06831`, pushed `feature/0.011-steam-desktop-shortcut`, and opened draft PR #20 pending T019 couch acceptance: https://github.com/fishdan/ubuntu-media-project/pull/20.
+- **T019 accepted from the couch.** The owner confirmed the new desktop icon opens Steam Big Picture with the DualSense. The controller had reconnected, `dualsense-media-mode.sh status` reported live desktop injection before launch, the privacy-safe controller report showed the DualSense joystick, and `steam-bigpicture.service` was active after launch. Steam was left running for the owner. PR #20 is ready for review and merge.
 
 ## 2026-11-21 — Post-Reboot Check and Merged PR #18
 
