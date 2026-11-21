@@ -1,5 +1,11 @@
 # Handoff
 
+## 2026-11-21 — Steam Desktop Shortcut Deployed; Couch Check Pending
+
+- On `feature/0.011-steam-desktop-shortcut`, Spec 011 T018 is implemented and deployed. `~/Desktop/steam-bigpicture.desktop` matches the tracked launcher, is executable and GNOME-trusted, and validates. The Steam installer reran twice without package changes.
+- The DualSense is paired but disconnected. Press PS once to reconnect; if the desktop pointer does not respond after this boot's login wait expired, run `scripts/dualsense-media-mode.sh on` over SSH. The user service and input-remapper daemon are present.
+- T019 is open: the owner should click the desktop Steam Big Picture icon from the couch and confirm it opens Big Picture with the controller. Do not claim that acceptance from file-level checks alone.
+
 ## 2026-11-21 — BSG Resume Merged; Network Failure Tests Still Open
 
 - PR #18 merged into `main` on 2026-10-12. The BSG resume shortcut had already been accepted from the couch; Spec 017 T020 is complete.

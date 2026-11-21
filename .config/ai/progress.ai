@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-11-21 — Spec 011 Steam Desktop Shortcut Restored
+
+- The owner requested a visible Steam shortcut and a reminder of DualSense activation. Steam remained installed, the tracked app launcher matched its installed copy, and no Steam icon existed under `~/Desktop`.
+- Added Spec 011 acceptance and T018/T019. Updated `scripts/install-steam.sh` to deploy the tracked Big Picture entry to the desktop, preserve any locally modified shortcut, make it executable, and set GNOME's trusted flag. Documented the desktop launch and the already-paired controller wake/recovery steps.
+- Ran the installer twice on `orpheus`; both runs used the already-installed `steam-installer` and did not reinstall packages. The desktop entry matches the tracked source, has mode 755 and `metadata::trusted: true`, and passes `desktop-file-validate`. `bash -n` and `git diff --check` passed. The live Steam session was not started or interrupted.
+- Privacy-safe controller report found one paired DualSense but no connected controller, joystick node, or loaded `hid_playstation` module. The login pointer service is enabled and finished its 60-second wait after the 2026-11-21 reboot with no controller present; the input-remapper system daemon is active. T019 remains for owner acceptance from the couch after pressing PS to reconnect, and media mode may need `scripts/dualsense-media-mode.sh on` if no pointer appears.
+
 ## 2026-11-21 — Post-Reboot Check and Merged PR #18
 
 - The owner reported that the appliance rebooted and works well. The current `orpheus` boot began at 14:14:57 local time; SSH and GDM are active, a `seat0` desktop session is present, `media_remote.automount` is active, and `media_remote.mount` remains static. No share mount was requested during this boot according to the mount-unit journal. This confirms ordinary reboot health and preserves the remote recovery path.

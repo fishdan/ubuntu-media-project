@@ -12,7 +12,9 @@ scripts/install-steam.sh
 ```
 
 Idempotent. It enables the `i386` architecture, installs `steam-installer` from
-Ubuntu `multiverse`, and deploys the launcher, systemd unit and desktop entry.
+Ubuntu `multiverse`, and deploys the launcher, systemd unit, application entry,
+and trusted **Steam Big Picture** icon on the GNOME desktop. Running it again
+restores a missing desktop icon without reinstalling Steam.
 No third-party APT source is added.
 
 Two things a tidy installer can hide, so they are stated plainly:
@@ -79,7 +81,7 @@ launching or leave the unit failed.
 
 ## Launching and returning
 
-Launch **Steam Big Picture** from the dock, or:
+Launch **Steam Big Picture** from the desktop icon or dock, or:
 
 ```bash
 systemctl --user start steam-bigpicture.service
